@@ -72,7 +72,11 @@ namespace System.ListExt
 
 		public object ToType(Type conversionType, IFormatProvider provider)
 		{
-			if (typeof(Dictionary).IsAssignableFrom(conversionType))
+            if (conversionType.IsAssignableFrom(this.GetType()))
+            {
+				return this;
+            }
+			else if (typeof(Dictionary).IsAssignableFrom(conversionType))
 			{
 				var con = conversionType.GetConstructor(new Type[] { typeof(IConvableDictionary) });
 				var obj = con.Invoke(new object[] { this });//.CreateInstance(conversionType.Name, false, Reflection.BindingFlags.CreateInstance, null, new object[] { this }, null, null);

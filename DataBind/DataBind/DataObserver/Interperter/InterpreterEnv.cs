@@ -5,7 +5,6 @@ using System.Linq;
 namespace vm
 {
 	using TEnv = Dictionary<string, object>;
-	using TEnvExt = ProtoDict<string, object>;
 	using number = System.Double;
 
 	public class InterpreterEnv
@@ -47,10 +46,10 @@ namespace vm
 		public static TEnv environment = new TEnv();
 		public static TEnv extendsEnvironment(TEnv ext)
 		{
-			if (ext is TEnvExt)
+			if (ext is IWithPrototype)
 			{
-				var ext1 = ext as TEnvExt;
-				ext1.Proto = environment;
+				var ext1 = ext as IWithPrototype;
+				ext1.SetProto(environment);
 				ext1._ = environment;
 			}
 			else
@@ -67,10 +66,10 @@ namespace vm
 		{
 			foreach (var kv in environment)
 			{
-                if (kv.Key == "__ob__")
-                {
+				if (kv.Key == "__ob__")
+				{
 					continue;
-                }
+				}
 				b[kv.Key] = kv.Value;
 			}
 			return b;

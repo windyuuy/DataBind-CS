@@ -8,20 +8,13 @@ namespace vm
 	using boolean = System.Boolean;
 	using number = System.Double;
 
+	// TODO: 避免原型链死循环
 	public partial class Utils
 	{
 		/**
 		* 讲使用.分隔的路径访问转换为函数。
 		* @param path 
 		*/
-
-		/**
-		 * 向目标对象实现所有基础属性
-		 */
-		public object implementEnvironment(object obj)
-		{
-			return obj;
-		}
 
 		public static bool IsTrue(object obj)
 		{
@@ -74,21 +67,17 @@ namespace vm
 			{
 				return func;
 			}
-#if false
+#if true
 			{
 				//复杂表达式
 				var i = new Interpreter(path);
 
 				func = (object self, object env) =>
 				{
-					var env1 = (Dictionary<string, object>)env;
-					if (env != null && env1 == null)
-					{
-						throw new Exception("env conversion failed");
-					}
+					var env1 = (IWithPrototype)env;
 					return i.run(env1);
 				};
-            }
+			}
 #else
 			{
 				var segments = path.Split('.');
@@ -119,7 +108,48 @@ namespace vm
 			var ret = IndexValue(a, key);
 			return (T)ret;
 		}
+		public static T IndexValue<T>(object a, object key, out bool exist)
+		{
+			var ret = IndexValue(a, key, out exist);
+			return (T)ret;
+		}
 		public static object IndexValue(object a, object key)
+		{
+			bool exist;
+			return IndexValue(a, key, out exist);
+		}
+		public static object IndexValueRecursive(object a, object key)
+		{
+			bool exist;
+			return IndexValueRecursive(a, key, out exist);
+		}
+		public static object IndexValueRecursive(object a, object key, out bool exist)
+		{
+			var value = IndexValue(a, key, out exist);
+			if (exist)
+			{
+				return value;
+			}
+			if (a is IWithPrototype)
+			{
+				var pa = a as IWithPrototype;
+				var proto = pa.GetProto();
+				if (proto != null)
+				{
+					var valueP = IndexValueRecursive(proto, key, out exist);
+					if (exist)
+					{
+						return valueP;
+					}
+				}
+				return null;
+			}
+			else
+			{
+				return null;
+			}
+		}
+		public static object IndexValue(object a, object key, out bool exist)
 		{
 			if (a == null)
 			{
@@ -127,6 +157,8 @@ namespace vm
 			}
 			else
 			{
+				exist = true;
+
 				string skey;
 				if (key is string)
 				{
@@ -191,8 +223,24 @@ namespace vm
 					}
 					if (m == null)
 					{
-						var mget = type.GetMethod("get_Item", new Type[] { typeof(string) });
-						if (mget == null)
+						// 尝试从索引中获取
+						var mget = type.GetMethod("get_Item", new Type[] { key.GetType() });
+						if (mget != null)
+						{
+							var hasKey = true;
+							var mhas = type.GetMethod("ContainsKey", new Type[] { key.GetType() });
+							if (mhas != null)
+							{
+								hasKey = (bool)mhas.Invoke(a, new object[] { key });
+							}
+							if (hasKey)
+							{
+								var v = mget.Invoke(a, new object[] { key });
+								return v;
+							}
+						}
+
+						// try extend method
 						{
 							foreach (var method in GetExtensionMethods(Assembly.GetExecutingAssembly(), type))
 							{
@@ -204,30 +252,13 @@ namespace vm
 							}
 							if (m == null)
 							{
+								exist = false;
 								return null;
 							}
 							else
 							{
 								return m;
 							}
-						}
-						else
-						{
-							var hasKey = true;
-							var mhas = type.GetMethod("ContainsKey", new Type[] { typeof(string) });
-							if (mhas != null)
-							{
-								hasKey = (bool)mhas.Invoke(a, new object[] { skey });
-							}
-                            if (hasKey)
-                            {
-								var v = mget.Invoke(a, new object[] { skey });
-								return v;
-                            }
-                            else
-                            {
-								return null;
-                            }
 						}
 					}
 					else
@@ -309,7 +340,41 @@ namespace vm
 
 			return false;
 		}
-		public static object IndexMethod(object a, object key, Type[] types)
+		public static object IndexMethodRecursive(object a, object key, Type[] types)
+		{
+			bool exist;
+			return IndexMethodRecursive(a, key, types, out exist);
+		}
+		public static object IndexMethodRecursive(object a, object key, Type[] types, out bool exist)
+		{
+			var v = IndexMethod(a, key, types, out exist);
+			if (exist)
+			{
+				return v;
+			}
+			else
+			{
+				if (a is IWithPrototype)
+				{
+					var pa = a as IWithPrototype;
+					var proto = pa.GetProto();
+					if (proto != null)
+					{
+						var v2 = IndexMethodRecursive(proto, key, types, out exist);
+						if (exist)
+						{
+							return v2;
+						}
+					}
+					return null;
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
+		public static object IndexMethod(object a, object key, Type[] types, out bool exist)
 		{
 			if (a == null)
 			{
@@ -317,6 +382,8 @@ namespace vm
 			}
 			else
 			{
+				exist = true;
+
 				string skey;
 				if (key is string)
 				{
@@ -365,8 +432,23 @@ namespace vm
 					else
 					{
 						// 尝试从索引中获取
-						var mget = type.GetMethod("get_Item", new Type[] { typeof(string) });
-						if (mget == null)
+						var mget = type.GetMethod("get_Item", new Type[] { key.GetType() });
+						if (mget != null)
+						{
+							var hasKey = true;
+							var mhas = type.GetMethod("ContainsKey", new Type[] { key.GetType() });
+							if (mhas != null)
+							{
+								hasKey = (bool)mhas.Invoke(a, new object[] { key });
+							}
+							if (hasKey)
+							{
+								var v = mget.Invoke(a, new object[] { key });
+								return v;
+							}
+						}
+
+						// try extend method
 						{
 							if (matchedMethodInfo == null)
 							{
@@ -397,14 +479,9 @@ namespace vm
 							}
 							else
 							{
+								exist = false;
 								return null;
 							}
-						}
-						else
-						{
-							var v = mget.Invoke(a, new object[] { skey });
-							var mv = v;
-							return mv;
 						}
 					}
 				}
@@ -431,7 +508,7 @@ namespace vm
 		{
 			if (func is MethodInfo)
 			{
-				return InvokeMethod((MethodInfo)func, obj, paramList0);
+				return InvokeMethodRaw((MethodInfo)func, obj, paramList0);
 			}
 			else
 			{
@@ -448,7 +525,7 @@ namespace vm
 				}
 			}
 		}
-		public static object InvokeMethod(System.Reflection.MethodInfo func, object obj, List<object> paramList0)
+		public static object InvokeMethodRaw(System.Reflection.MethodInfo func, object obj, List<object> paramList0)
 		{
 			if (paramList0 == null)
 			{
@@ -505,8 +582,17 @@ namespace vm
 
 		public static F ConvItem<F>(object value)
 		{
+			if(value == null)
+            {
+				return default(F);
+            }
+
 			var v = value;
 			if (v is F)
+			{
+				return (F)v;
+			}
+			else if (typeof(F).IsAssignableFrom(v.GetType()))
 			{
 				return (F)v;
 			}
@@ -520,7 +606,8 @@ namespace vm
 				}
 				else
 				{
-					return (F)v;
+					// return (F)v;
+					return (F)Convert.ChangeType(v, typeof(F));
 				}
 			}
 		}

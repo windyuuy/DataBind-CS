@@ -3,22 +3,29 @@ using System.ListExt;
 
 namespace vm
 {
-	public partial class ProtoDict<TKey, TValue> : Dictionary<TKey, TValue>
+	public partial class ProtoDict<K, V> : Dictionary<K, V>, IWithPrototype
 	{
-		public System.Collections.Generic.IDictionary<TKey, TValue> Proto;
-		public virtual object _ { get; set; }
-
 		public ProtoDict() : base()
 		{
 		}
 
 		public ProtoDict(IConvableDictionary dict)
 		{
-			this.dict = (System.Collections.Generic.IDictionary<TKey, object>)dict.RawDict;
+			this.dict = (System.Collections.Generic.IDictionary<K, object>)dict.RawDict;
 		}
 
+		protected virtual V getProtoValue(K key, out bool exist)
+		{
+			return Utils.IndexValue<V>(Proto, key, out exist);
+		}
 
-		public virtual new TValue this[TKey key]
+		protected virtual V getProtoValue(K key)
+		{
+			bool exist;
+			return Utils.IndexValue<V>(Proto, key, out exist);
+		}
+
+		public virtual new V this[K key]
 		{
 			get
 			{
@@ -30,7 +37,7 @@ namespace vm
 				{
 					if (this.Proto != null)
 					{
-						var v = this.Proto[key];
+						var v = getProtoValue(key);
 						return v;
 					}
 					else
@@ -45,20 +52,23 @@ namespace vm
 			}
 		}
 
-		public override TValue TryGet(TKey k)
+		public override V TryGet(K k)
 		{
 			if (dict.ContainsKey(k))
 			{
 				return GetValue(k);
 			}
-			else if (Proto.ContainsKey(k))
+			bool exist;
+			var value = getProtoValue(k, out exist);
+			if (exist)
 			{
-				return Proto[k];
+				return value;
 			}
 			else
 			{
-				return default(TValue);
+				return default(V);
 			}
 		}
+
 	}
 }

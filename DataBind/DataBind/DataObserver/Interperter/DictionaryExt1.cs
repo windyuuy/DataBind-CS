@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using vm;
 
@@ -14,6 +13,7 @@ namespace System.ListExt
 	public partial class Dictionary<K, V> : Dictionary, System.Collections.Generic.IDictionary<K, V>, IConvableDictionary
 	{
 		protected System.Collections.Generic.IDictionary<K, object> dict;
+
 		public override object RawDict => dict;
 
 		public Dictionary(System.Collections.Generic.IDictionary<K, object> dict)
@@ -32,15 +32,30 @@ namespace System.ListExt
 		}
 
 		public V GetValue(K key)
-        {
+		{
 			return Utils.ConvItem<V>(dict[key]);
+		}
+
+		public virtual V this[K key]
+        {
+            get
+            {
+                var value=Utils.ConvItem<V>(dict[key]);
+				this.NotifyPropertyGot(value, Utils.ToIndexKey(key));
+				return value;
+            }
+            set
+            {
+				object v0;
+				dict.TryGetValue(key, out v0);
+                dict[key] = value;
+				this.NotifyPropertyChanged(value, v0, Utils.ToIndexKey(key));
+            }
         }
 
-		public virtual V this[K key] { get => Utils.ConvItem<V>(dict[key]); set => dict[key] = value; }
+        public new virtual System.Collections.Generic.ICollection<K> Keys => dict.Keys;
 
-		public new virtual ICollection<K> Keys => dict.Keys;
-
-		public new virtual ICollection<V> Values => new System.ListExt.List<V>(dict.Values);
+		public new virtual System.Collections.Generic.ICollection<V> Values => new System.ListExt.List<V>(dict.Values);
 
 		public override int Count => dict.Count;
 
@@ -49,19 +64,22 @@ namespace System.ListExt
 		public virtual void Add(K key, V value)
 		{
 			dict.Add(key, value);
+			NotifyAddRelation(value);
 		}
 
-		public virtual void Add(KeyValuePair<K, V> item)
+		public virtual void Add(System.Collections.Generic.KeyValuePair<K, V> item)
 		{
 			dict.Add(item.Key, item.Value);
+			NotifyAddRelation(item.Value);
 		}
 
 		public override void Clear()
 		{
 			dict.Clear();
+			NotifyChangedRelation();
 		}
 
-		public virtual bool Contains(KeyValuePair<K, V> item0)
+		public virtual bool Contains(System.Collections.Generic.KeyValuePair<K, V> item0)
 		{
 			return dict.ContainsKey(item0.Key) && Object.ReferenceEquals(item0.Value, dict[item0.Key]);
 		}
@@ -71,7 +89,7 @@ namespace System.ListExt
 			return dict.ContainsKey(key);
 		}
 
-		public virtual void CopyTo(KeyValuePair<K, V>[] array, int arrayIndex)
+		public virtual void CopyTo(System.Collections.Generic.KeyValuePair<K, V>[] array, int arrayIndex)
 		{
 			// dict.CopyTo(array, arrayIndex);
 			var i = 0;
@@ -81,12 +99,12 @@ namespace System.ListExt
 				{
 					break;
 				}
-				array[i] = new KeyValuePair<K, V>(kv.Key, Utils.ConvItem<V>(kv.Value));
+				array[i] = new System.Collections.Generic.KeyValuePair<K, V>(kv.Key, Utils.ConvItem<V>(kv.Value));
 				i++;
 			}
 		}
 
-		public new virtual IEnumerator<KeyValuePair<K, V>> GetEnumerator()
+		public new virtual System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<K, V>> GetEnumerator()
 		{
 			// TODO: 优化性能
 			// return dict.GetEnumerator();
@@ -100,15 +118,18 @@ namespace System.ListExt
 
 		public virtual bool Remove(K key)
 		{
-			return dict.Remove(key);
+			var ret = dict.Remove(key);
+			this.NotifyChangedRelation();
+			return ret;
 		}
 
-		public virtual bool Remove(KeyValuePair<K, V> item)
+		public virtual bool Remove(System.Collections.Generic.KeyValuePair<K, V> item)
 		{
 			if (this.Contains(item))
 			{
 				return dict.Remove(item.Key);
 			}
+			this.NotifyChangedRelation();
 			return false;
 		}
 
@@ -132,5 +153,5 @@ namespace System.ListExt
 			return dict.GetEnumerator();
 		}
 
-	}
+    }
 }

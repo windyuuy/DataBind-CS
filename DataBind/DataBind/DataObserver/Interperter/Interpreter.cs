@@ -35,7 +35,6 @@ namespace vm
 
 	using ENodeType = System.Double;
 	using TEnv = Dictionary<string, object>;
-	using TEnvExt = ProtoDict<string, object>;
 
 	public class TNodeType
 	{
@@ -1055,8 +1054,8 @@ namespace vm
          * @param environment 
          * @param ast 
          */
-		static object srun(TEnv environment, ASTNode ast0)
-		 {
+		static object srun(IWithPrototype environment, ASTNode ast0)
+		{
 			object ast1 = ast0;
 			if (ast1 is ValueASTNode)
 			{
@@ -1069,7 +1068,7 @@ namespace vm
 					}
 					else
 					{
-						var v = Utils.IndexValue(environment, Utils.ToIndexKey(ast.value.value));
+						var v = Utils.IndexValueRecursive(environment, Utils.ToIndexKey(ast.value.value));
 						return v;
 					}
 				}
@@ -1109,11 +1108,11 @@ namespace vm
 					}
 					if (ast.right is ValueASTNode)
 					{
-						return Utils.IndexValue(a, (ast.right as ValueASTNode).value.value);
+						return Utils.IndexValueRecursive(a, (ast.right as ValueASTNode).value.value);
 					}
 					else
 					{
-						return Utils.IndexValue(a, Interpreter.srun(environment, ast.right));
+						return Utils.IndexValueRecursive(a, Interpreter.srun(environment, ast.right));
 					}
 				}
 
@@ -1211,17 +1210,16 @@ namespace vm
 					{
 						Func<object, object> f = (object a) =>
 						{
-							TEnvExt newEv;
-							if (a.IsDict())
+							IWithPrototype newEv;
+							if (a.IsWithProto())
 							{
-								newEv = (TEnvExt)Convert.ChangeType(a, typeof(TEnvExt));
+								newEv = (IWithPrototype)Convert.ChangeType(a, typeof(IWithPrototype));
 							}
 							else
 							{
-								newEv = new TEnvExt() { { "value", a } };
+								newEv = new TEnv() { { "value", a } };
 							}
-							newEv.Proto = environment;
-							newEv._ = environment;
+							newEv.SetProto(environment);
 
 							return Interpreter.srun(newEv, (p as BracketASTNode).node);
 						};
@@ -1237,7 +1235,7 @@ namespace vm
 				{
 					var ret = (ast.left as ValueASTNode).value.value;
 					//全局函数
-					func = Utils.IndexMethod(environment, ret, Utils.ExtractValuesTypes(paramList));
+					func = Utils.IndexMethodRecursive(environment, ret, Utils.ExtractValuesTypes(paramList));
 				}
 				else if (ast.left is BinaryASTNode)
 				{
@@ -1250,12 +1248,12 @@ namespace vm
 					if ((ast.left as BinaryASTNode).right is ValueASTNode)
 					{
 						var ret = ((ast.left as BinaryASTNode).right as ValueASTNode).value.value;
-						func = Utils.IndexMethod(self, ret, Utils.ExtractValuesTypes(paramList));
+						func = Utils.IndexMethodRecursive(self, ret, Utils.ExtractValuesTypes(paramList));
 					}
 					else
 					{
 						var ret = Interpreter.srun(environment, (ast.left as BinaryASTNode).right);
-						func = Utils.IndexMethod(self, ret, Utils.ExtractValuesTypes(paramList));
+						func = Utils.IndexMethodRecursive(self, ret, Utils.ExtractValuesTypes(paramList));
 					}
 				}
 				if (func == null)
@@ -1276,7 +1274,7 @@ namespace vm
 			return null;
 		}
 
-		public object run(Dictionary<string, object> environment)
+		public object run(IWithPrototype environment)
 		{
 			return Interpreter.srun(environment, this.ast);
 		}

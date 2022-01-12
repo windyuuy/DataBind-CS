@@ -20,7 +20,7 @@ namespace vm
 		/**
          * 宿主
          */
-		public IHost host;
+		public IHostAccessor host;
 
 
 		public number id;
@@ -70,7 +70,7 @@ namespace vm
 		public CombineType<object, string, number, boolean> loseValue;
 
 		public Watcher(
-			IHost host,
+			IHostAccessor host,
 			CombineType<object, string, Func<object, object, object>> expOrFn,
 			Action<object, object, object> cb,
 			WatchOptions options
@@ -147,7 +147,7 @@ namespace vm
 			//当get失败，则使用loseValue的值
 			if (this.loseValue != null && value == null)
 			{
-				value = this.loseValue;
+				value = this.loseValue?.RawObject;
 			}
 
 			/*结束收集*/

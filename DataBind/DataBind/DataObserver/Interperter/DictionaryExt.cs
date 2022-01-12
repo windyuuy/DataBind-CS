@@ -9,21 +9,22 @@ namespace System.ListExt
 	public partial class Dictionary : System.Collections.IDictionary, IConvableDictionary
 	{
 		public virtual object RawDict => throw new NotImplementedException();
-		public virtual object this[object key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+		private IDictionary InnerDict => ((IDictionary)RawDict);
+		public virtual object this[object key] { get => InnerDict[key]; set => throw new NotImplementedException(); }
 
-		public virtual bool IsFixedSize => throw new NotImplementedException();
+		public virtual bool IsFixedSize => InnerDict.IsFixedSize;
 
-		public virtual bool IsReadOnly => throw new NotImplementedException();
+		public virtual bool IsReadOnly => InnerDict.IsReadOnly;
 
-		public virtual ICollection Keys => throw new NotImplementedException();
+		public virtual ICollection Keys => InnerDict.Keys;
 
-		public virtual ICollection Values => throw new NotImplementedException();
+		public virtual ICollection Values => new System.ListExt.List<object>(InnerDict.Values);
 
-		public virtual int Count => throw new NotImplementedException();
+		public virtual int Count => InnerDict.Count;
 
-		public virtual bool IsSynchronized => throw new NotImplementedException();
+		public virtual bool IsSynchronized => InnerDict.IsSynchronized;
 
-		public virtual object SyncRoot => throw new NotImplementedException();
+		public virtual object SyncRoot => InnerDict.SyncRoot;
 
 		public virtual void Add(object key, object value)
 		{
@@ -57,7 +58,7 @@ namespace System.ListExt
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			throw new NotImplementedException();
+			return InnerDict.GetEnumerator();
 		}
 	}
 }

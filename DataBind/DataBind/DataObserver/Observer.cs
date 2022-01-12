@@ -10,13 +10,13 @@ namespace vm
 		public PropertyChangedEventArgs(string propertyName, object newValue, object oldValue)
 		{
 			this.PropertyName = propertyName;
-			this.newValue = newValue;
-			this.oldValue = oldValue;
+			this.NewValue = newValue;
+			this.OldValue = oldValue;
 		}
 
 		public virtual string PropertyName { get; }
-		public object oldValue;
-		public object newValue;
+		public object OldValue;
+		public object NewValue;
 
 	}
 	public class PropertyGetEventArgs : EventArgs
@@ -24,14 +24,28 @@ namespace vm
 		public PropertyGetEventArgs(string propertyName, object value)
 		{
 			this.PropertyName = propertyName;
-			this.value = value;
+			this.Value = value;
 		}
 
 		public virtual string PropertyName { get; }
-		public object value;
+		public object Value;
+	}
+	public class RelationChangedEventArgs : EventArgs
+	{
+		public RelationChangedEventArgs(string propertyName, IObservable host, System.Collections.IEnumerable newItems)
+		{
+			this.PropertyName = propertyName;
+			this.NewItems = newItems;
+			this.Host = host;
+		}
+
+		public IObservable Host;
+		public virtual string PropertyName { get; }
+		public System.Collections.IEnumerable NewItems;
 	}
 	public delegate void PropertyChangedEventHandler(object sender, PropertyChangedEventArgs e);
 	public delegate void PropertyGetEventHandler(object sender, PropertyGetEventArgs e);
+	public delegate void RelationChangedEventHandler(object sender, RelationChangedEventArgs e);
 	public interface IObserved
 	{
 		// Observer __ob__ { get; set; }
@@ -42,6 +56,10 @@ namespace vm
 	{
 		event PropertyChangedEventHandler PropertyChanged;
 		event PropertyGetEventHandler PropertyGot;
+	}
+	public interface IObservableCollection : IObservable
+	{
+		event RelationChangedEventHandler RelationChanged;
 	}
 	public partial class Utils
 	{
@@ -95,8 +113,15 @@ namespace vm
 			}
 			else if (IsObservable(value))
 			{
-				//只有普通的对象才可以进行观察
-				return new Observer(AsObservable(value));
+				if (IsObserved(value))
+				{
+					return ((IObservable)value)._SgetOb();
+				}
+				else
+				{
+					//只有普通的对象才可以进行观察
+					return new Observer(AsObservable(value));
+				}
 			}
 			return null;
 		}
@@ -105,9 +130,17 @@ namespace vm
 		{
 			return (IObservable)value;
 		}
-		public static List<object> AsCollection(object value)
+		public static IObservableCollection AsObservableCollection(object value)
 		{
-			return (List<object>)value;
+			return (IObservableCollection)value;
+		}
+		public static bool IsObservableCollection(object value)
+		{
+			return value is IObservableCollection;
+		}
+		public static System.Collections.IEnumerable AsCollection(object value)
+		{
+			return (System.Collections.IEnumerable)value;
 		}
 
 		/**
@@ -145,10 +178,10 @@ namespace vm
 					if (childOb != null)
 					{
 						childOb.dep.asCurTargetDepend();
-						var value = e.value;
+						var value = e.Value;
 						if (Utils.IsCollection(value))
 						{
-							Dep.dependArray(Utils.AsCollection(value));
+							Dep.dependCollection(Utils.AsCollection(value));
 						}
 					}
 				}
@@ -159,7 +192,7 @@ namespace vm
 				{
 					return;
 				}
-				var newVal = e.newValue;
+				var newVal = e.NewValue;
 				childOb = observe(newVal);//如果是普通对象需要处理成可观察的
 				dep.notifyWatchers();//触发刷新
 			};
@@ -180,8 +213,12 @@ namespace vm
 			//实现双向绑定
 			value._SsetOb(this);
 
+			if (value is System.Collections.IEnumerable)
 			{
-				/*如果是对象则直接walk进行绑定*/
+				this.observeCollection((System.Collections.IEnumerable)value);
+			}
+
+			{
 				this.walk(value);
 			}
 		}
@@ -199,19 +236,70 @@ namespace vm
 			for (var i = 0; i < keys.Length; i++)
 			{
 				var key = keys[i];
-				var value = key.GetValue(obj);
-				Utils.defineReactive(obj, key.Name, value);
+                if (key.GetIndexParameters().Length == 0)
+                {
+					var value = key.GetValue(obj);
+					Utils.defineReactive(obj, key.Name, value);
+                }
+                else
+                {
+					// 过滤 Item 属性
+                }
+			}
+			// 监听集合事件
+            if (Utils.IsObservableCollection(obj))
+            {
+				if(obj is System.Collections.IDictionary)
+                {
+					var dict=obj as System.Collections.IDictionary;
+					foreach (var key in dict.Keys)
+                    {
+						var value = dict[key];
+						Utils.defineReactive(obj, Utils.ToIndexKey(key), value);
+					}
+                }
+				// TODO: 考虑数组的变化改进
+				//else if(obj is System.Collections.IList)
+    //            {
+				//	var list=obj as System.Collections.IList;
+				//	for(int index = 0; index < list.Count; index++)
+    //                {
+				//		var value = list[index];
+				//		Utils.defineReactive(obj, index.ToString(), value);
+				//	}
+    //            }
+				var objColl = Utils.AsObservableCollection(obj);
+				objColl.RelationChanged += (sender, e) =>
+				{
+					var ob = e.Host._SgetOb();
+					if (e.NewItems != null)
+					{
+						ob.observeCollection(e.NewItems);
+					}
+					ob.dep.notifyWatchers();
+				};
 			}
 		}
 
 		/**
-         * 所以成员都替换成observe
-         */
-		public void observeArray(List<object> items)
+		 * 所以成员都替换成observe
+		 */
+		public void observeCollection(System.Collections.IEnumerable items)
 		{
-			for (int i = 0, l = items.length; i < l; i++)
-			{
-				Utils.observe(items[i]);
+			if(items is System.Collections.IDictionary)
+            {
+				var dict=items as System.Collections.IDictionary;
+				foreach (var item in dict.Values)
+				{
+					Utils.observe(item);
+				}
+			}
+            else
+            {
+				foreach (var item in items)
+				{
+					Utils.observe(item);
+				}
 			}
 		}
 

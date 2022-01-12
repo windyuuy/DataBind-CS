@@ -622,13 +622,13 @@ namespace TestDataBind
 			}
 			var haha = new SampleOBD3<SampleOBD2>();
 			haha.Set(new SampleOBD2());
-			haha.a.Set(100, 200, 300);
+			haha.A.Set(100, 200, 300);
 			{
 				var evn3 = new TEnvExt(){
 					{"haha",haha},
 				};
 				vm.InterpreterEnv.extendsEnvironment(evn3);
-				var exp = new vm.Interpreter("haha.a.a+haha.a.b+haha.a.c");
+				var exp = new vm.Interpreter("haha.A.a+haha.A.b+haha.A.c");
 				expect(exp.run(evn3)).toBe(600);
 			}
 			{
@@ -637,7 +637,7 @@ namespace TestDataBind
 					{"haha",haha},
 				};
 				vm.InterpreterEnv.extendsEnvironment(evn4);
-				var exp = new vm.Interpreter("Math.Max( haha.a.a,haha.a.b,haha.a.c)");
+				var exp = new vm.Interpreter("Math.Max( haha.A.a,haha.A.b,haha.A.c)");
 				expect(exp.run(evn4)).toBe(300);
 			}
 
@@ -645,7 +645,7 @@ namespace TestDataBind
 			a.Set(100);
 			var b = new SampleOBD3<SampleOBD5>();
 			b.Set(new SampleOBD5());
-			b.a.Set(100);
+			b.A.Set(100);
 			Func<object[], Func<object, object>, number> call = (object[] list, Func<object, object> func) =>
 			{
 				number s = 0;
@@ -673,11 +673,11 @@ namespace TestDataBind
 			};
 			{
 				vm.InterpreterEnv.extendsEnvironment(evn5);
-				var exp = new vm.Interpreter("b.a.add(a)");
+				var exp = new vm.Interpreter("b.A.add(a)");
 				expect(exp.run(evn5)).toBe(200);
 			}
 			{
-				var exp = new vm.Interpreter("a.add(b.a)");
+				var exp = new vm.Interpreter("a.add(b.A)");
 				expect(exp.run(evn5)).toBe(200);
 			}
 			{

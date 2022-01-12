@@ -6,35 +6,112 @@ using vm;
 
 namespace System.ListExt
 {
-	public partial class List<T> : List, IConvableList, ICollection<T>, IEnumerable<T>, IEnumerable, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection
+	using TRawList = System.Collections.Generic.List<object>;
+	public partial class List<T> : List, IConvableList,IHostAccessor, ICollection<T>, IEnumerable<T>, IEnumerable, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection, IObservableCollection
 	{
 		public List()
 		{
-			this.list = new Collections.Generic.List<object>();
+			this.list = new TRawList();
 		}
-		public List(System.Collections.Generic.List<object> ls)
+		public List(TRawList ls)
 		{
 			this.list = ls;
 		}
 		public List(IEnumerable<T> ls)
 		{
-			this.list = new Collections.Generic.List<object>();
+			this.list = new TRawList();
 			ls.ForEach(e => list.Add(e));
 		}
 		public List(IEnumerable<object> ls)
 		{
-			this.list = new Collections.Generic.List<object>();
+			this.list = new TRawList();
 			ls.ForEach(e => list.Add(e));
+		}
+		public List(IEnumerable ls)
+		{
+			this.list = new TRawList();
+			foreach (var e in ls)
+			{
+				list.Add(e);
+			}
 		}
 		public List(int capacity)
 		{
-			this.list = new Collections.Generic.List<object>(capacity);
+			this.list = new TRawList(capacity);
 		}
 		public List(IConvableList ls)
 		{
 			this.list = ls.RawList;
 		}
-		public new virtual T this[int index] { get => (T)list[index]; set => list[index] = value; }
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		public event PropertyGetEventHandler PropertyGot;
+		public event RelationChangedEventHandler RelationChanged;
+
+		public virtual void NotifyPropertyGot(object value, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		{
+			this.PropertyGot?.Invoke(this, new PropertyGetEventArgs(propertyName, value));
+		}
+		public virtual void NotifyPropertyChanged(object newValue, object oldValue, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		{
+			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, newValue, oldValue));
+		}
+		public virtual void NotifyAddRelations(System.Collections.IEnumerable values, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		{
+			this.RelationChanged?.Invoke(this, new RelationChangedEventArgs(propertyName, this, values));
+		}
+		public virtual void NotifyAddRelation(object value, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		{
+			this.RelationChanged?.Invoke(this, new RelationChangedEventArgs(propertyName, this, new object[] { value }));
+		}
+		public virtual void NotifyChangedRelation([Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		{
+			this.RelationChanged?.Invoke(this, new RelationChangedEventArgs(propertyName, this, null));
+		}
+
+		protected Observer ___Sob__;
+		public virtual Observer _SgetOb()
+		{
+			return ___Sob__;
+		}
+
+		public virtual Observer _SsetOb(Observer value)
+		{
+			___Sob__ = value;
+			return value;
+		}
+
+		public System.Collections.Generic.ICollection<Watcher> _Swatchers = new System.Collections.Generic.List<Watcher>();
+		public virtual System.Collections.Generic.ICollection<Watcher> GetWatchers()
+		{
+			return _Swatchers;
+		}
+
+		protected virtual T GetValue(int index)
+		{
+			return Utils.ConvItem<T>(list[index]);
+		}
+		public new virtual T this[int index]
+		{
+			get
+			{
+				var value=GetValue(index);
+				//this.NotifyPropertyGot(value, index.ToString());
+				return value;
+			}
+			set
+			{
+				var v0 = list[index];
+				list[index] = value;
+                this.NotifyAddRelation(value);
+				//this.NotifyPropertyChanged(value,v0,index.ToString());
+            }
+		}
+		public virtual T this[double index]
+		{
+			get=>this[(int)index];
+			set=>this[(int)index] = value;
+		}
 
 		public override int Count => list.Count;
 
@@ -49,11 +126,13 @@ namespace System.ListExt
 		public virtual void Add(T item)
 		{
 			list.Add(item);
+			this.NotifyAddRelation(item);
 		}
 
 		public override void Clear()
 		{
 			list.Clear();
+			this.NotifyChangedRelation();
 		}
 
 		public virtual bool Contains(T item)
@@ -104,26 +183,32 @@ namespace System.ListExt
 		public virtual void Insert(int index, T item)
 		{
 			list.Insert(index, item);
+			this.NotifyAddRelation(item);
 		}
 
 		public override void Insert(int index, object value)
 		{
 			list.Insert(index, (T)value);
+			this.NotifyAddRelation(value);
 		}
 
 		public virtual bool Remove(T item)
 		{
-			return list.Remove(item);
+			var ret = list.Remove(item);
+			this.NotifyChangedRelation();
+			return ret;
 		}
 
 		public override void Remove(object value)
 		{
 			list.Remove((T)value);
+			this.NotifyChangedRelation();
 		}
 
 		public override void RemoveAt(int index)
 		{
 			list.RemoveAt(index);
+			this.NotifyChangedRelation();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -144,30 +229,46 @@ namespace System.ListExt
 			var p = list[index];
 			this.list.RemoveAt(index);
 			var p2 = (T)p;
+			this.NotifyChangedRelation();
 			return p2;
 		}
 
 		public virtual int push(T e)
 		{
-			this.list.Add(e);
+			this.Add(e);
 			return list.Count;
 		}
 
 		public virtual List<T> reverse()
 		{
 			this.list.Reverse();
+			this.NotifyChangedRelation();
 			return this;
 		}
 
-		public virtual List<T> splice(int index, int count)
+		public virtual List<T> splice(int index, int? count0 = null, params T[] inserts)
 		{
-			var sp = new List<T>(count);
-			for (int i = 0; i < count; i++)
+			int count;
+			if (count0 == null)
 			{
-				sp.Add((T)list[index]);
-				this.RemoveAt(index);
+				count = list.Count-index;
 			}
-			return sp;
+			else
+			{
+				count = count0.Value;
+			}
+			var sp = list.GetRange(index, count);
+			var spl = new List<T>(sp);
+			list.RemoveRange(index, count);
+			if (inserts != null)
+			{
+				for (var i = 0; i < inserts.Length; i++)
+				{
+					list.Insert(index + i, inserts[i]);
+				}
+			}
+			this.NotifyAddRelations(inserts);
+			return spl;
 		}
 
 		public virtual List<T> slice(int? start = null, int? end = null)
@@ -179,12 +280,9 @@ namespace System.ListExt
 			{
 				size = 0;
 			}
-			var cp = new List<T>(size);
-			for (int i = start0; i < end0; i++)
-			{
-				cp.Add((T)list[i]);
-			}
-			return cp;
+			var cp = list.GetRange(start0, end0 - start0);
+			var cpl = new List<T>(cp);
+			return cpl;
 		}
 
 		public virtual List<F> AsList<F>()
@@ -213,7 +311,7 @@ namespace System.ListExt
 		{
 			if (list.Count > index && index >= 0)
 			{
-				return ConvItem(list[index]);
+				return GetValue(index);
 			}
 			else
 			{
@@ -262,9 +360,10 @@ namespace System.ListExt
 
 		internal List<T> Clone()
 		{
-			var ls = new System.Collections.Generic.List<object>();
+			var ls = new TRawList();
 			ls.AddRange(list);
 			return new List<T>(ls);
 		}
+
 	}
 }

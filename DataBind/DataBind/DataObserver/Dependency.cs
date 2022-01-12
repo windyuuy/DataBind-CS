@@ -13,19 +13,43 @@ namespace vm
 		/**
 		 * 递归遍历数组，进行ob对象的依赖记录。
 		 */
-		public static void dependArray(List<object> value)
+		public static void dependCollection(System.Collections.IEnumerable value)
 		{
-			IObservable obj;
-			for (int i = 0, l = value.length; i < l; i++)
+			if(value is System.Collections.IDictionary)
 			{
-				obj = (IObservable)value[i];
-				if (obj != null && obj._SgetOb() != null)
+				var dict=value as System.Collections.IDictionary;
+				foreach (var obj0 in dict.Values)
 				{
-					obj._SgetOb().dep.asCurTargetDepend();
+					if (Utils.IsObservable(obj0))
+					{
+						IObservable obj = Utils.AsObservable(obj0);
+						if (obj != null && obj._SgetOb() != null)
+						{
+							obj._SgetOb().dep.asCurTargetDepend();
+						}
+						if (Utils.IsCollection(obj))
+						{
+							dependCollection(Utils.AsCollection(obj));
+						}
+					}
 				}
-				if (Utils.IsCollection(obj))
+			}
+            else
+            {
+				foreach (var obj0 in value)
 				{
-					dependArray((List<object>)obj);
+					if (Utils.IsObservable(obj0))
+					{
+						IObservable obj = Utils.AsObservable(obj0);
+						if (obj != null && obj._SgetOb() != null)
+						{
+							obj._SgetOb().dep.asCurTargetDepend();
+						}
+						if (Utils.IsCollection(obj))
+						{
+							dependCollection(Utils.AsCollection(obj));
+						}
+					}
 				}
 			}
 		}

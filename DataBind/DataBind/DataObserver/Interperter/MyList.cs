@@ -9,7 +9,7 @@ namespace System.ListExt
 		System.Collections.Generic.List<object> RawList { get; }
 	}
 
-	public class List : IList, IConvableList
+	public class List : IList, ICollection, IConvableList
 	{
 		protected System.Collections.Generic.List<object> list;
 		public virtual System.Collections.Generic.List<object> RawList => list;

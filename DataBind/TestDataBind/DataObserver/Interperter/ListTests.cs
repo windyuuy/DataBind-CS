@@ -343,6 +343,34 @@ namespace TestDataBind.DataObserver.Interperter
             Assert.AreEqual(list[1],3);
             Assert.AreEqual(list[2],4);
             Assert.AreEqual(list[3],5);
+
+            Assert.AreEqual(result[0],6);
+            Assert.AreEqual(result[1],7);
+        }
+
+        [Test]
+        public void splice2_StateUnderTest_ExpectedBehavior()
+        {
+            // Arrange
+            var list = new List<int>()
+            {
+                2,3,4,5,6,7,
+            };
+            int index = 2;
+
+            // Act
+            var result = list.splice(
+                index);
+
+            // Assert
+            Assert.AreEqual(list.Count, 2);
+            Assert.AreEqual(list[0], 2);
+            Assert.AreEqual(list[1], 3);
+
+            Assert.AreEqual(result[0], 4);
+            Assert.AreEqual(result[1], 5);
+            Assert.AreEqual(result[2], 6);
+            Assert.AreEqual(result[3], 7);
         }
 
         [Test]

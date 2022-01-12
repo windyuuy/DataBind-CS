@@ -22,9 +22,9 @@ namespace TestDataBind
         {
 			Assert.IsInstanceOf(v,this.value);
 		}
-		public void toBeInstanceOf<T>()
+		public void toBeInstanceOf<F>()
 		{
-			Assert.IsInstanceOf<T>(this.value);
+			Assert.IsInstanceOf<F>(this.value);
 		}
 	}
 
