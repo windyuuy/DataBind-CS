@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+	<LangVersion>9.0</LangVersion>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
+    <PackageReference Include="NUnit" Version="3.13.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EngineAdapter\EngineAdapter.csproj" />
+  </ItemGroup>
+
+</Project>

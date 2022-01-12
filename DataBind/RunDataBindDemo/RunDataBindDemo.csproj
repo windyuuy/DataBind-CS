@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataBind\DataBind.csproj" />
+    <ProjectReference Include="..\EngineAdapter\EngineAdapter.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DataBind">
+      <HintPath>..\DataBind\bin\Debug\netcoreapp3.1\DataBind.dll</HintPath>
+    </Reference>
+    <Reference Include="EngineAdapter">
+      <HintPath>..\DataBind\bin\Debug\netcoreapp3.1\EngineAdapter.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
