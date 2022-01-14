@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TestInjectDataBind": {
+      "commandName": "Project",
+      "workingDirectory": "E:\\DATA\\Codes\\DataBind\\DataBind\\TestInjectDataBind\\bin\\Debug\\net472"
+    }
+  }
+}

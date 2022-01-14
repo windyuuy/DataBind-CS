@@ -133,7 +133,7 @@ namespace System.ListExt
 			return false;
 		}
 
-		public virtual bool TryGetValue(K key, [MaybeNullWhen(false)] out V value)
+		public virtual bool TryGetValue(K key, out V value)
 		{
 			object value2;
 			var ret = dict.TryGetValue(key, out value2);

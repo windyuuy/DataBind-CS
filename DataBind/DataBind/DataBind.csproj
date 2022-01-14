@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-	<LangVersion>9.0</LangVersion>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+	<LangVersion>8.0</LangVersion>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

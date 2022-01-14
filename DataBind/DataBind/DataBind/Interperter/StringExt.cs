@@ -23,7 +23,7 @@ public static class StringExt
 	}
 	public static string[] split(this string str,string c)
 	{
-		return str.Split(c);
+		return str.Split(new string[] {c},System.StringSplitOptions.None);
 	}
 	public static int length(this string str)
     {

@@ -8,10 +8,6 @@ namespace RunDataBindDemo
         static void Main(string[] args)
         {
             var target = new TSampleTarget();
-            target.PropertyChanged += (s, e) =>
-              {
-                  Debug.Log("wefwe");
-              };
             target.DoubleFV = 234;
         }
     }

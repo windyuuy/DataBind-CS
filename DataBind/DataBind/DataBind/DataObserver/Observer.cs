@@ -5,62 +5,6 @@ using System.Linq;
 
 namespace vm
 {
-	public class PropertyChangedEventArgs : EventArgs
-	{
-		public PropertyChangedEventArgs(string propertyName, object newValue, object oldValue)
-		{
-			this.PropertyName = propertyName;
-			this.NewValue = newValue;
-			this.OldValue = oldValue;
-		}
-
-		public virtual string PropertyName { get; }
-		public object OldValue;
-		public object NewValue;
-
-	}
-	public class PropertyGetEventArgs : EventArgs
-	{
-		public PropertyGetEventArgs(string propertyName, object value)
-		{
-			this.PropertyName = propertyName;
-			this.Value = value;
-		}
-
-		public virtual string PropertyName { get; }
-		public object Value;
-	}
-	public class RelationChangedEventArgs : EventArgs
-	{
-		public RelationChangedEventArgs(string propertyName, IObservable host, System.Collections.IEnumerable newItems)
-		{
-			this.PropertyName = propertyName;
-			this.NewItems = newItems;
-			this.Host = host;
-		}
-
-		public IObservable Host;
-		public virtual string PropertyName { get; }
-		public System.Collections.IEnumerable NewItems;
-	}
-	public delegate void PropertyChangedEventHandler(object sender, PropertyChangedEventArgs e);
-	public delegate void PropertyGetEventHandler(object sender, PropertyGetEventArgs e);
-	public delegate void RelationChangedEventHandler(object sender, RelationChangedEventArgs e);
-	public interface IObserved
-	{
-		// Observer __ob__ { get; set; }
-		Observer _SgetOb();
-		Observer _SsetOb(Observer value);
-	}
-	public interface IObservable : IObserved
-	{
-		event PropertyChangedEventHandler PropertyChanged;
-		event PropertyGetEventHandler PropertyGot;
-	}
-	public interface IObservableCollection : IObservable
-	{
-		event RelationChangedEventHandler RelationChanged;
-	}
 	public partial class Utils
 	{
 		/// <summary>
@@ -236,38 +180,38 @@ namespace vm
 			for (var i = 0; i < keys.Length; i++)
 			{
 				var key = keys[i];
-                if (key.GetIndexParameters().Length == 0)
-                {
+				if (key.GetIndexParameters().Length == 0)
+				{
 					var value = key.GetValue(obj);
 					Utils.defineReactive(obj, key.Name, value);
-                }
-                else
-                {
+				}
+				else
+				{
 					// 过滤 Item 属性
-                }
+				}
 			}
 			// 监听集合事件
-            if (Utils.IsObservableCollection(obj))
-            {
-				if(obj is System.Collections.IDictionary)
-                {
-					var dict=obj as System.Collections.IDictionary;
+			if (Utils.IsObservableCollection(obj))
+			{
+				if (obj is System.Collections.IDictionary)
+				{
+					var dict = obj as System.Collections.IDictionary;
 					foreach (var key in dict.Keys)
-                    {
+					{
 						var value = dict[key];
 						Utils.defineReactive(obj, Utils.ToIndexKey(key), value);
 					}
-                }
+				}
 				// TODO: 考虑数组的变化改进
 				//else if(obj is System.Collections.IList)
-    //            {
+				//            {
 				//	var list=obj as System.Collections.IList;
 				//	for(int index = 0; index < list.Count; index++)
-    //                {
+				//                {
 				//		var value = list[index];
 				//		Utils.defineReactive(obj, index.ToString(), value);
 				//	}
-    //            }
+				//            }
 				var objColl = Utils.AsObservableCollection(obj);
 				objColl.RelationChanged += (sender, e) =>
 				{
@@ -286,16 +230,16 @@ namespace vm
 		 */
 		public void observeCollection(System.Collections.IEnumerable items)
 		{
-			if(items is System.Collections.IDictionary)
-            {
-				var dict=items as System.Collections.IDictionary;
+			if (items is System.Collections.IDictionary)
+			{
+				var dict = items as System.Collections.IDictionary;
 				foreach (var item in dict.Values)
 				{
 					Utils.observe(item);
 				}
 			}
-            else
-            {
+			else
+			{
 				foreach (var item in items)
 				{
 					Utils.observe(item);

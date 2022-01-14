@@ -15,15 +15,6 @@ namespace vm
 		public Action<object, object> cb;
 	}
 
-	public interface IDestroyState
-	{
-		bool IsDestroyed { get; set; }
-	}
-	public interface IHostAccessor
-	{
-		System.Collections.Generic.ICollection<Watcher> GetWatchers();
-	}
-
 	public static class HostExt
 	{
 		/**
@@ -33,9 +24,9 @@ namespace vm
          */
 		public static Watcher _Swatch(this IHostAccessor self, CombineType<object, string, Func<object, object, object>> expOrFn, Action<object, object, object> cb, CombineType<object, string, number, boolean> loseValue = null, boolean sync = false)
 		{
-			if (self is IDestroyState)
+			if (self is IWithDestroyState)
 			{
-				if ((self as IDestroyState).IsDestroyed)
+				if ((self as IWithDestroyState)._SIsDestroyed)
 				{
 					console.error("the host is destroyed", self);
 					return null;
@@ -69,9 +60,9 @@ namespace vm
 				w.teardown();
 			}
 
-			if (self is IDestroyState)
+			if (self is IWithDestroyState)
 			{
-				(self as IDestroyState).IsDestroyed = true;
+				(self as IWithDestroyState)._SIsDestroyed = true;
 			}
 		}
 
@@ -87,33 +78,14 @@ namespace vm
 
 	}
 
-	public interface IHost
-	{
-
-		/**
-         * 侦听一个数据发生的变化
-         * @param expOrFn 访问的数据路径，或数据值的计算函数，当路径中的变量或计算函数所访问的值发生变化时，将会被重新执行
-         * @param cb 重新执行后，发生变化则会出发回调函数
-         */
-		Watcher _Swatch(CombineType<object, string, Func<object, object, object>> expOrFn, Action<object, object, object> cb, CombineType<object, string, number, boolean> loseValue, boolean sync);
-
-		/**
-         * 释放host，包括所有watch
-         */
-		void _Sdestroy();
-
-		void _SremoveWatcher(Watcher watcher);
-		void _SaddWatcher(Watcher watcher);
-	}
-
-	public class Host : IHost, IHostAccessor, IDestroyState, IObserved, IObservable, IWithPrototype
+	public class Host : IHost, IHostAccessor, IWithDestroyState, IObserved, IObservable, IWithPrototype
 	{
 
 		protected Observer ___Sob__;
 		public System.Collections.Generic.ICollection<Watcher> _Swatchers;
 		public boolean _SisDestroyed;
 
-		public bool IsDestroyed { get => _SisDestroyed; set => _SisDestroyed = value; }
+		public virtual bool _SIsDestroyed { get => _SisDestroyed; set => _SisDestroyed = value; }
 
 		public virtual System.Collections.Generic.ICollection<Watcher> GetWatchers()
 		{
@@ -123,11 +95,11 @@ namespace vm
 		public event PropertyChangedEventHandler PropertyChanged;
 		public event PropertyGetEventHandler PropertyGot;
 
-		public void NotifyPropertyGot(object value, [CallerMemberName] string propertyName = "")
+		public virtual void NotifyPropertyGot(object value, [CallerMemberName] string propertyName = "")
 		{
 			this.PropertyGot?.Invoke(this, new PropertyGetEventArgs(propertyName, value));
 		}
-		public void NotifyPropertyChanged(object newValue, object oldValue, [CallerMemberName] string propertyName = "")
+		public virtual void NotifyPropertyChanged(object newValue, object oldValue, [CallerMemberName] string propertyName = "")
 		{
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, newValue, oldValue));
 		}
@@ -144,7 +116,7 @@ namespace vm
 			// Utils.implementEnvironment(this);
 		}
 
-		public Watcher _Swatch(CombineType<object, string, Func<object, object, object>> expOrFn, Action<object, object, object> cb, CombineType<object, string, number, boolean> loseValue = null, boolean sync = false)
+		public virtual Watcher _Swatch(CombineType<object, string, Func<object, object, object>> expOrFn, Action<object, object, object> cb, CombineType<object, string, number, boolean> loseValue = null, boolean sync = false)
 		{
 			if (this._SisDestroyed)
 			{
@@ -165,7 +137,7 @@ namespace vm
 			return watcher;
 		}
 
-		public void _Sdestroy()
+		public virtual void _Sdestroy()
 		{
 			var temp = this._Swatchers;
 			this._Swatchers = new System.Collections.Generic.List<Watcher>();
@@ -177,22 +149,22 @@ namespace vm
 			this._SisDestroyed = true;
 		}
 
-		public void _SremoveWatcher(Watcher watcher)
+		public virtual void _SremoveWatcher(Watcher watcher)
 		{
 			this._Swatchers.Remove(watcher);
 		}
 
-		public void _SaddWatcher(Watcher watcher)
+		public virtual void _SaddWatcher(Watcher watcher)
 		{
 			this._Swatchers.Add(watcher);
 		}
 
-		public Observer _SgetOb()
+		public virtual Observer _SgetOb()
 		{
 			return ___Sob__;
 		}
 
-		public Observer _SsetOb(Observer value)
+		public virtual Observer _SsetOb(Observer value)
 		{
 			___Sob__ = value;
 			return value;
@@ -202,26 +174,18 @@ namespace vm
 		public object Proto;
 		public virtual object _ { get; set; }
 
-		public void SetProto(object dict)
+		public virtual void SetProto(object dict)
 		{
 			this.Proto = dict;
 			this._ = dict;
 		}
 
-        public object GetProto()
-        {
-			return Proto;
-        }
-        #endregion
-
-    }
-
-	[System.AttributeUsage(System.AttributeTargets.All, Inherited = false, AllowMultiple = true)]
-	sealed class ImplementHostAttribute : System.Attribute
-	{
-		// This is a positional argument
-		public ImplementHostAttribute(string positionalString)
+		public virtual object GetProto()
 		{
+			return Proto;
 		}
+		#endregion
+
 	}
+
 }

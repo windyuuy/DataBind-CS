@@ -568,14 +568,16 @@ namespace TestDataBind
             }
             {
                 var b = new TEnvExt(){ { "a", 1 } };
+				var count0 = b.Count;
                 InterpreterEnv.implementEnvironment(b);
 				var v = ((System.Reflection.MethodInfo)b["MIN"])
 					.Invoke(InterpreterEnv.environment, new object[] { new double[] { 1, 2 } });
 				expect(v).toBe(1);
                 expect(b["PI"]).toBe(Math.PI);
-                expect(b.Count).toBe(43);
-                //expect(b.Count).toBe(43);
-            }
+				var count1 = b.Count;
+                expect(count1-count0).toBe(28);
+				//expect(b.Count).toBe(43);
+			}
 		}
 
 		[Test]

@@ -66,7 +66,7 @@ namespace vm
 		{
 			foreach (var kv in environment)
 			{
-				if (kv.Key == "__ob__")
+				if (kv.Key == "___Sob__")
 				{
 					continue;
 				}
