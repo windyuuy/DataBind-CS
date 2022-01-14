@@ -94,19 +94,18 @@ namespace CiLin
 				Mono.Cecil.MethodAttributes.Virtual |
 				Mono.Cecil.MethodAttributes.HideBySig, voidRef);
 			var setWorker = set.Body.GetILProcessor();
+			setWorker.Append(setWorker.Create(OpCodes.Nop));
 			setWorker.Append(setWorker.Create(OpCodes.Ldarg_0));
 			setWorker.Append(setWorker.Create(OpCodes.Ldarg_1));
 			setWorker.Append(setWorker.Create(OpCodes.Stfld, field));
-			setWorker.Append(setWorker.Create(OpCodes.Ldarg_1));
-			setWorker.Append(setWorker.Create(OpCodes.Stloc_0));
-			var inst = setWorker.Create(OpCodes.Ldloc_0);
-			setWorker.Append(setWorker.Create(OpCodes.Br_S, inst));
-			setWorker.Append(inst);
+			//setWorker.Append(setWorker.Create(OpCodes.Ldarg_1));
+			//setWorker.Append(setWorker.Create(OpCodes.Stloc_0));
+			//var inst = setWorker.Create(OpCodes.Ldloc_0);
+			//setWorker.Append(setWorker.Create(OpCodes.Br_S, inst));
+			//setWorker.Append(inst);
 			setWorker.Append(setWorker.Create(OpCodes.Ret));
-			set.Parameters.Add(new ParameterDefinition(propertyType));
-			set.Body.Variables.Add(new VariableDefinition(targetType));
+			set.Parameters.Add(new ParameterDefinition("value",ParameterAttributes.None,propertyType));
 			set.SemanticsAttributes = MethodSemanticsAttributes.None;
-			set.Body.MaxStackSize = 2;
 			set.Body.InitLocals = true;
 			targetType.Methods.Add(set);
 

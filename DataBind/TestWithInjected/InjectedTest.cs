@@ -41,7 +41,7 @@ namespace TestWithInjected
                 var sampleObs1=sampleObs as vm.IObservable;
                 sampleObs1.PropertyChanged += (host, e) =>
                 {
-                    console.log("value changed",e.NewValue);
+                    console.log("value changed:",e.NewValue);
                 };
                 sampleObs.wf = "hello22";
             }

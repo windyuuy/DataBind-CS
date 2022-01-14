@@ -75,10 +75,9 @@ namespace System.ListExt
 			return ___Sob__;
 		}
 
-		public virtual Observer _SsetOb(Observer value)
+		public virtual void _SsetOb(Observer value)
 		{
 			___Sob__ = value;
-			return value;
 		}
 
 		public System.Collections.Generic.ICollection<Watcher> _Swatchers = new System.Collections.Generic.List<Watcher>();

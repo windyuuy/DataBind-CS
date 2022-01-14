@@ -164,10 +164,9 @@ namespace vm
 			return ___Sob__;
 		}
 
-		public virtual Observer _SsetOb(Observer value)
+		public virtual void _SsetOb(Observer value)
 		{
 			___Sob__ = value;
-			return value;
 		}
 
 		#region IWithPrototype

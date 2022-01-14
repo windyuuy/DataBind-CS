@@ -210,7 +210,7 @@ namespace DataBindService
 			var ObjectRef = MainAssembly.MainModule.ImportReference(typeof(object));
 			var IWithPrototypeRef = MainAssembly.MainModule.ImportReference(typeof(System.ListExt.IWithPrototype));
 			CILUtils.InjectField(MainAssembly,typeDefinition, "___Sproto__", ObjectRef, FieldAttributes.Family);
-			CILUtils.InjectField(MainAssembly, typeDefinition, "_", ObjectRef, FieldAttributes.Family);
+			CILUtils.InjectProperty(MainAssembly, typeDefinition, "_", ObjectRef);
 			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "GetProto", "___Sproto__", ObjectRef);
 			CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "SetProto", "___Sproto__", ObjectRef);
 			CILUtils.InjectInteface(MainAssembly, typeDefinition, IWithPrototypeRef);

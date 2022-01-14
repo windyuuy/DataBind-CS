@@ -43,9 +43,9 @@ namespace TestDataBind
 			return ___Sob__;
 		}
 
-		public vm.Observer _SsetOb(vm.Observer value)
+		public void _SsetOb(vm.Observer value)
 		{
-			return ___Sob__ = value;
+			___Sob__ = value;
 		}
 
 

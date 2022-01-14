@@ -21,7 +21,7 @@ namespace RunDataBindDemo
             throw new System.NotImplementedException();
         }
 
-        public Observer _SsetOb(Observer value)
+        public void _SsetOb(Observer value)
         {
             throw new System.NotImplementedException();
         }
@@ -134,10 +134,9 @@ namespace RunDataBindDemo
             return ___Sob__;
         }
 
-        public virtual Observer _SsetOb(Observer value)
+        public virtual void _SsetOb(Observer value)
         {
             ___Sob__ = value;
-            return value;
         }
 
     }
@@ -167,17 +166,17 @@ namespace RunDataBindDemo
     public class TSampleObserver
     {
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event PropertyGetEventHandler PropertyGot;
+        //public event PropertyChangedEventHandler PropertyChanged;
+        //public event PropertyGetEventHandler PropertyGot;
 
-        public virtual void NotifyPropertyGot222(object value, [CallerMemberName] string propertyName = "")
-        {
-            PropertyGot?.Invoke(this, new PropertyGetEventArgs(propertyName, value));
-        }
-        public virtual void NotifyPropertyChanged222(object newValue, object oldValue, [CallerMemberName] string propertyName = "")
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, newValue, oldValue));
-        }
+        //public virtual void NotifyPropertyGot222(object value, [CallerMemberName] string propertyName = "")
+        //{
+        //    PropertyGot?.Invoke(this, new PropertyGetEventArgs(propertyName, value));
+        //}
+        //public virtual void NotifyPropertyChanged222(object newValue, object oldValue, [CallerMemberName] string propertyName = "")
+        //{
+        //    this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, newValue, oldValue));
+        //}
 
         public int ffff;
         public int FFFF

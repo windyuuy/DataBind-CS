@@ -51,7 +51,7 @@ namespace vm
 	{
 		// Observer ___Sob__ { get; set; }
 		Observer _SgetOb();
-		Observer _SsetOb(Observer value);
+		void _SsetOb(Observer value);
 	}
 
 	/// <summary>
@@ -73,7 +73,7 @@ namespace vm
 	public interface IObservableEventDelegate
     {
 		void NotifyPropertyGot(object value, string propertyName);
-		void NotifyPropertyChanged222(object newValue, object oldValue, string propertyName);
+		void NotifyPropertyChanged(object newValue, object oldValue, string propertyName);
 	}
 }
 
