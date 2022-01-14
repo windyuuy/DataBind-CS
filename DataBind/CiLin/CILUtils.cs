@@ -435,7 +435,26 @@ namespace CiLin
 
 		}
 
-		public static void InjectBeforeReturn(MethodDefinition methodDefinition, Instruction[] instructions)
+		public static void InjectAtMethodBegin(MethodDefinition methodDefinition,Instruction[] instructions)
+        {
+			var ILWorker = methodDefinition.Body.GetILProcessor();
+            var headInst = ILWorker.Body.Instructions[0];
+			if (headInst == null)
+			{
+				foreach (var instruction in instructions)
+				{
+					ILWorker.Append(instruction);
+				}
+			}
+			else
+			{
+				foreach (var instruction in instructions)
+				{
+					ILWorker.InsertBefore(headInst, instruction);
+				}
+			}
+        }
+        public static void InjectBeforeReturn(MethodDefinition methodDefinition, Instruction[] instructions)
 		{
 			var ILWorker = methodDefinition.Body.GetILProcessor();
 			var replaceRetInst = instructions[0];

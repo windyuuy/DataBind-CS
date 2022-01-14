@@ -144,7 +144,7 @@ namespace DataBindService
 
 			typeDefinition.Properties.ForEach(p =>
 			{
-				Instruction[] getMethodInstCopy;
+				Instruction[] getMethodInstCopy=null;
 
 				// get
 				{
@@ -200,7 +200,57 @@ namespace DataBindService
 						setFinalInst.Add(setWorker.Create(OpCodes.Callvirt, NotifyPropertyChanged));
 						setFinalInst.Add(setWorker.Create(OpCodes.Nop));
 
-						CILUtils.InjectBeforeReturn(setMethod, setFinalInst.ToArray());
+						if (getMethodInstCopy != null)
+						{
+							var retInst=setMethod.Body.Instructions.Last(inst=> inst!=null&&inst.OpCode == OpCodes.Ret);
+
+							if(retInst != null)
+                            {
+								var compHeadInst = setWorker.Create(OpCodes.Ldarg_1);
+								var getMethodInstList = getMethodInstCopy.ToList();
+								var refRetInsts = getMethodInstList.Where(inst =>
+								{
+									if (inst.Operand is Instruction)
+									{
+										var subInst = inst.Operand as Instruction;
+										if (subInst.OpCode == OpCodes.Ret)
+										{
+											return true;
+										}
+									}
+									return false;
+								});
+								refRetInsts.ForEach(inst =>
+								{
+									inst.Operand = compHeadInst;
+								});
+								var retInsts = getMethodInstList.Where(inst => inst.OpCode == OpCodes.Ret);
+								retInsts.ForEach(inst =>
+								{
+									getMethodInstList.Remove(inst);
+								});
+								getMethodInstList.Add(compHeadInst);
+								getMethodInstList.Add(setWorker.Create(OpCodes.Ceq));
+								//getMethodInstList.Add(setWorker.Create(OpCodes.Stloc_0));
+								//getMethodInstList.Add(setWorker.Create(OpCodes.Ldloc_0));
+								getMethodInstList.Add(setWorker.Create(OpCodes.Brtrue_S, retInst));
+								
+								var BoolRef=MainAssembly.MainModule.ImportReference(typeof(bool));
+								setMethod.Body.Variables.Add(new VariableDefinition("", setMethod.Parameters[0].ParameterType));
+								setMethod.Body.Variables.Add(new VariableDefinition(BoolRef));
+								setMethod.Body.InitLocals=true;
+
+								CILUtils.InjectBeforeReturn(setMethod, setFinalInst.ToArray());
+
+								CILUtils.InjectAtMethodBegin(setMethod, getMethodInstList.ToArray());
+
+                            }
+                        }
+                        else
+                        {
+							CILUtils.InjectBeforeReturn(setMethod, setFinalInst.ToArray());
+						}
+
 					}
 				}
 			});

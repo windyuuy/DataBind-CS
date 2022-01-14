@@ -44,6 +44,7 @@ namespace TestWithInjected
                     console.log("value changed:",e.NewValue);
                 };
                 sampleObs.wf = "hello22";
+                sampleObs.wf = "hello22";
             }
         }
     }

@@ -188,6 +188,10 @@ namespace RunDataBindDemo
 
             set
             {
+                //if (ffff == value)
+                //{
+                //    return;
+                //}
                 ffff = value;
             }
         }
