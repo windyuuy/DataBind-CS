@@ -93,8 +93,8 @@ namespace RunDataBindDemo
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, newValue, oldValue));
         }
 
-        public Hello ffff;
-        public Hello FFF
+        public int ffff;
+        public int FFFF
         {
             get
             {
@@ -105,13 +105,16 @@ namespace RunDataBindDemo
 
             set
             {
-                ffff = value;
-                var xx = 234;
-                NotifyPropertyChanged(value, value);
-                if (xx > 0)
+                System.Func<int> call = () =>
+                {
+                    return ffff;
+                };
+                var kk = call();
+                if (kk == value)
                 {
                     return;
                 }
+                ffff = value;
             }
         }
         public TSampleTarget ffff2;
@@ -142,24 +145,7 @@ namespace RunDataBindDemo
     }
     public class TSampleHost:IHostStand
     {
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event PropertyGetEventHandler PropertyGot;
-
-        protected System.Collections.Generic.ICollection<Watcher> _Swatchers;
-        System.Collections.Generic.ICollection<Watcher> GetWatchers22()
-        {
-            //if (this._Swatchers != null)
-            //{
-            //    return this._Swatchers;
-            //}
-            //else
-            //{
-            //    this._Swatchers = new System.Collections.Generic.List<Watcher>();
-            //    return this._Swatchers;
-            //}
-            return this._Swatchers!=null?this._Swatchers:this._Swatchers = new System.Collections.Generic.List<Watcher>();
-        }
+        public virtual string KKK { get; set; }
     }
 
     [Observable]

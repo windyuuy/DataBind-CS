@@ -41,12 +41,20 @@ namespace DataBindService
             CILUtils.InjectField(MainAssembly, typeDefinition, "_Swatchers", IWatcherCollectionRef, FieldAttributes.Family);
 			CILUtils.InjectGetOrCreateObjectMethod(MainAssembly, typeDefinition, "GetWatchers", "_Swatchers", IWatcherCollectionRef, TDefaultValueType);
 
+			CILUtils.InjectInteface(MainAssembly,typeDefinition,IFullHostRef);
+
             #endregion
         }
 
         public static void HandleObservable(TypeDefinition typeDefinition, CustomAttribute attr)
 		{
 			var needInject = false;
+
+            if (!typeDefinition.CustomAttributes.Any(a=>a!=null&&CILUtils.IsSameTypeReference(a.AttributeType,attr.AttributeType)))
+            {
+				needInject = true;
+				typeDefinition.CustomAttributes.Add(attr);
+			}
 
 			{
 				var item = attr.ConstructorArguments[0];
@@ -141,22 +149,29 @@ namespace DataBindService
 			var IObservableEventDelegateRef = MainAssembly.MainModule.ImportReference(typeof(vm.IObservableEventDelegate));
 			var IObservableEventDelegateDef = new InterfaceImplementation(IObservableEventDelegateRef);
 			typeDefinition.Interfaces.Add(IObservableEventDelegateDef);
+			var BoolRef = MainAssembly.MainModule.ImportReference(typeof(bool));
 
 			typeDefinition.Properties.ForEach(p =>
 			{
 				Instruction[] getMethodInstCopy=null;
 
+				var getMethod = p.GetMethod;
 				// get
 				{
-					var getMethod = p.GetMethod;
-                    if (getMethod != null)
+					if (getMethod != null)
                     {
 						getMethodInstCopy = new Instruction[p.GetMethod.Body.Instructions.Count];
 						p.GetMethod.Body.Instructions.CopyTo(getMethodInstCopy, 0);
 
 						var getWorker = getMethod.Body.GetILProcessor();
 
-						var localVar = new VariableDefinition(getMethod.ReturnType);
+						VariableDefinition localVar;
+						localVar=getMethod.Body.Variables.FirstOrDefault(v=>v.VariableType==getMethod.ReturnType);
+                        if (localVar == null)
+                        {
+							localVar = new VariableDefinition(getMethod.ReturnType);
+							getMethod.Body.Variables.Add(localVar);
+						}
 						List<Instruction> getFinalInst = new List<Instruction>();
 						getFinalInst.Add(getWorker.Create(OpCodes.Stloc_S, localVar));
 						getFinalInst.Add(getWorker.Create(OpCodes.Ldloc_S, localVar));
@@ -171,8 +186,6 @@ namespace DataBindService
 						getFinalInst.Add(getWorker.Create(OpCodes.Nop));
 
 						CILUtils.InjectBeforeReturn(getMethod, getFinalInst.ToArray());
-
-						getMethod.Body.Variables.Add(localVar);
 					}
 				}
 
@@ -184,72 +197,87 @@ namespace DataBindService
                     {
 						var setWorker = setMethod.Body.GetILProcessor();
 
-						List<Instruction> setFinalInst = new List<Instruction>();
-						setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_0));
-						setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_1));
-						if (setMethod.ReturnType.IsValueType)
-						{
-							setFinalInst.Add(setWorker.Create(OpCodes.Box, setMethod.ReturnType));
-						}
-						setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_1));
-						if (setMethod.ReturnType.IsValueType)
-						{
-							setFinalInst.Add(setWorker.Create(OpCodes.Box, setMethod.ReturnType));
-						}
-						setFinalInst.Add(setWorker.Create(OpCodes.Ldstr, p.Name));
-						setFinalInst.Add(setWorker.Create(OpCodes.Callvirt, NotifyPropertyChanged));
-						setFinalInst.Add(setWorker.Create(OpCodes.Nop));
-
 						if (getMethodInstCopy != null)
 						{
-							var retInst=setMethod.Body.Instructions.Last(inst=> inst!=null&&inst.OpCode == OpCodes.Ret);
+							var tempLocal = new VariableDefinition(p.PropertyType);
+							setMethod.Body.Variables.Add(tempLocal);
 
-							if(retInst != null)
-                            {
-								var compHeadInst = setWorker.Create(OpCodes.Ldarg_1);
-								var getMethodInstList = getMethodInstCopy.ToList();
-								var refRetInsts = getMethodInstList.Where(inst =>
+							List<Instruction> setFinalInst = new List<Instruction>();
+							{
+								setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_0));
+								setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_1));
+								if (p.PropertyType.IsValueType)
 								{
-									if (inst.Operand is Instruction)
-									{
-										var subInst = inst.Operand as Instruction;
-										if (subInst.OpCode == OpCodes.Ret)
-										{
-											return true;
-										}
-									}
-									return false;
-								});
-								refRetInsts.ForEach(inst =>
+									setFinalInst.Add(setWorker.Create(OpCodes.Box, p.PropertyType));
+								}
+								setFinalInst.Add(setWorker.Create(OpCodes.Ldloc_S, tempLocal));
+								if (p.PropertyType.IsValueType)
 								{
-									inst.Operand = compHeadInst;
-								});
-								var retInsts = getMethodInstList.Where(inst => inst.OpCode == OpCodes.Ret);
-								retInsts.ForEach(inst =>
-								{
-									getMethodInstList.Remove(inst);
-								});
-								getMethodInstList.Add(compHeadInst);
+									setFinalInst.Add(setWorker.Create(OpCodes.Box, p.PropertyType));
+								}
+								setFinalInst.Add(setWorker.Create(OpCodes.Ldstr, p.Name));
+								setFinalInst.Add(setWorker.Create(OpCodes.Callvirt, NotifyPropertyChanged));
+								setFinalInst.Add(setWorker.Create(OpCodes.Nop));
+							}
+
+							var privateGetMethodName = $"<set_{setMethod.Name}>b__get0";
+							var privateGetMethod = CILUtils.CopyMethod(MainAssembly, typeDefinition, privateGetMethodName, typeDefinition, p.GetMethod);
+							privateGetMethod.Attributes = MethodAttributes.Private|MethodAttributes.Final|MethodAttributes.NewSlot;
+							privateGetMethod.SemanticsAttributes = MethodSemanticsAttributes.None;
+							getMethodInstCopy.ForEach(inst =>
+							{
+								privateGetMethod.Body.GetILProcessor().Append(inst);
+							});
+
+
+							{
+								var getMethodInstList = new System.Collections.Generic.List<Instruction>();
+								Instruction retInst;
+								retInst=setMethod.Body.Instructions.FirstOrDefault(inst => inst != null && inst.OpCode == OpCodes.Ret);
+                                if (retInst == null)
+                                {
+									retInst = setWorker.Create(OpCodes.Ret);
+									setFinalInst.Add(retInst);
+								}
+								getMethodInstList.Add(setWorker.Create(OpCodes.Ldarg_0));
+								getMethodInstList.Add(setWorker.Create(OpCodes.Call, privateGetMethod));
+								getMethodInstList.Add(setWorker.Create(OpCodes.Stloc, tempLocal));
+								getMethodInstList.Add(setWorker.Create(OpCodes.Ldloc, tempLocal));
+								getMethodInstList.Add(setWorker.Create(OpCodes.Ldarg_1));
 								getMethodInstList.Add(setWorker.Create(OpCodes.Ceq));
-								//getMethodInstList.Add(setWorker.Create(OpCodes.Stloc_0));
-								//getMethodInstList.Add(setWorker.Create(OpCodes.Ldloc_0));
 								getMethodInstList.Add(setWorker.Create(OpCodes.Brtrue_S, retInst));
-								
-								var BoolRef=MainAssembly.MainModule.ImportReference(typeof(bool));
-								setMethod.Body.Variables.Add(new VariableDefinition("", setMethod.Parameters[0].ParameterType));
-								setMethod.Body.Variables.Add(new VariableDefinition(BoolRef));
 								setMethod.Body.InitLocals=true;
 
 								CILUtils.InjectBeforeReturn(setMethod, setFinalInst.ToArray());
 
 								CILUtils.InjectAtMethodBegin(setMethod, getMethodInstList.ToArray());
 
-                            }
+							}
                         }
                         else
                         {
+
+							List<Instruction> setFinalInst = new List<Instruction>();
+							{
+								setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_0));
+								setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_1));
+								if (p.PropertyType.IsValueType)
+								{
+									setFinalInst.Add(setWorker.Create(OpCodes.Box, p.PropertyType));
+								}
+								setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_1));
+								if (p.PropertyType.IsValueType)
+								{
+									setFinalInst.Add(setWorker.Create(OpCodes.Box, p.PropertyType));
+								}
+								setFinalInst.Add(setWorker.Create(OpCodes.Ldstr, p.Name));
+								setFinalInst.Add(setWorker.Create(OpCodes.Callvirt, NotifyPropertyChanged));
+								setFinalInst.Add(setWorker.Create(OpCodes.Nop));
+							}
+
 							CILUtils.InjectBeforeReturn(setMethod, setFinalInst.ToArray());
 						}
+
 
 					}
 				}

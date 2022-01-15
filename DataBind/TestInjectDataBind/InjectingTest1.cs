@@ -13,7 +13,7 @@ namespace TestWithInjected
     {
 #if true
         [Test]
-        public void Test22()
+        public void Test0Pre01()
         {
             var useSymbols = false;
             using (var assembly = AssemblyDefinition.ReadAssembly(@"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net472\RunDataBindDemo.dll", new ReaderParameters()
@@ -112,7 +112,7 @@ namespace TestWithInjected
 #endif
 
         [Test]
-        public void Test23()
+        public void Test0Pre02()
         {
             var useSymbols = false;
             using (var assembly = AssemblyDefinition.ReadAssembly(@"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net472\RunDataBindDemo.dll", new ReaderParameters()
@@ -173,8 +173,10 @@ namespace TestWithInjected
 
                     var types = assembly.MainModule.GetTypes();
                     var MarkAttr=assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute));
+                    var MarkAttrCtor=assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute).GetConstructor(new Type[] { typeof(int) }));
 
                     var MarkInterface = assembly.MainModule.ImportReference(typeof(vm.IHostStand));
+                    var IntRef=assembly.MainModule.ImportReference(typeof(int));
 
                     foreach (var type in types)
                     {
@@ -182,6 +184,10 @@ namespace TestWithInjected
                         if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter,MarkInterface)))
                         {
                             DataBindTool.HandleHost(type);
+
+                            var attr2 = new CustomAttribute(MarkAttrCtor);
+                            attr2.ConstructorArguments.Add(new CustomAttributeArgument(IntRef,0));
+                            DataBindTool.HandleObservable(type, attr2);
                             continue;
                         } 
 

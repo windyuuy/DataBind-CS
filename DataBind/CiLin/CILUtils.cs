@@ -453,6 +453,8 @@ namespace CiLin
 					ILWorker.InsertBefore(headInst, instruction);
 				}
 			}
+
+			UpdateMethodOffsets(methodDefinition.Body);
         }
         public static void InjectBeforeReturn(MethodDefinition methodDefinition, Instruction[] instructions)
 		{
