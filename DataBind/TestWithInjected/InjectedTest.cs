@@ -101,6 +101,17 @@ namespace TestWithInjected
 
                 Assert.AreEqual(rets.Count, demos.Count);
                 Assert.AreEqual(rets, demos);
+
+                var sampleObs = new TSampleObserver();
+                sampleHost1.SetProto(sampleObs);
+                sampleHost1._Swatch("FFFF", (host, newValue, oldValue) =>
+                {
+                    rets.Add(newValue as string);
+                    console.log("value changed:", newValue);
+                });
+                sampleObs.FFFF = 234;
+                vm.Tick.next();
+
                 console.log("true");
             }
             else

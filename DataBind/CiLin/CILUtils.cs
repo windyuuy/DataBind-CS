@@ -77,7 +77,7 @@ namespace CiLin
 			return IsSameTypeReference(attr.AttributeType, typeReference);
 		}
 
-		public static void InjectSetFieldMethod(AssemblyDefinition assembly, TypeDefinition targetType, string methodName, string fieldName, TypeReference propertyType)
+		public static MethodDefinition InjectSetFieldMethod(AssemblyDefinition assembly, TypeDefinition targetType, string methodName, string fieldName, TypeReference propertyType)
 		{
 			//Import the void type
 			TypeReference voidRef = assembly.MainModule.ImportReference(typeof(void));
@@ -109,6 +109,7 @@ namespace CiLin
 			set.Body.InitLocals = true;
 			targetType.Methods.Add(set);
 
+			return set;
 		}
 		public static void InjectGetOrCreateObjectMethod(AssemblyDefinition assembly, TypeDefinition targetType, string methodName, string fieldName, TypeReference propertyType, Type defaultValueType)
 		{

@@ -41,7 +41,7 @@ namespace vm
 		void _SaddWatcher(Watcher watcher);
 	}
 
-	public interface IFullHost:IHostAccessor,IWithDestroyState
+	public interface IFullHost:IHostAccessor,IWithDestroyState,IWithPrototype
     {
 
     }

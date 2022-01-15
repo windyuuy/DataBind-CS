@@ -287,11 +287,29 @@ namespace DataBindService
 			#region implement IWithPrototype
 			var ObjectRef = MainAssembly.MainModule.ImportReference(typeof(object));
 			var IWithPrototypeRef = MainAssembly.MainModule.ImportReference(typeof(System.ListExt.IWithPrototype));
-			CILUtils.InjectField(MainAssembly,typeDefinition, "___Sproto__", ObjectRef, FieldAttributes.Family);
-			CILUtils.InjectProperty(MainAssembly, typeDefinition, "_", ObjectRef);
-			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "GetProto", "___Sproto__", ObjectRef);
-			CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "SetProto", "___Sproto__", ObjectRef);
+
 			CILUtils.InjectInteface(MainAssembly, typeDefinition, IWithPrototypeRef);
+
+			CILUtils.InjectField(MainAssembly,typeDefinition, "___Sproto__", ObjectRef, FieldAttributes.Family);
+			var P_=CILUtils.InjectProperty(MainAssembly, typeDefinition, "_", ObjectRef);
+
+			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "GetProto", "___Sproto__", ObjectRef);
+			var SetProtoDef = CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "SetProto", "___Sproto__", ObjectRef);
+			{
+				var setMethod = SetProtoDef;
+				var retInst = setMethod.Body.Instructions.Last();
+
+				var setWorker = setMethod.Body.GetILProcessor();
+				var appendSetInsts = new System.Collections.Generic.List<Instruction>();
+				appendSetInsts.Add(setWorker.Create(OpCodes.Ldarg_0));
+				appendSetInsts.Add(setWorker.Create(OpCodes.Ldarg_1));
+				appendSetInsts.Add(setWorker.Create(OpCodes.Call, P_.SetMethod));
+
+				appendSetInsts.ForEach(inst =>
+				{
+					setWorker.InsertBefore(retInst, inst);
+				});
+			}
 			#endregion
 		}
 	}
