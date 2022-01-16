@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using RunDataBindDemo;
-using vm;
+using DataBinding;
 
 namespace TestWithInjected
 {
@@ -110,7 +110,14 @@ namespace TestWithInjected
                     console.log("value changed:", newValue);
                 });
                 sampleObs.FFFF = 234;
+                sampleHost.KKK2 = 2;
                 vm.Tick.next();
+
+                var value=vm.Utils.IndexValueRecursive(sampleHost, "FFFF");
+                console.log("value:", value);
+
+                var exp = new vm.Interpreter("KKK2+FFFF");
+                var ret = exp.run(sampleHost);
 
                 console.log("true");
             }

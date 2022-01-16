@@ -54,13 +54,17 @@ namespace vm
 		void _SsetOb(Observer value);
 	}
 
-	/// <summary>
-	/// 被观察对象需要实现
-	/// </summary>
-	public interface IObservable : IObserved
+	public interface IObservableEvents
 	{
 		event PropertyChangedEventHandler PropertyChanged;
 		event PropertyGetEventHandler PropertyGot;
+	}
+
+	/// <summary>
+	/// 被观察对象需要实现
+	/// </summary>
+	public interface IObservable : IObserved, IObservableEvents
+	{
 	}
 	/// <summary>
 	/// 被观察集合需要实现

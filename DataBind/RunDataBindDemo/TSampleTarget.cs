@@ -77,75 +77,26 @@ namespace RunDataBindDemo
     public struct Hello
     {
         public int wfe;
-    }
 
-    public class TTest1 : IHostStand
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event PropertyGetEventHandler PropertyGot;
+        //public static bool operator +(Hello lhs, Hello rhs){return true;}
+        //public static bool operator -(Hello lhs, Hello rhs){return true;}
+        //public static bool operator *(Hello lhs, Hello rhs){return true;}
+        //public static bool operator /(Hello lhs, Hello rhs){return true;}
+        //public static bool operator %(Hello lhs, Hello rhs){return true;}
+        //public static bool operator ^(Hello lhs, Hello rhs){return true;}
+        //public static bool operator !=(Hello lhs, Hello rhs) { return true;}
+        //public static bool operator ==(Hello lhs, Hello rhs) { return true;}
+        //public static bool operator >=(Hello lhs, Hello rhs) { return true;}
+        //public static bool operator <=(Hello lhs, Hello rhs) { return true;}
+        public static bool operator ^(Hello lhs, Hello rhs) { return true; }
 
-        public virtual void NotifyPropertyGot(object value, [CallerMemberName] string propertyName = "")
-        {
-            PropertyGot?.Invoke(this, new PropertyGetEventArgs(propertyName, value));
-        }
-        public virtual void NotifyPropertyChanged(object newValue, object oldValue, [CallerMemberName] string propertyName = "")
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, newValue, oldValue));
-        }
-
-        public int ffff;
-        public int FFFF
-        {
-            get
-            {
-                var v0 = ffff;
-                NotifyPropertyGot(v0);
-                return v0;
-            }
-
-            set
-            {
-                System.Func<int> call = () =>
-                {
-                    return ffff;
-                };
-                var kk = call();
-                if (kk == value)
-                {
-                    return;
-                }
-                ffff = value;
-            }
-        }
-        public TSampleTarget ffff2;
-        public TSampleTarget FFF2
-        {
-            get
-            {
-                return ffff2;
-            }
-
-            set
-            {
-                ffff2 = value;
-            }
-        }
-
-		protected Observer ___Sob__;
-        public virtual Observer _SgetOb()
-        {
-            return ___Sob__;
-        }
-
-        public virtual void _SsetOb(Observer value)
-        {
-            ___Sob__ = value;
-        }
 
     }
+
     public class TSampleHost:IHostStand
     {
         public virtual string KKK { get; set; }
+        public virtual int KKK2 { get; set; }
     }
 
     [Observable]

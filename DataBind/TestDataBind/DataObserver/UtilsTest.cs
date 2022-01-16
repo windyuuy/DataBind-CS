@@ -48,12 +48,12 @@ namespace TestDataBind
 		public object Proto;
 		public virtual object _ { get; set; }
 
-		public object GetProto()
+		public virtual object GetProto()
 		{
 			return Proto;
 		}
 
-		public void SetProto(object dict)
+		public virtual void SetProto(object dict)
 		{
 			this.Proto = dict;
 			this._ = dict;

@@ -50,7 +50,7 @@ namespace vm
 			{
 				var ext1 = ext as IWithPrototype;
 				ext1.SetProto(environment);
-				ext1._ = environment;
+				//ext1._ = environment;
 			}
 			else
 			{

@@ -46,18 +46,18 @@ namespace vm
 
     }
 
-	/// <summary>
-	/// 用于标记需要作为观察者
-	/// </summary>
-	public interface IHostStand
-    {
-
-    }
-
 }
 
 namespace DataBinding
 {
+
+	/// <summary>
+	/// 用于标记需要作为观察者
+	/// </summary>
+	public interface IHostStand
+	{
+
+	}
 
 	/// <summary>
 	/// 手动添加，标记这个类需要作为观察者

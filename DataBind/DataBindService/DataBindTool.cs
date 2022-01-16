@@ -46,20 +46,25 @@ namespace DataBindService
             #endregion
         }
 
-        public static void HandleObservable(TypeDefinition typeDefinition, CustomAttribute attr)
+        public static void HandleObservable(TypeDefinition typeDefinition, CustomAttribute attr0)
 		{
 			var needInject = false;
 
-            if (!typeDefinition.CustomAttributes.Any(a=>a!=null&&CILUtils.IsSameTypeReference(a.AttributeType,attr.AttributeType)))
+			var attr = typeDefinition.CustomAttributes.FirstOrDefault(a => a != null && CILUtils.IsSameTypeReference(a.AttributeType, attr0.AttributeType));
+			if (attr==null)
             {
 				needInject = true;
-				typeDefinition.CustomAttributes.Add(attr);
+				typeDefinition.CustomAttributes.Add(attr0);
+				attr = attr0;
 			}
 
 			{
 				var item = attr.ConstructorArguments[0];
 				if (item.Value.Equals(0))
 				{
+					var newItem = new CustomAttributeArgument(item.Type, 1);
+					attr.ConstructorArguments.Remove(item);
+					attr.ConstructorArguments.Add(newItem);
 					needInject = true;
 				}
 			}

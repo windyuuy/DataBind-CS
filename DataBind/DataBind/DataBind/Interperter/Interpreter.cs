@@ -1161,38 +1161,129 @@ namespace vm
 					}
 
 					{
-						var a1 = Convert.ToDouble(a);
-						var b1 = Convert.ToDouble(b);
-
-						switch (ast.operatorx)
+						if(
+							(a is double)
+							|| (a is int)
+							|| (a is long)
+							|| (a is short)
+							)
 						{
-							case number op when op == TNodeType.Inst["**"]:
-								return Math.Pow(a1, b1);
-							case number op when op == TNodeType.Inst["*"]:
-								return a1 * b1;
-							case number op when op == TNodeType.Inst["/"]:
-								return a1 / b1;
-							case number op when op == TNodeType.Inst["%"]:
-								return a1 % b1;
-							case number op when op == TNodeType.Inst["+"]:
-								return a1 + b1;
-							case number op when op == TNodeType.Inst["-"]:
-								return a1 - b1;
-							case number op when op == TNodeType.Inst[">"]:
-								return a1 > b1;
-							case number op when op == TNodeType.Inst["<"]:
-								return a1 < b1;
-							case number op when op == TNodeType.Inst[">="]:
-								return a1 >= b1;
-							case number op when op == TNodeType.Inst["<="]:
-								return a1 <= b1;
-							case number op when op == TNodeType.Inst["!="]:
-								return a1 != b1;
-							case number op when op == TNodeType.Inst["=="]:
-								return a1 == b1;
-							default:
-								throw new Exception($"意外的二元运算符[{TNodeType.Inst[ast.operatorx]}]");
-						}
+							var a1 = Convert.ToDouble(a);
+							var b1 = Convert.ToDouble(b);
+
+							switch (ast.operatorx)
+							{
+								case number op when op == TNodeType.Inst["**"]:
+									return Math.Pow(a1, b1);
+								case number op when op == TNodeType.Inst["*"]:
+									return a1 * b1;
+								case number op when op == TNodeType.Inst["/"]:
+									return a1 / b1;
+								case number op when op == TNodeType.Inst["%"]:
+									return a1 % b1;
+								case number op when op == TNodeType.Inst["+"]:
+									return a1 + b1;
+								case number op when op == TNodeType.Inst["-"]:
+									return a1 - b1;
+								case number op when op == TNodeType.Inst[">"]:
+									return a1 > b1;
+								case number op when op == TNodeType.Inst["<"]:
+									return a1 < b1;
+								case number op when op == TNodeType.Inst[">="]:
+									return a1 >= b1;
+								case number op when op == TNodeType.Inst["<="]:
+									return a1 <= b1;
+								case number op when op == TNodeType.Inst["!="]:
+									return a1 != b1;
+								case number op when op == TNodeType.Inst["=="]:
+									return a1 == b1;
+								default:
+									throw new Exception($"意外的二元运算符[{TNodeType.Inst[ast.operatorx]}]");
+							}
+                        }
+                        else
+                        {
+							// TODO: 支持自动定位运算符
+                            switch (ast.operatorx)
+							{
+								case number op when op == TNodeType.Inst["**"]:
+									{
+										var mOp = a.GetType().GetMethod("op_Pow", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+								case number op when op == TNodeType.Inst["*"]:
+									{
+										var mOp = a.GetType().GetMethod("op_Multiply",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public);
+										var ret= mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+                                case number op when op == TNodeType.Inst["/"]:
+                                    {
+										var mOp = a.GetType().GetMethod("op_Division", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+                                case number op when op == TNodeType.Inst["%"]:
+									{
+										var mOp = a.GetType().GetMethod("op_Modulus", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+								case number op when op == TNodeType.Inst["+"]:
+									{
+										var mOp = a.GetType().GetMethod("op_Addition", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+								case number op when op == TNodeType.Inst["-"]:
+									{
+										var mOp = a.GetType().GetMethod("op_Subtraction", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+								case number op when op == TNodeType.Inst[">"]:
+									{
+										var mOp = a.GetType().GetMethod("op_GreaterThan", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+								case number op when op == TNodeType.Inst["<"]:
+									{
+										var mOp = a.GetType().GetMethod("op_LessThan", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+								case number op when op == TNodeType.Inst[">="]:
+									{
+										var mOp = a.GetType().GetMethod("op_GreaterThanOrEqual", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+								case number op when op == TNodeType.Inst["<="]:
+									{
+										var mOp = a.GetType().GetMethod("op_LessThanOrEqual", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
+										return ret;
+									}
+								case number op when op == TNodeType.Inst["!="]:
+									{
+										//var mOp = a.GetType().GetMethod("op_Inequality", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										//var ret = mOp.Invoke(a, new object[] { b });
+										//return ret;
+										return a != b;
+									}
+								case number op when op == TNodeType.Inst["=="]:
+									{
+										//var mOp = a.GetType().GetMethod("op_Equality", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										//var ret = mOp.Invoke(a, new object[] { b });
+										//return ret;
+										return a == b;
+									}
+								default:
+                                    throw new Exception($"意外的二元运算符[{TNodeType.Inst[ast.operatorx]}]");
+                            }
+                        }
 					}
 				}
 			}

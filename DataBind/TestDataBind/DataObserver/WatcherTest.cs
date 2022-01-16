@@ -3,6 +3,7 @@ using System;
 using System.ListExt;
 using System.Text;
 using vm;
+using DataBinding;
 
 namespace TestDataBind.DataObserver
 {

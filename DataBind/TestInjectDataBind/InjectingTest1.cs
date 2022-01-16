@@ -157,56 +157,28 @@ namespace TestWithInjected
         public void TestInjectDataBind()
         {
             var useSymbols = false;
-            using (var assembly = AssemblyDefinition.ReadAssembly(@"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net472\RunDataBindDemo.dll", new ReaderParameters()
-            {
-                ReadSymbols = useSymbols,
-                //ReadingMode = ReadingMode.Immediate,
-                //ReadWrite = true,
-            }))
-            {
-                //if (false)
+            BindEntry.InjectDataBind(
+                @"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net472\RunDataBindDemo.dll",
+                new InjectOptions()
                 {
-                    var sys = AssemblyDefinition.ReadAssembly(typeof(void).Assembly.Location);
-                    CILUtils.SysAssembly = sys;
-                    DataBindTool.MainAssembly = assembly;
-                    DataBindTool.SysAssembly = sys;
-
-                    var types = assembly.MainModule.GetTypes();
-                    var MarkAttr=assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute));
-                    var MarkAttrCtor=assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute).GetConstructor(new Type[] { typeof(int) }));
-
-                    var MarkInterface = assembly.MainModule.ImportReference(typeof(vm.IHostStand));
-                    var IntRef=assembly.MainModule.ImportReference(typeof(int));
-
-                    foreach (var type in types)
-                    {
-
-                        if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter,MarkInterface)))
-                        {
-                            DataBindTool.HandleHost(type);
-
-                            var attr2 = new CustomAttribute(MarkAttrCtor);
-                            attr2.ConstructorArguments.Add(new CustomAttributeArgument(IntRef,0));
-                            DataBindTool.HandleObservable(type, attr2);
-                            continue;
-                        } 
-
-                        var attr=type.CustomAttributes.FirstOrDefault(c=>CILUtils.IsSameAttr(c,MarkAttr));
-                        if(attr != null)
-                        {
-                            DataBindTool.HandleObservable(type,attr);
-                            continue;
-                        }
-
-                    }
-                }
-
-                assembly.Write(@"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll", new WriterParameters()
-                {
-                    WriteSymbols = useSymbols,
+                    useSymbols = useSymbols,
+                    outputPath= @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll",
                 });
-                Console.Out.WriteLine("donex22x");
-            }
+            console.log("inject done.");
+        }
+
+        [Test]
+        public void TestReInjectDataBind()
+        {
+            var useSymbols = false;
+            BindEntry.InjectDataBind(
+                @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll",
+                new InjectOptions()
+                {
+                    useSymbols = useSymbols,
+                    outputPath = @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll",
+                });
+            console.log("inject done.");
         }
 
     }
