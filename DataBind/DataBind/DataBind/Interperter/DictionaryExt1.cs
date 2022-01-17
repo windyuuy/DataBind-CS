@@ -30,24 +30,22 @@ namespace DataBinding.CollectionExt
 			this.dict = (System.Collections.Generic.IDictionary<K, object>)dict.RawDict;
 		}
 
-		public V GetValue(K key)
+		public virtual V GetValue(K key)
 		{
 			return Utils.ConvItem<V>(dict[key]);
 		}
 
-		[Obsolete]
-		public override object this[object key]
-        {
-            get {
-				var key2 = Utils.ConvItem<K>(key);
-				return this[key2];
-			}
-            set
-            {
-				var key2 = Utils.ConvItem<K>(key);
-                this[key2] = Utils.ConvItem<V>(value);
-			}
-        }
+		public override object GetValueByKey(object key)
+		{
+			var key2 = Utils.ConvItem<K>(key);
+			return this[key2];
+		}
+		public override void SetValueByKey(object key, object value)
+		{
+			var key2 = Utils.ConvItem<K>(key);
+			this[key2] = Utils.ConvItem<V>(value);
+		}
+
         public virtual V this[K key]
 		{
 			get

@@ -54,15 +54,15 @@ namespace DataBindService
 			if (attr == null)
 			{
 				needInject = true;
-				typeDefinition.CustomAttributes.Add(attr0);
-				attr = attr0;
-			}
-
-			{
+				attr = CILUtils.CopyCustomAttribute(MainAssembly,attr0);
+				typeDefinition.CustomAttributes.Add(attr);
+            }
+            else
+            {
 				var item = attr.ConstructorArguments[0];
 				if (item.Value.Equals(0))
 				{
-					var newItem = new CustomAttributeArgument(item.Type, 1);
+					var newItem = new CustomAttributeArgument(item.Type, attr0.ConstructorArguments[0].Value);
 					attr.ConstructorArguments.Remove(item);
 					attr.ConstructorArguments.Add(newItem);
 					needInject = true;
@@ -327,5 +327,19 @@ namespace DataBindService
 			}
 			#endregion
 		}
+
+		public static void HandleObservableRecursive(TypeDefinition typeDefinition,CustomAttribute attr0)
+        {
+			HandleObservable(typeDefinition, attr0);
+			typeDefinition.Properties.ToArray().ForEach(prop =>
+			{
+				var propTypeDef = MainAssembly.MainModule.Types.FirstOrDefault(t => CILUtils.IsSameTypeReference(t, prop.PropertyType));
+				if(propTypeDef != null)
+                {
+					var attr = typeDefinition.CustomAttributes.FirstOrDefault(a => a != null && CILUtils.IsSameTypeReference(a.AttributeType, attr0.AttributeType));
+					HandleObservableRecursive(propTypeDef, attr);
+				}
+			});
+        }
 	}
 }

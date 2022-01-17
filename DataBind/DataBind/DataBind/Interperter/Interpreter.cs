@@ -1160,50 +1160,28 @@ namespace vm
 					}
 
 					{
-						if(
-							(a is double)
-							|| (a is int)
-							|| (a is long)
-							|| (a is short)
+						if (
+							a!=null&&b!=null&&
+							(a.GetType().IsPrimitive && b.GetType().IsPrimitive)
+							&& (
+								(a is double || a is double)
+								|| (a is float || b is float)
+								|| (a is ulong || b is ulong)
+								|| (a is long || b is long)
+								|| (a is uint || b is uint)
+								|| (a is int || b is int)
+								|| (a is ushort || b is ushort)
+								|| (a is short || b is short)
+								)
 							)
 						{
-							var a1 = Convert.ToDouble(a);
-							var b1 = Convert.ToDouble(b);
-
-							switch (ast.operatorx)
-							{
-								case number op when op == TNodeType.Inst["**"]:
-									return Math.Pow(a1, b1);
-								case number op when op == TNodeType.Inst["*"]:
-									return a1 * b1;
-								case number op when op == TNodeType.Inst["/"]:
-									return a1 / b1;
-								case number op when op == TNodeType.Inst["%"]:
-									return a1 % b1;
-								case number op when op == TNodeType.Inst["+"]:
-									return a1 + b1;
-								case number op when op == TNodeType.Inst["-"]:
-									return a1 - b1;
-								case number op when op == TNodeType.Inst[">"]:
-									return a1 > b1;
-								case number op when op == TNodeType.Inst["<"]:
-									return a1 < b1;
-								case number op when op == TNodeType.Inst[">="]:
-									return a1 >= b1;
-								case number op when op == TNodeType.Inst["<="]:
-									return a1 <= b1;
-								case number op when op == TNodeType.Inst["!="]:
-									return a1 != b1;
-								case number op when op == TNodeType.Inst["=="]:
-									return a1 == b1;
-								default:
-									throw new Exception($"意外的二元运算符[{TNodeType.Inst[ast.operatorx]}]");
-							}
-                        }
-                        else
-                        {
+							var ret = MathInsider.CalcUnkownNumOp(ast.operatorx, a, b);
+							return ret;
+						}
+						else
+						{
 							// TODO: 支持自动定位运算符
-                            switch (ast.operatorx)
+							switch (ast.operatorx)
 							{
 								case number op when op == TNodeType.Inst["**"]:
 									{
@@ -1213,17 +1191,17 @@ namespace vm
 									}
 								case number op when op == TNodeType.Inst["*"]:
 									{
-										var mOp = a.GetType().GetMethod("op_Multiply",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public);
-										var ret= mOp.Invoke(a, new object[] { b });
+										var mOp = a.GetType().GetMethod("op_Multiply", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-                                case number op when op == TNodeType.Inst["/"]:
-                                    {
+								case number op when op == TNodeType.Inst["/"]:
+									{
 										var mOp = a.GetType().GetMethod("op_Division", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-                                case number op when op == TNodeType.Inst["%"]:
+								case number op when op == TNodeType.Inst["%"]:
 									{
 										var mOp = a.GetType().GetMethod("op_Modulus", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
@@ -1280,9 +1258,9 @@ namespace vm
 										return a == b;
 									}
 								default:
-                                    throw new Exception($"意外的二元运算符[{TNodeType.Inst[ast.operatorx]}]");
-                            }
-                        }
+									throw new Exception($"意外的二元运算符[{TNodeType.Inst[ast.operatorx]}]");
+							}
+						}
 					}
 				}
 			}

@@ -10,10 +10,30 @@ namespace DataBinding.CollectionExt
 	{
 		public virtual object RawDict => throw new NotImplementedException();
 		private IDictionary InnerDict => ((IDictionary)RawDict);
-		[Obsolete]
-		public virtual object this[object key] { get => InnerDict[key]; set => throw new NotImplementedException(); }
 
-		public virtual bool IsFixedSize => InnerDict.IsFixedSize;
+		public virtual object GetValueByKey(object key)
+		{
+			return InnerDict[key];
+		}
+		public virtual void SetValueByKey(object key,object value)
+        {
+			InnerDict[key] = value;
+        }
+
+		[Obsolete]
+		public virtual object this[object key]
+        {
+            get
+            {
+                return GetValueByKey(key);
+            }
+            set
+            {
+                SetValueByKey(key, value);
+            }
+        }
+
+        public virtual bool IsFixedSize => InnerDict.IsFixedSize;
 
 		public virtual bool IsReadOnly => InnerDict.IsReadOnly;
 

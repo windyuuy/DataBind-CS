@@ -66,13 +66,13 @@ namespace vm
 	}
 
 	/// <summary>
-	/// ���۲������Ҫʵ��
+	/// 标记可观察对象
 	/// </summary>
 	public interface IObservable : IObserved, IObservableEvents
 	{
 	}
 	/// <summary>
-	/// ���۲켯����Ҫʵ��
+	/// 标记可观察容器对象
 	/// </summary>
 	public interface IObservableCollection : IObservable
 	{
@@ -90,18 +90,30 @@ namespace DataBinding
 {
 
 	/// <summary>
-	/// �ֶ����ӣ�������������Ҫ�ɹ۲��
+	/// 标记可观察对象
 	/// </summary>
 	[System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
 	public sealed class ObservableAttribute : System.Attribute
 	{
 		/// <summary>
-		/// 0���ȴ��۲죬1�����ڹ۲죬2������۲�
+		/// 状态：0：可观察，1：已观察，2：无需观察
 		/// </summary>
 		public int ObserveState = 0;
 		public ObservableAttribute(int ObserveState = 0)
 		{
 			this.ObserveState = ObserveState;
+		}
+	}
+
+	/// <summary>
+	/// 标记可观察对象
+	/// - 所有属性对应的类型也会被标记为可观察
+	/// </summary>
+	[System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+	public sealed class ObservableRecursiveAttribute : System.Attribute
+	{
+		public ObservableRecursiveAttribute()
+		{
 		}
 	}
 

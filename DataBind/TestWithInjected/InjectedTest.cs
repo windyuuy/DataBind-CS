@@ -61,6 +61,23 @@ namespace TestWithInjected
 
                 Assert.AreEqual(rets.Count, demos.Count);
                 Assert.AreEqual(rets, demos);
+
+                rets.Clear();
+                sampleObs.sub.PropertyChanged += (host, e) =>
+                  {
+                      rets.Add(e.NewValue as string);
+                      console.log("sub value changed:", e.NewValue);
+                  };
+                sampleObs.sub.CCC = demos[0];
+                sampleObs.sub.CCC = demos[0];
+                sampleObs.sub.CCC = demos[1];
+                sampleObs.sub.CCC = demos[1];
+                sampleObs.sub.CCC = demos[2];
+                sampleObs.sub.CCC = demos[2];
+
+                Assert.AreEqual(rets.Count, demos.Count);
+                Assert.AreEqual(rets, demos);
+
             }
         }
 

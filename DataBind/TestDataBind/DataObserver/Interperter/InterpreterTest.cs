@@ -648,12 +648,12 @@ namespace TestDataBind
 			var b = new SampleOBD3<SampleOBD5>();
 			b.Set(new SampleOBD5());
 			b.A.Set(100);
-			Func<object[], Func<object, object>, number> call = (object[] list, Func<object, object> func) =>
+			Func<object[], Func<object, object>, int> call = (object[] list, Func<object, object> func) =>
 			{
-				number s = 0;
+				int s = 0;
 				foreach (var i in list)
 				{
-					s += (number)func(i);
+					s += (int)func(i);
 				}
 				return s;
 			};

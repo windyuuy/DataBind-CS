@@ -396,7 +396,7 @@ namespace TestDataBind.DataObserver
 					expect(progress).toBe(0.1);
 				}
 
-						(Boos["boss"] as TBoss).HpMax = 10;
+				(Boos["boss"] as TBoss).HpMax = 10;
 				(Boos["boss"] as TBoss).Hp = 5;
 				vm.Tick.next();
 				expect(progress).toBe(0.5);
@@ -408,8 +408,8 @@ namespace TestDataBind.DataObserver
 				{
 					{"boss", new Dictionary<string, object>(){
 						{"active" , false},
-						{"HpMax" , 10},
-						{"Hp" , 0},
+						{"HpMax" , (double)10},
+						{"Hp" , (double)0},
 					}}
 				};
 				var newHost = Boos;
@@ -424,15 +424,15 @@ namespace TestDataBind.DataObserver
 					vm.Tick.next();
 					Boos["boss"] = new Dictionary<string, object>(){
 						{"active" , false},
-						{"HpMax" , 10},
-						{"Hp" , 1},
+						{"HpMax" , (double)10},
+						{"Hp" , (double)1},
 					};
 					vm.Tick.next();
 					expect(progress).toBe(0.1);
 				}
 
-				(Boos["boss"] as Dictionary<string, object>)["HpMax"] = 10;
-				(Boos["boss"] as Dictionary<string, object>)["Hp"] = 5;
+				(Boos["boss"] as Dictionary<string, object>)["HpMax"] = (double)10;
+				(Boos["boss"] as Dictionary<string, object>)["Hp"] = (double)5;
 				vm.Tick.next();
 				expect(progress).toBe(0.5);
 			}

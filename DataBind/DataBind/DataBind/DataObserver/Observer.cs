@@ -202,16 +202,16 @@ namespace vm
 						Utils.defineReactive(obj, Utils.ToIndexKey(key), value);
 					}
 				}
-				// TODO: 考虑数组的变化改进
-				//else if(obj is System.Collections.IList)
-				//            {
-				//	var list=obj as System.Collections.IList;
-				//	for(int index = 0; index < list.Count; index++)
-				//                {
-				//		var value = list[index];
-				//		Utils.defineReactive(obj, index.ToString(), value);
-				//	}
-				//            }
+				else if (obj is System.Collections.IList)
+				{
+					var list = obj as System.Collections.IList;
+					for (int index = 0; index < list.Count; index++)
+					{
+						var value = list[index];
+						Utils.defineReactive(obj, index.ToString(), value);
+					}
+				}
+
 				var objColl = Utils.AsObservableCollection(obj);
 				objColl.RelationChanged += (sender, e) =>
 				{

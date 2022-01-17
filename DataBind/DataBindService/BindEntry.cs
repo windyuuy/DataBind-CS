@@ -19,14 +19,15 @@ namespace DataBindService
 
 	public class BindEntry
 	{
-		[System.Diagnostics.DebuggerStepThrough]
-		public static void SupportU3DDataBind()
+        [System.Diagnostics.DebuggerStepThrough]
+        public static void SupportU3DDataBind()
 		{
 			var pathToBuiltProject = @".\Library\ScriptAssemblies\Assembly-CSharp.dll";
 			SupportDataBind(pathToBuiltProject, new BindOptions());
 		}
-		[System.Diagnostics.DebuggerStepThrough]
-		public static void SupportDataBind(string inputPath, BindOptions options)
+
+        [System.Diagnostics.DebuggerStepThrough]
+        public static void SupportDataBind(string inputPath, BindOptions options)
 		{
 			var useSymbols = options.useSymbols;
 
@@ -45,9 +46,14 @@ namespace DataBindService
 					var types = assembly.MainModule.GetTypes();
 					var MarkAttr = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute));
 					var MarkAttrCtor = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute).GetConstructor(new Type[] { typeof(int) }));
+					var MarkRecursiveAttr = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableRecursiveAttribute));
 
 					var MarkInterface = assembly.MainModule.ImportReference(typeof(DataBinding.IStdHost));
 					var IntRef = assembly.MainModule.ImportReference(typeof(int));
+
+					// 模板
+					var ObservableAttrTemp = new CustomAttribute(MarkAttrCtor);
+					ObservableAttrTemp.ConstructorArguments.Add(new CustomAttributeArgument(IntRef, 1));
 
 					foreach (var type in types)
 					{
@@ -56,18 +62,22 @@ namespace DataBindService
 						{
 							DataBindTool.HandleHost(type);
 
-							var attr2 = new CustomAttribute(MarkAttrCtor);
-							attr2.ConstructorArguments.Add(new CustomAttributeArgument(IntRef, 0));
-							DataBindTool.HandleObservable(type, attr2);
-							continue;
+							DataBindTool.HandleObservable(type, ObservableAttrTemp);
+                        }
+                        else
+                        {
+							var attr = type.CustomAttributes.FirstOrDefault(c => CILUtils.IsSameAttr(c, MarkAttr));
+							if (attr != null)
+							{
+								DataBindTool.HandleObservable(type, ObservableAttrTemp);
+							}
 						}
 
-						var attr = type.CustomAttributes.FirstOrDefault(c => CILUtils.IsSameAttr(c, MarkAttr));
-						if (attr != null)
-						{
-							DataBindTool.HandleObservable(type, attr);
-							continue;
-						}
+						var attrRecursive = type.CustomAttributes.FirstOrDefault(c => CILUtils.IsSameAttr(c, MarkRecursiveAttr));
+						if(attrRecursive != null)
+                        {
+							DataBindTool.HandleObservableRecursive(type, ObservableAttrTemp);
+                        }
 
 					}
 				}

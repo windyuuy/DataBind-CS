@@ -162,7 +162,6 @@ namespace TestWithInjected
                 new BindOptions()
                 {
                     useSymbols = useSymbols,
-                    outputPath= @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll",
                 });
             console.log("inject done.");
         }
@@ -176,7 +175,6 @@ namespace TestWithInjected
                 new BindOptions()
                 {
                     useSymbols = useSymbols,
-                    outputPath = @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll",
                 });
             console.log("inject done.");
         }

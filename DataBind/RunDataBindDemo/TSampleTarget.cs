@@ -99,7 +99,12 @@ namespace RunDataBindDemo
         public virtual int KKK2 { get; set; }
     }
 
-    [Observable]
+    public class TSubSampleObserver
+    {
+        public string CCC { get; set; } = "23";
+    }
+
+    [ObservableRecursive]
     public class TSampleObserver
     {
 
@@ -134,7 +139,9 @@ namespace RunDataBindDemo
         }
 
         public string wf { get; set; }
-        public string wf2 { get;  }
+        public string wf2 { get; }
         public string wf3 { set { ffff = int.Parse(value); } }
+
+        public TSubSampleObserver sub { get;set;} =new TSubSampleObserver();
     }
 }

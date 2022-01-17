@@ -89,6 +89,16 @@ namespace DataBinding.CollectionExt
 		{
 			return Utils.ConvItem<T>(list[index]);
 		}
+
+		public override object GetValueByIndex(int index)
+		{
+			return this[index];
+		}
+		public override void SetValueByIndex(int index, object value)
+		{
+			this[index] = Utils.ConvItem<T>(value);
+		}
+
 		public new virtual T this[int index]
 		{
 			get

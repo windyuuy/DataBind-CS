@@ -14,7 +14,26 @@ namespace DataBinding.CollectionExt
 		protected System.Collections.Generic.List<object> list;
 		public virtual System.Collections.Generic.List<object> RawList => list;
 
-		public virtual object this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+		public virtual object GetValueByIndex(int index)
+        {
+			return list[index];
+		}
+		public virtual void SetValueByIndex(int index,object value)
+        {
+			list[index] = value;
+		}
+
+		public virtual object this[int index]
+		{
+			get
+			{
+				return GetValueByIndex(index);
+			}
+			set
+			{
+				SetValueByIndex(index, value);
+			}
+		}
 
 		public virtual bool IsFixedSize => throw new NotImplementedException();
 

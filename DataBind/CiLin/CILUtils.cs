@@ -217,6 +217,17 @@ namespace CiLin
 
 			return targetMethod;
 		}
+
+		public static CustomAttribute CopyCustomAttribute(AssemblyDefinition assembly,CustomAttribute customAttribute)
+        {
+			var copyAttr = new CustomAttribute(customAttribute.Constructor,customAttribute.GetBlob());
+			customAttribute.ConstructorArguments.ForEach(argv =>
+			{
+				var argvCopy = new CustomAttributeArgument(argv.Type, argv.Value);
+				copyAttr.ConstructorArguments.Add(argvCopy);
+			});
+			return copyAttr;
+        }
 		public static PropertyDefinition InjectProperty(AssemblyDefinition assembly, TypeDefinition targetType, string propertyName, Type returnType)
 		{
 			TypeReference propertyType = assembly.MainModule.ImportReference(returnType);
