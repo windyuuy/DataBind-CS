@@ -157,9 +157,9 @@ namespace TestWithInjected
         public void TestInjectDataBind()
         {
             var useSymbols = false;
-            BindEntry.InjectDataBind(
+            BindEntry.SupportDataBind(
                 @"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net472\RunDataBindDemo.dll",
-                new InjectOptions()
+                new BindOptions()
                 {
                     useSymbols = useSymbols,
                     outputPath= @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll",
@@ -171,9 +171,9 @@ namespace TestWithInjected
         public void TestReInjectDataBind()
         {
             var useSymbols = false;
-            BindEntry.InjectDataBind(
+            BindEntry.SupportDataBind(
                 @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll",
-                new InjectOptions()
+                new BindOptions()
                 {
                     useSymbols = useSymbols,
                     outputPath = @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll",

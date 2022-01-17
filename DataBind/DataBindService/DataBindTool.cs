@@ -12,15 +12,15 @@ namespace DataBindService
 		public static AssemblyDefinition MainAssembly;
 		public static AssemblyDefinition SysAssembly;
 		public static void HandleHost(TypeDefinition typeDefinition)
-        {
-            var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
+		{
+			var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
 
 			var IFullHostRef = MainAssembly.MainModule.ImportReference(typeof(vm.IFullHost));
 			var IHostRef = MainAssembly.MainModule.ImportReference(typeof(vm.IHost));
-			if(typeDefinition.Interfaces.Any(inter=>CILUtils.IsSameInterface(inter, IHostRef)))
-            {
+			if (typeDefinition.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, IHostRef)))
+			{
 				return;
-            }
+			}
 			if (typeDefinition.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, IFullHostRef)))
 			{
 				return;
@@ -28,31 +28,31 @@ namespace DataBindService
 
 			#region implement IFullHost
 			var VoidRef = MainAssembly.MainModule.ImportReference(typeof(void));
-			var BoolRef =MainAssembly.MainModule.ImportReference(typeof(bool));
+			var BoolRef = MainAssembly.MainModule.ImportReference(typeof(bool));
 			var TWatcherCollection = typeof(System.Collections.Generic.ICollection<vm.Watcher>);
 			var IWatcherCollectionRef = MainAssembly.MainModule.ImportReference(TWatcherCollection);
 			var TDefaultValueType = typeof(System.Collections.Generic.List<vm.Watcher>);
-			var WatcherRef=MainAssembly.MainModule.ImportReference(typeof (vm.Watcher));
+			var WatcherRef = MainAssembly.MainModule.ImportReference(typeof(vm.Watcher));
 			//var CombineTypeRef = MainAssembly.MainModule.ImportReference(typeof(vm.CombineType<object, string, Func<object, object, object>>));
 			//var CallbackRef = MainAssembly.MainModule.ImportReference(typeof(Action<object, object, object>));
 			//         var CombineTypeRef2 = MainAssembly.MainModule.ImportReference(typeof(vm.CombineType<object, string, number, boolean>));
 
 			CILUtils.InjectProperty(MainAssembly, typeDefinition, "_SIsDestroyed", BoolRef);
-            CILUtils.InjectField(MainAssembly, typeDefinition, "_Swatchers", IWatcherCollectionRef, FieldAttributes.Family);
+			CILUtils.InjectField(MainAssembly, typeDefinition, "_Swatchers", IWatcherCollectionRef, FieldAttributes.Family);
 			CILUtils.InjectGetOrCreateObjectMethod(MainAssembly, typeDefinition, "GetWatchers", "_Swatchers", IWatcherCollectionRef, TDefaultValueType);
 
-			CILUtils.InjectInteface(MainAssembly,typeDefinition,IFullHostRef);
+			CILUtils.InjectInteface(MainAssembly, typeDefinition, IFullHostRef);
 
-            #endregion
-        }
+			#endregion
+		}
 
-        public static void HandleObservable(TypeDefinition typeDefinition, CustomAttribute attr0)
+		public static void HandleObservable(TypeDefinition typeDefinition, CustomAttribute attr0)
 		{
 			var needInject = false;
 
 			var attr = typeDefinition.CustomAttributes.FirstOrDefault(a => a != null && CILUtils.IsSameTypeReference(a.AttributeType, attr0.AttributeType));
-			if (attr==null)
-            {
+			if (attr == null)
+			{
 				needInject = true;
 				typeDefinition.CustomAttributes.Add(attr0);
 				attr = attr0;
@@ -74,17 +74,24 @@ namespace DataBindService
 				return;
 			}
 
-            #region implement IObservable
-            var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
+			#region implement IObservable
+			var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
 
+			var DebuggerStepThroughAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerStepThroughAttribute).GetConstructor(new Type[0]));
 			var ObserverRef = MainAssembly.MainModule.ImportReference(typeof(vm.Observer));
 
 			CILUtils.InjectField(MainAssembly, typeDefinition, "___Sob__", ObserverRef, FieldAttributes.Family);
 			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "_SgetOb", "___Sob__", ObserverRef);
 			CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "_SsetOb", "___Sob__", ObserverRef);
 
-			CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyGot", typeof(vm.PropertyGetEventHandler));
-			CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyChanged", typeof(vm.PropertyChangedEventHandler));
+			var GetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyGot", typeof(vm.PropertyGetEventHandler));
+			var SetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyChanged", typeof(vm.PropertyChangedEventHandler));
+			//GetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			//GetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			//GetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			//SetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			//SetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			//SetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 
 			var RuntimeDemoRef = MainAssembly.MainModule.ImportReference(typeof(DataBindService.DBRuntimeDemo));
 			var RuntimeDemoDef = DataBindAssembly.MainModule.Types.First(t => t != null && t.Namespace == RuntimeDemoRef.Namespace && t.FullName == RuntimeDemoRef.FullName);
@@ -117,6 +124,7 @@ namespace DataBindService
 				worker.Append(worker.Create(OpCodes.Nop));
 				worker.Append(inst2);
 
+				//GetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			}
 			{
 				var eventField = typeDefinition.Fields.First(f => f.Name == "PropertyChanged");
@@ -143,6 +151,7 @@ namespace DataBindService
 				worker.Append(worker.Create(OpCodes.Nop));
 				worker.Append(inst2);
 
+				//SetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			}
 
 			var NotifyPropertyGot = typeDefinition.Methods.First(m => m.Name == "NotifyPropertyGot");
@@ -158,22 +167,22 @@ namespace DataBindService
 
 			typeDefinition.Properties.ForEach(p =>
 			{
-				Instruction[] getMethodInstCopy=null;
+				Instruction[] getMethodInstCopy = null;
 
 				var getMethod = p.GetMethod;
 				// get
 				{
 					if (getMethod != null)
-                    {
+					{
 						getMethodInstCopy = new Instruction[p.GetMethod.Body.Instructions.Count];
 						p.GetMethod.Body.Instructions.CopyTo(getMethodInstCopy, 0);
 
 						var getWorker = getMethod.Body.GetILProcessor();
 
 						VariableDefinition localVar;
-						localVar=getMethod.Body.Variables.FirstOrDefault(v=>v.VariableType==getMethod.ReturnType);
-                        if (localVar == null)
-                        {
+						localVar = getMethod.Body.Variables.FirstOrDefault(v => v.VariableType == getMethod.ReturnType);
+						if (localVar == null)
+						{
 							localVar = new VariableDefinition(getMethod.ReturnType);
 							getMethod.Body.Variables.Add(localVar);
 						}
@@ -198,8 +207,8 @@ namespace DataBindService
 				{
 					// TODO: 优化value判定，优化效率
 					var setMethod = p.SetMethod;
-					if(setMethod != null)
-                    {
+					if (setMethod != null)
+					{
 						var setWorker = setMethod.Body.GetILProcessor();
 
 						if (getMethodInstCopy != null)
@@ -227,8 +236,9 @@ namespace DataBindService
 
 							var privateGetMethodName = $"<set_{setMethod.Name}>b__get0";
 							var privateGetMethod = CILUtils.CopyMethod(MainAssembly, typeDefinition, privateGetMethodName, typeDefinition, p.GetMethod);
-							privateGetMethod.Attributes = MethodAttributes.Private|MethodAttributes.Final|MethodAttributes.NewSlot;
+							privateGetMethod.Attributes = MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot;
 							privateGetMethod.SemanticsAttributes = MethodSemanticsAttributes.None;
+							privateGetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 							getMethodInstCopy.ForEach(inst =>
 							{
 								privateGetMethod.Body.GetILProcessor().Append(inst);
@@ -238,9 +248,9 @@ namespace DataBindService
 							{
 								var getMethodInstList = new System.Collections.Generic.List<Instruction>();
 								Instruction retInst;
-								retInst=setMethod.Body.Instructions.FirstOrDefault(inst => inst != null && inst.OpCode == OpCodes.Ret);
-                                if (retInst == null)
-                                {
+								retInst = setMethod.Body.Instructions.FirstOrDefault(inst => inst != null && inst.OpCode == OpCodes.Ret);
+								if (retInst == null)
+								{
 									retInst = setWorker.Create(OpCodes.Ret);
 									setFinalInst.Add(retInst);
 								}
@@ -251,16 +261,16 @@ namespace DataBindService
 								getMethodInstList.Add(setWorker.Create(OpCodes.Ldarg_1));
 								getMethodInstList.Add(setWorker.Create(OpCodes.Ceq));
 								getMethodInstList.Add(setWorker.Create(OpCodes.Brtrue_S, retInst));
-								setMethod.Body.InitLocals=true;
+								setMethod.Body.InitLocals = true;
 
 								CILUtils.InjectBeforeReturn(setMethod, setFinalInst.ToArray());
 
 								CILUtils.InjectAtMethodBegin(setMethod, getMethodInstList.ToArray());
 
 							}
-                        }
-                        else
-                        {
+						}
+						else
+						{
 
 							List<Instruction> setFinalInst = new List<Instruction>();
 							{
@@ -295,8 +305,8 @@ namespace DataBindService
 
 			CILUtils.InjectInteface(MainAssembly, typeDefinition, IWithPrototypeRef);
 
-			CILUtils.InjectField(MainAssembly,typeDefinition, "___Sproto__", ObjectRef, FieldAttributes.Family);
-			var P_=CILUtils.InjectProperty(MainAssembly, typeDefinition, "_", ObjectRef);
+			CILUtils.InjectField(MainAssembly, typeDefinition, "___Sproto__", ObjectRef, FieldAttributes.Family);
+			var P_ = CILUtils.InjectProperty(MainAssembly, typeDefinition, "_", ObjectRef);
 
 			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "GetProto", "___Sproto__", ObjectRef);
 			var SetProtoDef = CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "SetProto", "___Sproto__", ObjectRef);

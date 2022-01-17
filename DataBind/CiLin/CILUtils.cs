@@ -104,7 +104,7 @@ namespace CiLin
 			//setWorker.Append(setWorker.Create(OpCodes.Br_S, inst));
 			//setWorker.Append(inst);
 			setWorker.Append(setWorker.Create(OpCodes.Ret));
-			set.Parameters.Add(new ParameterDefinition("value",ParameterAttributes.None,propertyType));
+			set.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, propertyType));
 			set.SemanticsAttributes = MethodSemanticsAttributes.None;
 			set.Body.InitLocals = true;
 			targetType.Methods.Add(set);
@@ -301,7 +301,7 @@ namespace CiLin
 
 			return fieldName.ToString();
 		}
-		public static void InjectEvent(AssemblyDefinition assembly, TypeDefinition assemblyTypes, string propertyName, Type returnType)
+		public static EventDefinition InjectEvent(AssemblyDefinition assembly, TypeDefinition assemblyTypes, string propertyName, Type returnType)
 		{
 			//var sys2 = AssemblyDefinition.ReadAssembly(typeof(System.IO.FileAttributes).Assembly.Location);
 			//var sys= AssemblyDefinition.ReadAssembly(typeof(System.Delegate).Assembly.Location);
@@ -425,21 +425,22 @@ namespace CiLin
 			assemblyTypes.Methods.Add(remove);
 
 			//create the event
-			var event1 = new EventDefinition(propertyName, EventAttributes.None, propertyType)
+			var evt1 = new EventDefinition(propertyName, EventAttributes.None, propertyType)
 			{
 				AddMethod = add,
 				RemoveMethod = remove,
 			};
 
 			//add the property to the type.
-			assemblyTypes.Events.Add(event1);
+			assemblyTypes.Events.Add(evt1);
 
+			return evt1;
 		}
 
-		public static void InjectAtMethodBegin(MethodDefinition methodDefinition,Instruction[] instructions)
-        {
+		public static void InjectAtMethodBegin(MethodDefinition methodDefinition, Instruction[] instructions)
+		{
 			var ILWorker = methodDefinition.Body.GetILProcessor();
-            var headInst = ILWorker.Body.Instructions[0];
+			var headInst = ILWorker.Body.Instructions[0];
 			if (headInst == null)
 			{
 				foreach (var instruction in instructions)
@@ -456,8 +457,8 @@ namespace CiLin
 			}
 
 			UpdateMethodOffsets(methodDefinition.Body);
-        }
-        public static void InjectBeforeReturn(MethodDefinition methodDefinition, Instruction[] instructions)
+		}
+		public static void InjectBeforeReturn(MethodDefinition methodDefinition, Instruction[] instructions)
 		{
 			var ILWorker = methodDefinition.Body.GetILProcessor();
 			var replaceRetInst = instructions[0];
