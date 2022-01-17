@@ -14,7 +14,11 @@ namespace vm
 		bool _SIsDestroyed { get; set; }
 	}
 
-	public interface IHostAccessor
+	public interface IHostEntity
+    {
+
+    }
+	public interface IHostAccessor: IHostEntity
 	{
 		// protected System.Collections.Generic.ICollection<Watcher> _Swatchers;
 		System.Collections.Generic.ICollection<Watcher> GetWatchers();
@@ -62,7 +66,7 @@ namespace DataBinding
 	/// <summary>
 	/// 手动添加，标记这个类需要作为观察者
 	/// </summary>
-	[System.AttributeUsage(System.AttributeTargets.All, Inherited = false, AllowMultiple = true)]
+	[System.AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
 	sealed class HostAttribute : System.Attribute
 	{
 		public HostAttribute()

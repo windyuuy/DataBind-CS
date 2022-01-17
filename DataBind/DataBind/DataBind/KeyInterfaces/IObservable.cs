@@ -5,8 +5,10 @@ using System.Linq;
 
 namespace vm
 {
+	[System.Diagnostics.DebuggerStepThrough]
 	public class PropertyChangedEventArgs : EventArgs
 	{
+		[System.Diagnostics.DebuggerStepThrough]
 		public PropertyChangedEventArgs(string propertyName, object newValue, object oldValue)
 		{
 			this.PropertyName = propertyName;
@@ -19,8 +21,10 @@ namespace vm
 		public object NewValue;
 
 	}
+	[System.Diagnostics.DebuggerStepThrough]
 	public class PropertyGetEventArgs : EventArgs
 	{
+		[System.Diagnostics.DebuggerStepThrough]
 		public PropertyGetEventArgs(string propertyName, object value)
 		{
 			this.PropertyName = propertyName;
@@ -30,6 +34,7 @@ namespace vm
 		public virtual string PropertyName { get; }
 		public object Value;
 	}
+	[System.Diagnostics.DebuggerStepThrough]
 	public class RelationChangedEventArgs : EventArgs
 	{
 		public RelationChangedEventArgs(string propertyName, IObservable host, System.Collections.IEnumerable newItems)

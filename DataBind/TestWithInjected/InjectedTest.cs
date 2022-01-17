@@ -81,7 +81,7 @@ namespace TestWithInjected
                 var sampleHost1 = sampleHost as vm.IFullHost;
                 console.log(sampleHost1._SIsDestroyed);
                 sampleHost1.GetWatchers().Clear();
-                sampleHost1._Swatch("KKK", (host, newValue, oldValue) =>
+                sampleHost1.Watch("KKK", (host, newValue, oldValue) =>
                 {
                     rets.Add(newValue as string);
                     console.log("value changed:", newValue);
@@ -104,7 +104,7 @@ namespace TestWithInjected
 
                 var sampleObs = new TSampleObserver();
                 sampleHost1.SetProto(sampleObs);
-                sampleHost1._Swatch("FFFF", (host, newValue, oldValue) =>
+                sampleHost1.Watch("FFFF", (host, newValue, oldValue) =>
                 {
                     rets.Add(newValue as string);
                     console.log("value changed:", newValue);

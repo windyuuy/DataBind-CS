@@ -87,11 +87,11 @@ namespace DataBindService
 			var GetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyGot", typeof(vm.PropertyGetEventHandler));
 			var SetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyChanged", typeof(vm.PropertyChangedEventHandler));
 			//GetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			//GetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			//GetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			GetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			GetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			//SetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			//SetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			//SetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			SetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			SetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 
 			var RuntimeDemoRef = MainAssembly.MainModule.ImportReference(typeof(DataBindService.DBRuntimeDemo));
 			var RuntimeDemoDef = DataBindAssembly.MainModule.Types.First(t => t != null && t.Namespace == RuntimeDemoRef.Namespace && t.FullName == RuntimeDemoRef.FullName);
@@ -124,7 +124,7 @@ namespace DataBindService
 				worker.Append(worker.Create(OpCodes.Nop));
 				worker.Append(inst2);
 
-				//GetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+				GetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			}
 			{
 				var eventField = typeDefinition.Fields.First(f => f.Name == "PropertyChanged");
@@ -151,7 +151,7 @@ namespace DataBindService
 				worker.Append(worker.Create(OpCodes.Nop));
 				worker.Append(inst2);
 
-				//SetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+				SetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			}
 
 			var NotifyPropertyGot = typeDefinition.Methods.First(m => m.Name == "NotifyPropertyGot");

@@ -2,7 +2,7 @@
 using System.Linq;
 using vm;
 
-namespace DataBinding
+namespace vm
 {
 
 	using boolean = System.Boolean;
@@ -67,11 +67,6 @@ namespace DataBinding
 		public static void _SaddWatcher(this IHostAccessor self, Watcher watcher)
 		{
 			self.GetWatchers().Add(watcher);
-		}
-
-		public static IFullHost GetHost(this IHostStand self)
-		{
-			return (IFullHost)self;
 		}
 
 	}
