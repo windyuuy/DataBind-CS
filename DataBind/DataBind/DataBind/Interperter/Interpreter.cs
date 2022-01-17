@@ -421,7 +421,8 @@ namespace vm
 					  }
 					  else
 					  {
-						  nodeList.Add(new WordNode(TNodeType.number, number.Parse(temp), line, column - temp.Length, column - 1));
+						  object eNumValue = MathInsider.ParseNumStr(temp);
+						  nodeList.Add(new WordNode(TNodeType.number, eNumValue, line, column - temp.Length, column - 1));
 						  reset();
 						  run(charx);//重新执行
 					  }
@@ -1161,7 +1162,7 @@ namespace vm
 
 					{
 						if (
-							a!=null&&b!=null&&
+							a != null && b != null &&
 							(a.GetType().IsPrimitive && b.GetType().IsPrimitive)
 							&& (
 								(a is double || a is double)
@@ -1289,7 +1290,8 @@ namespace vm
 							}
 							newEv.SetProto(environment);
 
-							return Interpreter.srun(newEv, (p as BracketASTNode).node);
+							var ret = Interpreter.srun(newEv, (p as BracketASTNode).node);
+							return ret;
 						};
 						return f;
 					}

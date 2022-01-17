@@ -586,7 +586,7 @@ namespace TestDataBind
 			expect(new vm.Interpreter("!false").run(vm.InterpreterEnv.environment)).toBe(true);
 			expect(new vm.Interpreter("3**2").run(vm.InterpreterEnv.environment)).toBe(9);
 			expect(new vm.Interpreter("3*2").run(vm.InterpreterEnv.environment)).toBe(6);
-			expect(new vm.Interpreter("3/2").run(vm.InterpreterEnv.environment)).toBe(1.5);
+			expect(new vm.Interpreter("3.0/2").run(vm.InterpreterEnv.environment)).toBe(1.5);
 			expect(new vm.Interpreter("3%2").run(vm.InterpreterEnv.environment)).toBe(1);
 			expect(new vm.Interpreter("11+12").run(vm.InterpreterEnv.environment)).toBe(23);
 			expect(new vm.Interpreter("11-12").run(vm.InterpreterEnv.environment)).toBe(-1);
@@ -648,12 +648,12 @@ namespace TestDataBind
 			var b = new SampleOBD3<SampleOBD5>();
 			b.Set(new SampleOBD5());
 			b.A.Set(100);
-			Func<object[], Func<object, object>, int> call = (object[] list, Func<object, object> func) =>
+			Func<object[], Func<object, object>, number> call = (object[] list, Func<object, object> func) =>
 			{
-				int s = 0;
+				number s = 0;
 				foreach (var i in list)
 				{
-					s += (int)func(i);
+					s += (number)func(i);
 				}
 				return s;
 			};
