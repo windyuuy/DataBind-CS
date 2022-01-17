@@ -1,6 +1,6 @@
 
 using System;
-using System.ListExt;
+using DataBinding.CollectionExt;
 using DataBinding;
 
 namespace vm

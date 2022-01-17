@@ -1,5 +1,6 @@
 
-using System.ListExt;
+using System;
+using DataBinding.CollectionExt;
 
 namespace vm
 {
@@ -15,9 +16,9 @@ namespace vm
 		 */
 		public static void dependCollection(System.Collections.IEnumerable value)
 		{
-			if(value is System.Collections.IDictionary)
+			if (value is System.Collections.IDictionary)
 			{
-				var dict=value as System.Collections.IDictionary;
+				var dict = value as System.Collections.IDictionary;
 				foreach (var obj0 in dict.Values)
 				{
 					if (Utils.IsObservable(obj0))
@@ -34,8 +35,8 @@ namespace vm
 					}
 				}
 			}
-            else
-            {
+			else
+			{
 				foreach (var obj0 in value)
 				{
 					if (Utils.IsObservable(obj0))

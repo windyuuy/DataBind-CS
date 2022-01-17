@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using vm;
 
-namespace System.ListExt
+namespace DataBinding.CollectionExt
 {
 	public partial class Dictionary : System.Collections.IDictionary, IConvableDictionary
 	{
 		public virtual object RawDict => throw new NotImplementedException();
 		private IDictionary InnerDict => ((IDictionary)RawDict);
+		[Obsolete]
 		public virtual object this[object key] { get => InnerDict[key]; set => throw new NotImplementedException(); }
 
 		public virtual bool IsFixedSize => InnerDict.IsFixedSize;
@@ -18,7 +19,7 @@ namespace System.ListExt
 
 		public virtual ICollection Keys => InnerDict.Keys;
 
-		public virtual ICollection Values => new System.ListExt.List<object>(InnerDict.Values);
+		public virtual ICollection Values => new DataBinding.CollectionExt.List<object>(InnerDict.Values);
 
 		public virtual int Count => InnerDict.Count;
 

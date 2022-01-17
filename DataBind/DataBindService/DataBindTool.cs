@@ -301,7 +301,7 @@ namespace DataBindService
 
 			#region implement IWithPrototype
 			var ObjectRef = MainAssembly.MainModule.ImportReference(typeof(object));
-			var IWithPrototypeRef = MainAssembly.MainModule.ImportReference(typeof(System.ListExt.IWithPrototype));
+			var IWithPrototypeRef = MainAssembly.MainModule.ImportReference(typeof(DataBinding.CollectionExt.IWithPrototype));
 
 			CILUtils.InjectInteface(MainAssembly, typeDefinition, IWithPrototypeRef);
 

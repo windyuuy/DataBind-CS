@@ -93,7 +93,7 @@ namespace RunDataBindDemo
 
     }
 
-    public class TSampleHost:IHostStand
+    public class TSampleHost:IStdHost
     {
         public virtual string KKK { get; set; }
         public virtual int KKK2 { get; set; }

@@ -69,6 +69,10 @@ namespace vm
 			self.GetWatchers().Add(watcher);
 		}
 
+		public static void _SclearWatchers(this IHostAccessor self)
+        {
+			self.GetWatchers().Clear();
+        }
 	}
 
 }

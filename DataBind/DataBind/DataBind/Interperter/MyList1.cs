@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using vm;
 
-namespace System.ListExt
+namespace DataBinding.CollectionExt
 {
 	using TRawList = System.Collections.Generic.List<object>;
-	public partial class List<T> : List, IConvableList,IHostAccessor, ICollection<T>, IEnumerable<T>, IEnumerable, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection, IObservableCollection
+	public partial class List<T> : List, IConvableList, IHostAccessor, ICollection<T>, IEnumerable<T>, IEnumerable, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection, IObservableCollection
 	{
 		public List()
 		{
@@ -48,23 +47,23 @@ namespace System.ListExt
 		public event PropertyGetEventHandler PropertyGot;
 		public event RelationChangedEventHandler RelationChanged;
 
-		public virtual void NotifyPropertyGot(object value, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		public virtual void NotifyPropertyGot(object value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
 		{
 			this.PropertyGot?.Invoke(this, new PropertyGetEventArgs(propertyName, value));
 		}
-		public virtual void NotifyPropertyChanged(object newValue, object oldValue, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		public virtual void NotifyPropertyChanged(object newValue, object oldValue, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
 		{
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, newValue, oldValue));
 		}
-		public virtual void NotifyAddRelations(System.Collections.IEnumerable values, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		public virtual void NotifyAddRelations(System.Collections.IEnumerable values, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
 		{
 			this.RelationChanged?.Invoke(this, new RelationChangedEventArgs(propertyName, this, values));
 		}
-		public virtual void NotifyAddRelation(object value, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		public virtual void NotifyAddRelation(object value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
 		{
 			this.RelationChanged?.Invoke(this, new RelationChangedEventArgs(propertyName, this, new object[] { value }));
 		}
-		public virtual void NotifyChangedRelation([Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		public virtual void NotifyChangedRelation([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
 		{
 			this.RelationChanged?.Invoke(this, new RelationChangedEventArgs(propertyName, this, null));
 		}
@@ -94,7 +93,7 @@ namespace System.ListExt
 		{
 			get
 			{
-				var value=GetValue(index);
+				var value = GetValue(index);
 				//this.NotifyPropertyGot(value, index.ToString());
 				return value;
 			}
@@ -102,14 +101,14 @@ namespace System.ListExt
 			{
 				var v0 = list[index];
 				list[index] = value;
-                this.NotifyAddRelation(value);
+				this.NotifyAddRelation(value);
 				//this.NotifyPropertyChanged(value,v0,index.ToString());
-            }
+			}
 		}
 		public virtual T this[double index]
 		{
-			get=>this[(int)index];
-			set=>this[(int)index] = value;
+			get => this[(int)index];
+			set => this[(int)index] = value;
 		}
 
 		public override int Count => list.Count;
@@ -250,7 +249,7 @@ namespace System.ListExt
 			int count;
 			if (count0 == null)
 			{
-				count = list.Count-index;
+				count = list.Count - index;
 			}
 			else
 			{

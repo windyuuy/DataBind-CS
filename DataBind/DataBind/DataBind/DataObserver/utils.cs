@@ -1,4 +1,4 @@
-using System.ListExt;
+using DataBinding.CollectionExt;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -224,7 +224,8 @@ namespace vm
 					if (m == null)
 					{
 						// 尝试从索引中获取
-						var mget = type.GetMethod("get_Item", new Type[] { key.GetType() });
+						var tkey = key.GetType();
+						var mget = type.GetMethod("get_Item", new Type[] { tkey });
 						if (mget != null)
 						{
 							var hasKey = true;
@@ -582,10 +583,10 @@ namespace vm
 
 		public static F ConvItem<F>(object value)
 		{
-			if(value == null)
-            {
+			if (value == null)
+			{
 				return default(F);
-            }
+			}
 
 			var v = value;
 			if (v is F)

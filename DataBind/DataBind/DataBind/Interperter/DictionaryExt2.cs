@@ -1,7 +1,7 @@
 using System;
 using vm;
 
-namespace System.ListExt
+namespace DataBinding.CollectionExt
 {
 	public partial class Dictionary<K, V> : System.Collections.Generic.IDictionary<K, V>, IConvertible
 	{
@@ -72,10 +72,10 @@ namespace System.ListExt
 
 		public object ToType(Type conversionType, IFormatProvider provider)
 		{
-            if (conversionType.IsAssignableFrom(this.GetType()))
-            {
+			if (conversionType.IsAssignableFrom(this.GetType()))
+			{
 				return this;
-            }
+			}
 			else if (typeof(Dictionary).IsAssignableFrom(conversionType))
 			{
 				var con = conversionType.GetConstructor(new Type[] { typeof(IConvableDictionary) });

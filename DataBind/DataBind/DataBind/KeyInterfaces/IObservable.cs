@@ -1,5 +1,5 @@
 using System;
-using System.ListExt;
+using DataBinding.CollectionExt;
 using System.Linq;
 
 
@@ -66,21 +66,21 @@ namespace vm
 	}
 
 	/// <summary>
-	/// ±»¹Û²ì¶ÔÏóÐèÒªÊµÏÖ
+	/// ï¿½ï¿½ï¿½Û²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÒªÊµï¿½ï¿½
 	/// </summary>
 	public interface IObservable : IObserved, IObservableEvents
 	{
 	}
 	/// <summary>
-	/// ±»¹Û²ì¼¯ºÏÐèÒªÊµÏÖ
+	/// ï¿½ï¿½ï¿½Û²ì¼¯ï¿½ï¿½ï¿½ï¿½ÒªÊµï¿½ï¿½
 	/// </summary>
 	public interface IObservableCollection : IObservable
 	{
 		event RelationChangedEventHandler RelationChanged;
 	}
-	
+
 	public interface IObservableEventDelegate
-    {
+	{
 		void NotifyPropertyGot(object value, string propertyName);
 		void NotifyPropertyChanged(object newValue, object oldValue, string propertyName);
 	}
@@ -90,16 +90,16 @@ namespace DataBinding
 {
 
 	/// <summary>
-	/// ÊÖ¶¯Ìí¼Ó£¬±ê¼ÇÕâ¸öÀàÊÇÐèÒª¿É¹Û²ìµÄ
+	/// ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½Ó£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½É¹Û²ï¿½ï¿½
 	/// </summary>
 	[System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
 	public sealed class ObservableAttribute : System.Attribute
 	{
 		/// <summary>
-		/// 0£ºµÈ´ý¹Û²ì£¬1£ºÒÑÔÚ¹Û²ì£¬2£ºÎÞÐè¹Û²ì
+		/// 0ï¿½ï¿½ï¿½È´ï¿½ï¿½Û²ì£¬1ï¿½ï¿½ï¿½ï¿½ï¿½Ú¹Û²ì£¬2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Û²ï¿½
 		/// </summary>
 		public int ObserveState = 0;
-		public ObservableAttribute(int ObserveState=0)
+		public ObservableAttribute(int ObserveState = 0)
 		{
 			this.ObserveState = ObserveState;
 		}

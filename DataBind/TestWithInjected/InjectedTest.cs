@@ -76,11 +76,11 @@ namespace TestWithInjected
             var rets = new System.Collections.Generic.List<string>();
 
             var sampleHost = new TSampleHost();
-            if (sampleHost is vm.IFullHost)
+            if (sampleHost is IStdHost)
             {
-                var sampleHost1 = sampleHost as vm.IFullHost;
-                console.log(sampleHost1._SIsDestroyed);
-                sampleHost1.GetWatchers().Clear();
+                var sampleHost1 = sampleHost as IStdHost;
+                console.log(sampleHost1.IsHostDestroyed());
+                sampleHost1.ClearWatchers();
                 sampleHost1.Watch("KKK", (host, newValue, oldValue) =>
                 {
                     rets.Add(newValue as string);

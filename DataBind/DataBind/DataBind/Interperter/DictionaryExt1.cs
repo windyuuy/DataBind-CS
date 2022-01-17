@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 using vm;
 
-namespace System.ListExt
+namespace DataBinding.CollectionExt
 {
 	public interface IConvableDictionary
 	{
@@ -36,26 +35,47 @@ namespace System.ListExt
 			return Utils.ConvItem<V>(dict[key]);
 		}
 
-		public virtual V this[K key]
+		[Obsolete]
+		public override object this[object key]
         {
-            get
-            {
-                var value=Utils.ConvItem<V>(dict[key]);
-				this.NotifyPropertyGot(value, Utils.ToIndexKey(key));
-				return value;
-            }
+            get {
+				var key2 = Utils.ConvItem<K>(key);
+				return this[key2];
+			}
             set
             {
+				var key2 = Utils.ConvItem<K>(key);
+                this[key2] = Utils.ConvItem<V>(value);
+			}
+        }
+        public virtual V this[K key]
+		{
+			get
+			{
+				var value = Utils.ConvItem<V>(dict[key]);
+				this.NotifyPropertyGot(value, Utils.ToIndexKey(key));
+				return value;
+			}
+			set
+			{
 				object v0;
 				dict.TryGetValue(key, out v0);
-                dict[key] = value;
-				this.NotifyPropertyChanged(value, v0, Utils.ToIndexKey(key));
-            }
-        }
+				var keyExist = dict.ContainsKey(key);
+				dict[key] = value;
+                if (keyExist)
+                {
+                    this.NotifyPropertyChanged(value, v0, Utils.ToIndexKey(key));
+                }
+                else
+                {
+					this.NotifyAddRelation(value, Utils.ToIndexKey(key));
+				}
+			}
+		}
 
-        public new virtual System.Collections.Generic.ICollection<K> Keys => dict.Keys;
+		public new virtual System.Collections.Generic.ICollection<K> Keys => dict.Keys;
 
-		public new virtual System.Collections.Generic.ICollection<V> Values => new System.ListExt.List<V>(dict.Values);
+		public new virtual System.Collections.Generic.ICollection<V> Values => new DataBinding.CollectionExt.List<V>(dict.Values);
 
 		public override int Count => dict.Count;
 
@@ -64,13 +84,13 @@ namespace System.ListExt
 		public virtual void Add(K key, V value)
 		{
 			dict.Add(key, value);
-			NotifyAddRelation(value);
+			NotifyAddRelation(value,Utils.ToIndexKey(key));
 		}
 
 		public virtual void Add(System.Collections.Generic.KeyValuePair<K, V> item)
 		{
 			dict.Add(item.Key, item.Value);
-			NotifyAddRelation(item.Value);
+			NotifyAddRelation(item.Value,Utils.ToIndexKey(item.Key));
 		}
 
 		public override void Clear()
@@ -153,5 +173,5 @@ namespace System.ListExt
 			return dict.GetEnumerator();
 		}
 
-    }
+	}
 }

@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using System.ListExt;
+using DataBinding.CollectionExt;
 using System;
 using vm;
 
@@ -551,31 +551,31 @@ namespace TestDataBind
 		[Test]
 		public void test环境测试()
 		{
-            {
+			{
 				var v = ((System.Reflection.MethodInfo)InterpreterEnv.environment["MIN"])
 					.Invoke(InterpreterEnv.environment, new object[] { new double[] { 1, 2 } });
 				expect(v).toBe(1);
-                expect((double)vm.InterpreterEnv.environment["PI"]).toBe(Math.PI);
-            }
-            {
+				expect((double)vm.InterpreterEnv.environment["PI"]).toBe(Math.PI);
+			}
+			{
 				var a = new TEnvExt();
-                InterpreterEnv.extendsEnvironment(a);
+				InterpreterEnv.extendsEnvironment(a);
 				var v = ((System.Reflection.MethodInfo)a["MIN"])
 					.Invoke(InterpreterEnv.environment, new object[] { new double[] { 1, 2 } });
 				expect(v).toBe(1);
-                expect(a["PI"]).toBe(Math.PI);
-                expect(a.Count).toBe(0);
-            }
-            {
-                var b = new TEnvExt(){ { "a", 1 } };
+				expect(a["PI"]).toBe(Math.PI);
+				expect(a.Count).toBe(0);
+			}
+			{
+				var b = new TEnvExt() { { "a", 1 } };
 				var count0 = b.Count;
-                InterpreterEnv.implementEnvironment(b);
+				InterpreterEnv.implementEnvironment(b);
 				var v = ((System.Reflection.MethodInfo)b["MIN"])
 					.Invoke(InterpreterEnv.environment, new object[] { new double[] { 1, 2 } });
 				expect(v).toBe(1);
-                expect(b["PI"]).toBe(Math.PI);
+				expect(b["PI"]).toBe(Math.PI);
 				var count1 = b.Count;
-                expect(count1-count0).toBe(28);
+				expect(count1 - count0).toBe(28);
 				//expect(b.Count).toBe(43);
 			}
 		}

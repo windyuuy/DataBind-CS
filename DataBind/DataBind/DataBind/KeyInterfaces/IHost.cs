@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ListExt;
+using DataBinding.CollectionExt;
 using System.Runtime.CompilerServices;
 
 namespace vm
@@ -15,10 +15,10 @@ namespace vm
 	}
 
 	public interface IHostEntity
-    {
+	{
 
-    }
-	public interface IHostAccessor: IHostEntity
+	}
+	public interface IHostAccessor : IHostEntity
 	{
 		// protected System.Collections.Generic.ICollection<Watcher> _Swatchers;
 		System.Collections.Generic.ICollection<Watcher> GetWatchers();
@@ -45,10 +45,10 @@ namespace vm
 		void _SaddWatcher(Watcher watcher);
 	}
 
-	public interface IFullHost:IHostAccessor,IWithDestroyState,IWithPrototype
-    {
+	public interface IFullHost : IHostAccessor, IWithDestroyState, IWithPrototype
+	{
 
-    }
+	}
 
 }
 
@@ -58,7 +58,7 @@ namespace DataBinding
 	/// <summary>
 	/// 用于标记需要作为观察者
 	/// </summary>
-	public interface IHostStand
+	public interface IStdHost
 	{
 
 	}

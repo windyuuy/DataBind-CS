@@ -36,15 +36,15 @@ namespace vm
 		}
 		public static bool IsProtoDict(this object v)
 		{
-			return (v is System.Collections.IDictionary) && (v is System.ListExt.IWithPrototype);
+			return (v is System.Collections.IDictionary) && (v is DataBinding.CollectionExt.IWithPrototype);
 		}
 		public static bool IsWithProto(this object v)
 		{
-			return (v is System.ListExt.IWithPrototype);
+			return (v is DataBinding.CollectionExt.IWithPrototype);
 		}
 		public static bool IsConvableDict(this object v)
 		{
-			return v is System.ListExt.Dictionary;
+			return v is DataBinding.CollectionExt.Dictionary;
 		}
 	}
 }

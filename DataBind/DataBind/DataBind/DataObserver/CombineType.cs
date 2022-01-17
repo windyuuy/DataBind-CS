@@ -1,5 +1,6 @@
 ﻿
-using System.ListExt;
+using System;
+using DataBinding.CollectionExt;
 
 namespace vm
 {
@@ -34,16 +35,16 @@ namespace vm
 		//	return this.rawobject is system.collections.ilist;
 		//}
 		public virtual List<T> AsList<T>()
-        {
+		{
 			var v = this.RawObject;
-			if(v is List<T>)
-            {
+			if (v is List<T>)
+			{
 				return (List<T>)v;
-            }
-            else
-            {
+			}
+			else
+			{
 				return new List<T>(((List)v).RawList);
-            }
+			}
 		}
 	}
 	public class CombineType<C0> : CombineType
@@ -218,7 +219,7 @@ namespace vm
 				return base.Set(value);
 			}
 		}
-		public CombineType(T3 value) :base()
+		public CombineType(T3 value) : base()
 		{
 			this.value3 = value;
 		}
@@ -243,19 +244,19 @@ namespace vm
 			}
 		}
 
-        public static implicit operator CombineType<C0, T1, T2, T3>(T1 self)
-        {
-            return new CombineType<C0, T1, T2, T3>(self);
-        }
-        public static implicit operator CombineType<C0, T1, T2, T3>(T2 self)
-        {
-            return new CombineType<C0, T1, T2, T3>(self);
-        }
-        public static implicit operator CombineType<C0, T1, T2, T3>(T3 self)
-        {
-            return new CombineType<C0, T1, T2, T3>(self);
-        }
-        public static implicit operator CombineType<C0, T1, T2, T3>(C0 self)
+		public static implicit operator CombineType<C0, T1, T2, T3>(T1 self)
+		{
+			return new CombineType<C0, T1, T2, T3>(self);
+		}
+		public static implicit operator CombineType<C0, T1, T2, T3>(T2 self)
+		{
+			return new CombineType<C0, T1, T2, T3>(self);
+		}
+		public static implicit operator CombineType<C0, T1, T2, T3>(T3 self)
+		{
+			return new CombineType<C0, T1, T2, T3>(self);
+		}
+		public static implicit operator CombineType<C0, T1, T2, T3>(C0 self)
 		{
 			return new CombineType<C0, T1, T2, T3>(self);
 		}
@@ -307,7 +308,7 @@ namespace vm
 			}
 		}
 
-		public static explicit operator CombineType<C0, T1, T2, T3,T4>(C0 self)
+		public static explicit operator CombineType<C0, T1, T2, T3, T4>(C0 self)
 		{
 			return new CombineType<C0, T1, T2, T3, T4>(self);
 		}

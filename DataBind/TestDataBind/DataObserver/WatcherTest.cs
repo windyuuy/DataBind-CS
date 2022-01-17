@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
-using System.ListExt;
+using DataBinding.CollectionExt;
 using System.Text;
 using vm;
 using DataBinding;
@@ -493,18 +493,18 @@ namespace TestDataBind.DataObserver
 			var view = new View4();
 
 			var host = new TestHost2_1()
-            {
-				testString="a",
-				tstNumber=1,
-				subObj=new TestHost1()
-                {
-					tstNumber=2,
-                },
-				testArr=new List<number>()
-                {
+			{
+				testString = "a",
+				tstNumber = 1,
+				subObj = new TestHost1()
+				{
+					tstNumber = 2,
+				},
+				testArr = new List<number>()
+				{
 					1,2,
-                },
-            };
+				},
+			};
 			host._Swatch("this.TestString", (host, newVal, oldVal) =>
 			{
 				view.testString = (string)newVal;
@@ -539,7 +539,7 @@ namespace TestDataBind.DataObserver
 
 		[Test]
 		public void testTick()
-        {
+		{
 			var Boos = new Dictionary<string, object>()
 			{
 				{"boss", new TBoss(){
@@ -555,7 +555,7 @@ namespace TestDataBind.DataObserver
 				var w = newHost._Swatch("boss.Hp/boss.HpMax", (host, newVal, oldVal) =>
 				{
 					progress = (number)newVal;
-				},-1);
+				}, -1);
 				progress = (number)w?.value;
 				vm.Tick.next();
 				expect(progress).toBe(0.5);

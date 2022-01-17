@@ -1,19 +1,19 @@
 using System;
 using vm;
 
-namespace System.ListExt
+namespace DataBinding.CollectionExt
 {
 	public partial class Dictionary<K, V> : System.Collections.Generic.IDictionary<K, V>, IWithPrototype, IObservableCollection, IHostAccessor
 	{
 		public object Proto;
 		public virtual object _ { get; set; }
 
-        public virtual object GetProto()
-        {
-            return Proto;
-        }
+		public virtual object GetProto()
+		{
+			return Proto;
+		}
 
-        public virtual void SetProto(object dict)
+		public virtual void SetProto(object dict)
 		{
 			this.Proto = dict;
 			this._ = dict;
@@ -31,15 +31,15 @@ namespace System.ListExt
 		{
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, newValue, oldValue));
 		}
-		public virtual void NotifyAddRelations(System.Collections.IEnumerable values, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		public virtual void NotifyAddRelations(System.Collections.IEnumerable values, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
 		{
 			this.RelationChanged?.Invoke(this, new RelationChangedEventArgs(propertyName, this, values));
 		}
-		public virtual void NotifyAddRelation(object value, [Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		public virtual void NotifyAddRelation(object value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
 		{
 			this.RelationChanged?.Invoke(this, new RelationChangedEventArgs(propertyName, this, new object[] { value }));
 		}
-		public virtual void NotifyChangedRelation([Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+		public virtual void NotifyChangedRelation([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
 		{
 			this.RelationChanged?.Invoke(this, new RelationChangedEventArgs(propertyName, this, null));
 		}

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using vm;
 
-namespace System.ListExt
+namespace DataBinding.CollectionExt
 {
 	public partial class List<T> : IConvertible
 	{
@@ -75,10 +75,10 @@ namespace System.ListExt
 
 		public object ToType(Type conversionType, IFormatProvider provider)
 		{
-            if (conversionType.IsAssignableFrom(this.GetType()))
-            {
+			if (conversionType.IsAssignableFrom(this.GetType()))
+			{
 				return this;
-            }
+			}
 			else if (typeof(List).IsAssignableFrom(conversionType))
 			{
 				var con = conversionType.GetConstructor(new Type[] { typeof(IConvableList) });

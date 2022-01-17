@@ -46,7 +46,7 @@ namespace DataBindService
 					var MarkAttr = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute));
 					var MarkAttrCtor = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute).GetConstructor(new Type[] { typeof(int) }));
 
-					var MarkInterface = assembly.MainModule.ImportReference(typeof(DataBinding.IHostStand));
+					var MarkInterface = assembly.MainModule.ImportReference(typeof(DataBinding.IStdHost));
 					var IntRef = assembly.MainModule.ImportReference(typeof(int));
 
 					foreach (var type in types)

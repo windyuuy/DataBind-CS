@@ -1,9 +1,10 @@
 
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace System.ListExt
+namespace DataBinding.CollectionExt
 {
 
 	public static class ListExt
