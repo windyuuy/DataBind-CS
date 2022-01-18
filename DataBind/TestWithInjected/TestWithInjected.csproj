@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net471</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <Reference Include="RunDataBindDemo">
-      <HintPath>bin\Debug\net472\RunDataBindDemo.dll</HintPath>
+      <HintPath>bin\Debug\net471\RunDataBindDemo.dll</HintPath>
     </Reference>
   </ItemGroup>
 

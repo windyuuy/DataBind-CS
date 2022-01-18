@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace DataBindService
 {
-	public class BindOptions
+    [System.Diagnostics.DebuggerStepThrough]
+    public class BindOptions
 	{
 		public bool writeImmediate = true;
 		public bool useSymbols = true;
@@ -19,14 +20,14 @@ namespace DataBindService
 
 	public class BindEntry
 	{
-        [System.Diagnostics.DebuggerStepThrough]
+        //[System.Diagnostics.DebuggerStepThrough]
         public static void SupportU3DDataBind()
 		{
 			var pathToBuiltProject = @".\Library\ScriptAssemblies\Assembly-CSharp.dll";
 			SupportDataBind(pathToBuiltProject, new BindOptions());
 		}
 
-        [System.Diagnostics.DebuggerStepThrough]
+        //[System.Diagnostics.DebuggerStepThrough]
         public static void SupportDataBind(string inputPath, BindOptions options)
 		{
 			var useSymbols = options.useSymbols;

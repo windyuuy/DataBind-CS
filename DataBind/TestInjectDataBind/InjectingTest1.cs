@@ -16,7 +16,7 @@ namespace TestWithInjected
         public void Test0Pre01()
         {
             var useSymbols = false;
-            using (var assembly = AssemblyDefinition.ReadAssembly(@"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net472\RunDataBindDemo.dll", new ReaderParameters()
+            using (var assembly = AssemblyDefinition.ReadAssembly(@"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net471\RunDataBindDemo.dll", new ReaderParameters()
             {
                 ReadSymbols = useSymbols,
                 //ReadingMode = ReadingMode.Immediate,
@@ -102,7 +102,7 @@ namespace TestWithInjected
                 //    WriteSymbols = false,
                 //});
                 //assembly.Name.Name = "RunDataBindDemoInjected";
-                assembly.Write(@"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll", new WriterParameters()
+                assembly.Write(@"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll", new WriterParameters()
                 {
                     WriteSymbols = useSymbols,
                 });
@@ -115,7 +115,7 @@ namespace TestWithInjected
         public void Test0Pre02()
         {
             var useSymbols = false;
-            using (var assembly = AssemblyDefinition.ReadAssembly(@"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net472\RunDataBindDemo.dll", new ReaderParameters()
+            using (var assembly = AssemblyDefinition.ReadAssembly(@"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net471\RunDataBindDemo.dll", new ReaderParameters()
             {
                 ReadSymbols = useSymbols,
                 //ReadingMode = ReadingMode.Immediate,
@@ -145,7 +145,7 @@ namespace TestWithInjected
                     }
                 }
 
-                assembly.Write(@"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll", new WriterParameters()
+                assembly.Write(@"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll", new WriterParameters()
                 {
                     WriteSymbols = useSymbols,
                 });
@@ -158,9 +158,10 @@ namespace TestWithInjected
         {
             var useSymbols = false;
             BindEntry.SupportDataBind(
-                @"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net472\RunDataBindDemo.dll",
+                @"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net471\RunDataBindDemo.dll",
                 new BindOptions()
                 {
+                    outputPath= @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll",
                     useSymbols = useSymbols,
                 });
             console.log("inject done.");
@@ -171,7 +172,7 @@ namespace TestWithInjected
         {
             var useSymbols = false;
             BindEntry.SupportDataBind(
-                @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net472\RunDataBindDemo.dll",
+                @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll",
                 new BindOptions()
                 {
                     useSymbols = useSymbols,
