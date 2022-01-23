@@ -5,6 +5,11 @@ using System.Linq;
 
 namespace vm
 {
+	using TDictGotFuncs = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<PropertyGetEventHandler>>;
+	using TGotFuncs = System.Collections.Generic.List<PropertyGetEventHandler>;
+	using TDictChangedFuncs = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<PropertyChangedEventHandler>>;
+	using TChangedFuncs = System.Collections.Generic.List<PropertyChangedEventHandler>;
+
 	public partial class Utils
 	{
 		/// <summary>
@@ -108,38 +113,85 @@ namespace vm
 			var dep = new Dep();
 			var childOb = observe(val);
 			var obj = Utils.AsObservable(obj0);
-			obj.PropertyGot += (sender, e) =>
-			{
-				if (e.PropertyName != key)
-				{
-					return;
-				}
-				//进行依赖收集，依赖收集前 Dependency.collectTarget 会被赋值，收集完成后会置空。
-				if (Dep.target != null)
-				{
-					dep.asCurTargetDepend();//将自身加入到Dependency.collectTarget中
+			var ob = obj._SgetOb();
+			//System.Diagnostics.Debug.Assert(ob != null);
 
-					if (childOb != null)
+            {
+				PropertyGetEventHandler handle= (sender, e) =>
+				{
+					//System.Diagnostics.Debug.Assert(e.PropertyName == key);
+					if (e.PropertyName != key)
 					{
-						childOb.dep.asCurTargetDepend();
-						var value = e.Value;
-						if (Utils.IsCollection(value))
+						return;
+					}
+					//进行依赖收集，依赖收集前 Dependency.collectTarget 会被赋值，收集完成后会置空。
+					if (Dep.target != null)
+					{
+						dep.asCurTargetDepend();//将自身加入到Dependency.collectTarget中
+
+						if (childOb != null)
 						{
-							Dep.dependCollection(Utils.AsCollection(value));
+							childOb.dep.asCurTargetDepend();
+							var value = e.Value;
+							if (Utils.IsCollection(value))
+							{
+								Dep.dependCollection(Utils.AsCollection(value));
+							}
 						}
 					}
-				}
-			};
-			obj.PropertyChanged += (sender, e) =>
-			{
-				if (e.PropertyName != key)
+				};
+				//var weakRef=new WeakReference<PropertyGetEventHandler>(handle);
+				var DictGotFuncs = ob.DictGotFuncs;
+				TGotFuncs funcs;
+				lock (DictGotFuncs)
 				{
-					return;
+					DictGotFuncs.TryGetValue(key, out funcs);
+					if(funcs == null)
+                    {
+						funcs = new TGotFuncs();
+						DictGotFuncs.Add(key, funcs);
+					}
 				}
-				var newVal = e.NewValue;
-				childOb = observe(newVal);//如果是普通对象需要处理成可观察的
-				dep.notifyWatchers();//触发刷新
-			};
+				if(funcs != null)
+                {
+					lock (funcs)
+					{
+						funcs.Add(handle);
+					}
+				}
+			}
+            {
+				PropertyChangedEventHandler handle = (sender, e) =>
+				{
+					//System.Diagnostics.Debug.Assert(e.PropertyName == key);
+					if (e.PropertyName != key)
+					{
+						return;
+					}
+					var newVal = e.NewValue;
+					childOb = observe(newVal);//如果是普通对象需要处理成可观察的
+					dep.notifyWatchers();//触发刷新
+				};
+				//var weakRef = new WeakReference<PropertyChangedEventHandler>(handle);
+				var DictChangedFuncs = ob.DictChangedFuncs;
+				TChangedFuncs funcs;
+				lock (DictChangedFuncs)
+				{
+					DictChangedFuncs.TryGetValue(key, out funcs);
+					if (funcs == null)
+					{
+						funcs = new TChangedFuncs();
+						DictChangedFuncs.Add(key, funcs);
+					}
+				}
+				if(funcs!= null)
+                {
+					lock (funcs)
+					{
+						funcs.Add(handle);
+					}
+				}
+			}
 		}
 	}
 
@@ -147,6 +199,9 @@ namespace vm
 	{
 		public IObservable value;
 		public Dep dep;
+		public TDictGotFuncs DictGotFuncs = new TDictGotFuncs();
+		public TDictChangedFuncs DictChangedFuncs = new TDictChangedFuncs();
+
 		public Observer(
 			IObservable value
 		)
@@ -156,14 +211,57 @@ namespace vm
 
 			//实现双向绑定
 			value._SsetOb(this);
+			value.PropertyGot += onPropertyGot;
+			value.PropertyChanged += onPropertyChanged;
 
-			if (value is System.Collections.IEnumerable)
-			{
-				this.observeCollection((System.Collections.IEnumerable)value);
-			}
+            if (value is System.Collections.IEnumerable)
+            {
+                this.observeCollection((System.Collections.IEnumerable)value);
+            }
 
-			{
+            {
 				this.walk(value);
+			}
+		}
+
+		protected virtual void onPropertyGot(object sender, PropertyGetEventArgs  e)
+		{
+			TGotFuncs funcs;
+			lock (DictGotFuncs)
+            {
+				DictGotFuncs.TryGetValue(e.PropertyName, out funcs);
+            }
+            if (funcs != null)
+            {
+				PropertyGetEventHandler[] funcsArr;
+				lock(funcs){
+					funcsArr = funcs.ToArray();
+                }
+				foreach(var f in funcsArr)
+                {
+					f(sender, e);
+				}
+            }
+		}
+
+		protected virtual void onPropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			TChangedFuncs funcs;
+			lock (DictChangedFuncs)
+			{
+				DictChangedFuncs.TryGetValue(e.PropertyName, out funcs);
+			}
+			if (funcs != null)
+			{
+				PropertyChangedEventHandler[] funcsArr;
+				lock (funcs)
+				{
+					funcsArr = funcs.ToArray();
+				}
+				foreach(var f in funcsArr)
+                {
+					f(sender, e);
+				}
 			}
 		}
 
@@ -211,6 +309,14 @@ namespace vm
 						Utils.defineReactive(obj, index.ToString(), value);
 					}
 				}
+				else if(obj is System.Collections.IEnumerable)
+                {
+					System.Collections.IEnumerable items=obj as System.Collections.IEnumerable;
+					foreach (var item in items)
+					{
+						Utils.observe(item);
+					}
+				}
 
 				var objColl = Utils.AsObservableCollection(obj);
 				objColl.RelationChanged += (sender, e) =>
@@ -247,5 +353,5 @@ namespace vm
 			}
 		}
 
-	}
+    }
 }

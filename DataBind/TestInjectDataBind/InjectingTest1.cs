@@ -12,7 +12,6 @@ namespace TestWithInjected
     public class Tests
     {
 #if true
-        [Test]
         public void Test0Pre01()
         {
             var useSymbols = false;
@@ -111,7 +110,6 @@ namespace TestWithInjected
         }
 #endif
 
-        [Test]
         public void Test0Pre02()
         {
             var useSymbols = false;
@@ -153,7 +151,7 @@ namespace TestWithInjected
             }
         }
 
-        [Test]
+        [Test][Order(0)]
         public void TestInjectDataBind()
         {
             var useSymbols = false;
@@ -167,7 +165,7 @@ namespace TestWithInjected
             console.log("inject done.");
         }
 
-        [Test]
+        [Test][Order(1)]
         public void TestReInjectDataBind()
         {
             var useSymbols = false;

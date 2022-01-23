@@ -115,6 +115,7 @@ namespace TestDataBind
 		public void testDefineReactive()
 		{
 			var o = new SampleOBD2() { a = 1, b = 2, c = 3, };
+			vm.Utils.observe(o);
 			vm.Utils.defineReactive(o, "a", 1);
 			Assert.AreEqual(1, o.a);
 			o.a = 123;

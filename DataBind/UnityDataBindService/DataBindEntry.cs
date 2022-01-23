@@ -11,10 +11,35 @@ using System.Diagnostics;
 
 namespace DataBinding.Editor.DataBindEntry
 {
-
-	public class DataBindEntry
+	public class MyCustomBuildProcessor0
 	{
-		public static bool HasSupport = false;
+		public virtual void HandleDLLs(BuildReport report)
+		{
+		}
+
+	}
+
+	public class DataBindEntry : MyCustomBuildProcessor0, IPostBuildPlayerScriptDLLs
+	{
+		#region IPostBuildPlayerScriptDLLs
+		public int callbackOrder { get { return 0; } }
+
+		public override void HandleDLLs(BuildReport report)
+		{
+			var targets = report.files
+				.Select(f => f.path)
+				.Where(p => p.EndsWith(".dll", System.StringComparison.OrdinalIgnoreCase));
+			BindEntry.SupportU3DDataBind(targets);
+		}
+
+		public virtual void OnPostBuildPlayerScriptDLLs(BuildReport report)
+		{
+			HandleDLLs(report);
+		}
+
+        #endregion
+
+        public static bool HasSupport = false;
 		[PostProcessBuild(1000)]
 		private static void OnPostprocessBuildPlayer(BuildTarget buildTarget, string buildPath)
 		{
@@ -37,33 +62,6 @@ namespace DataBinding.Editor.DataBindEntry
 		{
 
 			BindEntry.SupportU3DDataBind();
-		}
-
-	}
-
-	public class MyCustomBuildProcessor0
-	{
-		public virtual void HandleDLLs(BuildReport report)
-		{
-		}
-
-	}
-
-	public class MyCustomBuildProcessor : MyCustomBuildProcessor0, IPostBuildPlayerScriptDLLs
-	{
-		public int callbackOrder { get { return 0; } }
-
-		[Conditional("UNITY_2019_1_OR_NEWER")]
-		public new void HandleDLLs(BuildReport report)
-		{
-			var filePath = report.files.Single(file => file.path.EndsWith("Assembly-CSharp.dll")).path;
-			var binaryPath = Path.GetDirectoryName(filePath);
-			BindEntry.SupportDataBind(filePath, new BindOptions());
-		}
-
-		public void OnPostBuildPlayerScriptDLLs(BuildReport report)
-		{
-			HandleDLLs(report);
 		}
 
 	}

@@ -25,7 +25,7 @@ namespace vm
 			Tick.queue = Tick.temp;
 			Tick.temp = temp;
 
-			foreach (var w in temp)
+			foreach (var w in temp.ToArray())
 			{
 				w.run();
 			}

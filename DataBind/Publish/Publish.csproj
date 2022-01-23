@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CiLin\CiLin.csproj" />
+    <ProjectReference Include="..\DataBindService\DataBindService.csproj" />
+    <ProjectReference Include="..\DataBind\DataBind.csproj" />
+    <ProjectReference Include="..\EngineAdapter\EngineAdapter.csproj" />
+    <ProjectReference Include="..\UnityDataBindService\UnityDataBindService.csproj" />
+  </ItemGroup>
+
+</Project>

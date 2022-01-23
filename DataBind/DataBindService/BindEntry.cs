@@ -23,8 +23,47 @@ namespace DataBindService
         //[System.Diagnostics.DebuggerStepThrough]
         public static void SupportU3DDataBind()
 		{
-			var pathToBuiltProject = @".\Library\ScriptAssemblies\Assembly-CSharp.dll";
-			SupportDataBind(pathToBuiltProject, new BindOptions());
+			var filePaths = System.IO.Directory.GetFiles(@".\Library\ScriptAssemblies\", @"*.dll", System.IO.SearchOption.TopDirectoryOnly);
+			var validDlls=filePaths
+				.Where(p=>IsValidDllToSupport(p))
+				.ToArray();
+			foreach (var dllPath in validDlls)
+			{
+				SupportDataBind(dllPath, new BindOptions());
+			}
+		}
+		public static void SupportU3DDataBind(IEnumerable<string> filePaths)
+		{
+			var validDlls=filePaths
+				.Where(p=>IsValidDllToSupport(p))
+				.ToArray();
+			foreach (var dllPath in validDlls)
+			{
+                try
+                {
+					SupportDataBind(dllPath, new BindOptions());
+				}
+				catch(Exception ex)
+                {
+					console.error(ex.ToString());
+                }
+			}
+		}
+
+		public static bool IsValidDllToSupport(string filePath)
+        {
+			if (
+					filePath.Contains("Unity.")
+					|| filePath.Contains("UnityEngine.")
+					|| filePath.Contains("UnityEditor.")
+                    || filePath.StartsWith("DataBind.")
+                    || filePath.Contains(".Editor.")
+					|| filePath.Contains(".Cecil.")
+					)
+			{
+				return false;
+			}
+			return true;
 		}
 
         //[System.Diagnostics.DebuggerStepThrough]
@@ -32,78 +71,98 @@ namespace DataBindService
 		{
 			var useSymbols = options.useSymbols;
 
-			using (var assembly = AssemblyDefinition.ReadAssembly(inputPath, new ReaderParameters()
+            try
 			{
-				ReadWrite = true,
-				ReadSymbols = useSymbols,
-			}))
-			{
+				using var assembly = AssemblyDefinition.ReadAssembly(inputPath, new ReaderParameters()
 				{
-					var sys = AssemblyDefinition.ReadAssembly(typeof(void).Assembly.Location);
-					CILUtils.SysAssembly = sys;
-					DataBindTool.MainAssembly = assembly;
-					DataBindTool.SysAssembly = sys;
+					ReadWrite = true,
+					ReadSymbols = useSymbols,
+				});
+				SupportDataBind(assembly, options);
+			}
+			catch (Exception ex)
+            {
+				using var assembly = AssemblyDefinition.ReadAssembly(inputPath, new ReaderParameters()
+				{
+					ReadWrite = true,
+					ReadSymbols = false,
+				});
+				options.useSymbols = false;
+				SupportDataBind(assembly, options);
+				options.useSymbols = useSymbols;
+			}
 
-					var types = assembly.MainModule.GetTypes();
-					var MarkAttr = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute));
-					var MarkAttrCtor = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute).GetConstructor(new Type[] { typeof(int) }));
-					var MarkRecursiveAttr = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableRecursiveAttribute));
+		}
 
-					var MarkInterface = assembly.MainModule.ImportReference(typeof(DataBinding.IStdHost));
-					var IntRef = assembly.MainModule.ImportReference(typeof(int));
+		public static void SupportDataBind(AssemblyDefinition assembly, BindOptions options)
+		{
+			var useSymbols = options.useSymbols;
 
-					// 模板
-					var ObservableAttrTemp = new CustomAttribute(MarkAttrCtor);
-					ObservableAttrTemp.ConstructorArguments.Add(new CustomAttributeArgument(IntRef, 1));
+			{
+				var sys = AssemblyDefinition.ReadAssembly(typeof(void).Assembly.Location);
+				CILUtils.SysAssembly = sys;
+				DataBindTool.MainAssembly = assembly;
+				DataBindTool.SysAssembly = sys;
 
-					foreach (var type in types)
+				var types = assembly.MainModule.GetTypes();
+				var MarkAttr = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute));
+				var MarkAttrCtor = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute).GetConstructor(new Type[] { typeof(int) }));
+				var MarkRecursiveAttr = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableRecursiveAttribute));
+
+				var MarkInterface = assembly.MainModule.ImportReference(typeof(DataBinding.IStdHost));
+				var IntRef = assembly.MainModule.ImportReference(typeof(int));
+
+				// 模板
+				var ObservableAttrTemp = new CustomAttribute(MarkAttrCtor);
+				ObservableAttrTemp.ConstructorArguments.Add(new CustomAttributeArgument(IntRef, 1));
+
+				foreach (var type in types)
+				{
+
+					if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, MarkInterface)))
 					{
+						DataBindTool.HandleHost(type);
 
-						if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, MarkInterface)))
+						DataBindTool.HandleObservable(type, ObservableAttrTemp);
+                    }
+                    else
+                    {
+						var attr = type.CustomAttributes.FirstOrDefault(c => CILUtils.IsSameAttr(c, MarkAttr));
+						if (attr != null)
 						{
-							DataBindTool.HandleHost(type);
-
 							DataBindTool.HandleObservable(type, ObservableAttrTemp);
-                        }
-                        else
-                        {
-							var attr = type.CustomAttributes.FirstOrDefault(c => CILUtils.IsSameAttr(c, MarkAttr));
-							if (attr != null)
-							{
-								DataBindTool.HandleObservable(type, ObservableAttrTemp);
-							}
 						}
-
-						var attrRecursive = type.CustomAttributes.FirstOrDefault(c => CILUtils.IsSameAttr(c, MarkRecursiveAttr));
-						if(attrRecursive != null)
-                        {
-							DataBindTool.HandleObservableRecursive(type, ObservableAttrTemp);
-                        }
-
 					}
+
+					var attrRecursive = type.CustomAttributes.FirstOrDefault(c => CILUtils.IsSameAttr(c, MarkRecursiveAttr));
+					if(attrRecursive != null)
+                    {
+						DataBindTool.HandleObservableRecursive(type, ObservableAttrTemp);
+                    }
+
 				}
+			}
 
-				if (options.onDone != null)
+			if (options.onDone != null)
+			{
+				options.onDone(assembly);
+			}
+
+			if (options.writeImmediate)
+			{
+				if (options.outputPath != null)
 				{
-					options.onDone(assembly);
+					assembly.Write(options.outputPath, new WriterParameters()
+					{
+						WriteSymbols = useSymbols,
+					});
 				}
-
-				if (options.writeImmediate)
+				else
 				{
-					if (options.outputPath != null)
+					assembly.Write(new WriterParameters()
 					{
-						assembly.Write(options.outputPath, new WriterParameters()
-						{
-							WriteSymbols = useSymbols,
-						});
-					}
-					else
-					{
-						assembly.Write(new WriterParameters()
-						{
-							WriteSymbols = useSymbols,
-						});
-					}
+						WriteSymbols = useSymbols,
+					});
 				}
 			}
 		}

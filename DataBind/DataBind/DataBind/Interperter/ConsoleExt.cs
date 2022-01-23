@@ -1,30 +1,36 @@
-
-using System;
+using System.Text;
+using Game.Diagnostics;
 
 public class console
 {
 	public static void error(params object[] ps)
 	{
+		var sbd=new StringBuilder();
 		foreach (var p in ps)
 		{
-			Console.Error.Write(p);
+			sbd.Append(p.ToString());
 		}
-		Console.Error.Write("\n");
+		var ret = sbd.ToString();
+		Console.LogError(ret);
 	}
 	public static void log(params object[] ps)
 	{
+		var sbd = new StringBuilder();
 		foreach (var p in ps)
 		{
-			Console.Out.Write(p);
+			sbd.Append(p.ToString());
 		}
-		Console.Out.Write("\n");
+		var ret = sbd.ToString();
+		Console.Log(ret);
 	}
 	public static void warn(params object[] ps)
 	{
+		var sbd = new StringBuilder();
 		foreach (var p in ps)
 		{
-			Console.Out.Write(p);
+			sbd.Append(p.ToString());
 		}
-		Console.Out.Write("\n");
+		var ret = sbd.ToString();
+		Console.LogWarning(ret);
 	}
 }

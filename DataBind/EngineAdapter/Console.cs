@@ -1,7 +1,7 @@
 using SysConsole = System.Console;
 using SysDebug = System.Diagnostics.Debug;
-//using UConsole = UnityEngine.Debug;
-//using UDebug = UnityEngine.Debug;
+using UConsole = UnityEngine.Debug;
+using UDebug = UnityEngine.Debug;
 
 namespace Game.Diagnostics
 {
@@ -24,17 +24,18 @@ namespace Game.Diagnostics
         Physics
     }
 
+    [System.Diagnostics.DebuggerStepThrough]
     public class Console
     {
         static bool isUnityEnv = false;
         static Console()
         {
-            //try
-            //{
-            //    UConsole.Log("test UConsole");
-            //    isUnityEnv = true;
-            //}
-            //catch (System.Exception)
+            try
+            {
+                UConsole.Log("test UConsole");
+                isUnityEnv = true;
+            }
+            catch (System.Exception)
             {
                 isUnityEnv = false;
             }
@@ -44,7 +45,7 @@ namespace Game.Diagnostics
         {
             if (isUnityEnv)
             {
-                //UConsole.Log(message);
+                UConsole.Log(message);
             }
             else
             {
@@ -56,7 +57,7 @@ namespace Game.Diagnostics
         {
             if (isUnityEnv)
             {
-                //UConsole.LogWarning(message);
+                UConsole.LogWarning(message);
             }
             else
             {
@@ -68,7 +69,7 @@ namespace Game.Diagnostics
         {
             if (isUnityEnv)
             {
-                //UConsole.LogError(message);
+                UConsole.LogError(message);
             }
             else
             {
@@ -80,7 +81,7 @@ namespace Game.Diagnostics
         {
             if (isUnityEnv)
             {
-                //UDebug.Assert(condition);
+                UDebug.Assert(condition);
             }
             else
             {
@@ -91,7 +92,7 @@ namespace Game.Diagnostics
         {
             if (isUnityEnv)
             {
-                //UDebug.Assert(condition,message);
+                UDebug.Assert(condition, message);
             }
             else
             {
@@ -99,6 +100,7 @@ namespace Game.Diagnostics
             }
         }
     }
+
 }
 
 namespace Game.Diagnostics

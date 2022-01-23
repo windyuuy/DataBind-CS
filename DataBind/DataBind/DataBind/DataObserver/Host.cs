@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using DataBinding.CollectionExt;
 using System.Runtime.CompilerServices;
 
@@ -74,8 +75,8 @@ namespace vm
 
 		public virtual void _Sdestroy()
 		{
-			var temp = this._Swatchers;
-			this._Swatchers = new System.Collections.Generic.List<Watcher>();
+			var temp = this._Swatchers.ToArray();
+			this._Swatchers.Clear();
 			foreach (var w in temp)
 			{
 				w.teardown();
