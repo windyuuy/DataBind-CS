@@ -14,8 +14,4 @@
     <ProjectReference Include="..\UnityDataBindService\UnityDataBindService.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="call $(ProjectDir)refactlib.bat $(TargetDir)" />
-  </Target>
-
 </Project>
