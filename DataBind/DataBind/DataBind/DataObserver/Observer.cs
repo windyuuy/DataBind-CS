@@ -114,13 +114,13 @@ namespace vm
 			var childOb = observe(val);
 			var obj = Utils.AsObservable(obj0);
 			var ob = obj._SgetOb();
-			//System.Diagnostics.Debug.Assert(ob != null);
+            System.Diagnostics.Debug.Assert(ob != null);
 
             {
 				PropertyGetEventHandler handle= (sender, e) =>
 				{
-					//System.Diagnostics.Debug.Assert(e.PropertyName == key);
-					if (e.PropertyName != key)
+                    System.Diagnostics.Debug.Assert(e.PropertyName == key);
+                    if (e.PropertyName != key)
 					{
 						return;
 					}
@@ -163,8 +163,8 @@ namespace vm
             {
 				PropertyChangedEventHandler handle = (sender, e) =>
 				{
-					//System.Diagnostics.Debug.Assert(e.PropertyName == key);
-					if (e.PropertyName != key)
+                    System.Diagnostics.Debug.Assert(e.PropertyName == key);
+                    if (e.PropertyName != key)
 					{
 						return;
 					}
@@ -214,10 +214,10 @@ namespace vm
 			value.PropertyGot += onPropertyGot;
 			value.PropertyChanged += onPropertyChanged;
 
-            if (value is System.Collections.IEnumerable)
-            {
-                this.observeCollection((System.Collections.IEnumerable)value);
-            }
+            //if (value is System.Collections.IEnumerable)
+            //{
+            //    this.observeCollection((System.Collections.IEnumerable)value);
+            //}
 
             {
 				this.walk(value);
