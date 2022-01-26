@@ -74,6 +74,20 @@ namespace vm
 			}
 			return b;
 		}
+		public static IWithPrototype implementEnvironment(IWithPrototype b)
+		{
+			var envDict = new TEnv();
+			b.SetProto(envDict);
+			foreach (var kv in environment)
+			{
+				if (kv.Key == "___Sob__")
+				{
+					continue;
+				}
+				envDict[kv.Key] = kv.Value;
+			}
+			return b;
+		}
 	}
 
 }

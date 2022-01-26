@@ -123,4 +123,26 @@ namespace vm
 
 	}
 
+	public partial class Utils
+    {
+
+		/**
+		 * 向普通对象注入Host相关方法
+		 */
+		public static IHost implementHost<T>(T obj) {
+			if(obj is IObservable)
+            {
+				//实现基础方法，用于表达式中方便得调用
+				if (obj is IWithPrototype)
+				{
+					InterpreterEnv.implementEnvironment(obj as IWithPrototype);
+				}
+
+				observe(obj);
+			}
+			return obj as IHost;
+		}
+
+    }
+
 }
