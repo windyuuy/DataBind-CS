@@ -3,3 +3,4 @@ obj
 .vs
 /Tools/sync2gitlab.bat
 /DataBind/DataBindService/Properties/PublishProfiles
+/DataBind/Publish
