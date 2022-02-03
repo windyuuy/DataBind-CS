@@ -48,7 +48,8 @@ namespace DataBindService
 
 		public static void HandleHost(TypeDefinition typeDefinition)
 		{
-			var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
+			var DataBindServiceAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
+			var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBinding.HostExt2).Assembly.Location);
 
 			var IFullHostRef = MainAssembly.MainModule.ImportReference(typeof(vm.IFullHost));
 			var IHostRef = MainAssembly.MainModule.ImportReference(typeof(vm.IHost));
@@ -77,12 +78,115 @@ namespace DataBindService
 			CILUtils.InjectGetOrCreateObjectMethod(MainAssembly, typeDefinition, "GetWatchers", "_Swatchers", IWatcherCollectionRef, TDefaultValueType);
 
 			CILUtils.InjectInteface(MainAssembly, typeDefinition, IFullHostRef);
-			//CILUtils.InjectInteface(MainAssembly, typeDefinition, IHostRef);
 
 			#endregion
-		}
 
-		public static void HandleObservable(TypeDefinition typeDefinition, CustomAttribute attr0)
+			#region implement IHost
+			var implementIHost = false;
+			if (implementIHost)
+            {
+				// implement IHost
+				CILUtils.InjectInteface(MainAssembly, typeDefinition, IHostRef);
+
+				// define _SaddWatcher
+				{
+					var HostExt2Type = typeof(DataBinding.HostExt2);
+					var WatchMethodRef = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethod("AddWatcher"));
+					var methodAttribute = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
+					var _SaddWatcherMethod = new MethodDefinition("_SaddWatcher", methodAttribute, VoidRef);
+					_SaddWatcherMethod.Parameters.Add(new ParameterDefinition("watcher", ParameterAttributes.None, WatcherRef));
+					var ILWorker = _SaddWatcherMethod.Body.GetILProcessor();
+					ILWorker.Append(ILWorker.Create(OpCodes.Nop));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_0));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_1));
+					ILWorker.Append(ILWorker.Create(OpCodes.Call, WatchMethodRef));
+					ILWorker.Append(ILWorker.Create(OpCodes.Nop));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ret));
+					typeDefinition.Methods.Add(_SaddWatcherMethod);
+				}
+
+				// define _Sdestroy
+				{
+					var HostExt2Type = typeof(DataBinding.HostExt2);
+					var DestroyMethodRef = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethod("Destroy"));
+					var methodAttribute = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
+					var _SdestroyWatcherMethod = new MethodDefinition("_Sdestroy", methodAttribute, VoidRef);
+					var ILWorker = _SdestroyWatcherMethod.Body.GetILProcessor();
+					ILWorker.Append(ILWorker.Create(OpCodes.Nop));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_0));
+					ILWorker.Append(ILWorker.Create(OpCodes.Call, DestroyMethodRef));
+					ILWorker.Append(ILWorker.Create(OpCodes.Nop));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ret));
+					typeDefinition.Methods.Add(_SdestroyWatcherMethod);
+				}
+
+				// define _SremoveWatcher
+				{
+					var HostExt2Type = typeof(DataBinding.HostExt2);
+					var DestroyMethodRef = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethod("RemoveWatcher"));
+					var methodAttribute = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
+					var _SremoveWatcherMethod = new MethodDefinition("_SremoveWatcher", methodAttribute, VoidRef);
+					_SremoveWatcherMethod.Parameters.Add(new ParameterDefinition("watcher", ParameterAttributes.None, WatcherRef));
+					var ILWorker = _SremoveWatcherMethod.Body.GetILProcessor();
+					ILWorker.Append(ILWorker.Create(OpCodes.Nop));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_0));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_1));
+					ILWorker.Append(ILWorker.Create(OpCodes.Call, DestroyMethodRef));
+					ILWorker.Append(ILWorker.Create(OpCodes.Nop));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ret));
+					typeDefinition.Methods.Add(_SremoveWatcherMethod);
+				}
+
+				// define _Swatch
+				{
+					var HostExt2Type = typeof(DataBinding.HostExt2);
+					var WatchMethodRef0 = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethod("_Watch0"));
+					var WatchMethodRef = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethods()
+						.First(m => {
+							return m.Name == "Watch" && m.GetParameters()[1].ParameterType.Name == WatchMethodRef0.Parameters[1].ParameterType.Name;
+						}
+						));
+					var ExpOrFnType = MainAssembly.MainModule.ImportReference(WatchMethodRef.Parameters[0].ParameterType);
+					var methodAttribute = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
+					var _SwatchMethod = new MethodDefinition("_Swatch", methodAttribute, WatcherRef);
+					var paramNames = new List<string>()
+				{
+					"expOrFn",
+					"cb",
+					"loseValue",
+					"sync",
+				};
+					for (var i = 1; i < WatchMethodRef.Parameters.Count; i++)
+					{
+						var p = WatchMethodRef.Parameters[i];
+						var pName = paramNames[i - 1];
+						_SwatchMethod.Parameters.Add(new ParameterDefinition(pName, p.Attributes, p.ParameterType));
+					}
+					_SwatchMethod.Body.InitLocals = true;
+					_SwatchMethod.Body.Variables.Add(new VariableDefinition(WatcherRef));
+					_SwatchMethod.Body.MaxStackSize = 5;
+					var p4 = _SwatchMethod.Parameters[3];
+					var ILWorker = _SwatchMethod.Body.GetILProcessor();
+					ILWorker.Append(ILWorker.Create(OpCodes.Nop));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_0));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_1));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_2));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_3));
+					ILWorker.Append(ILWorker.Create(OpCodes.Ldarg_S, p4));
+					ILWorker.Append(ILWorker.Create(OpCodes.Call, WatchMethodRef));
+					ILWorker.Append(ILWorker.Create(OpCodes.Stloc_0));
+					var inst0 = ILWorker.Create(OpCodes.Ldloc_0);
+					ILWorker.Append(ILWorker.Create(OpCodes.Br_S, inst0));
+					ILWorker.Append(inst0);
+					ILWorker.Append(ILWorker.Create(OpCodes.Ret));
+					typeDefinition.Methods.Add(_SwatchMethod);
+				}
+			}
+            #endregion
+
+        }
+
+        public static void HandleObservable(TypeDefinition typeDefinition, CustomAttribute attr0)
 		{
 			var needInject = false;
 

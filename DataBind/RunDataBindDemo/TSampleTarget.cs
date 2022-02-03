@@ -101,22 +101,22 @@ namespace RunDataBindDemo
 
     public class TSampleHost2 : IHost, IStdHost
     {
-        public void _SaddWatcher(Watcher watcher)
+        public virtual void _SaddWatcher(Watcher watcher)
         {
             this.AddWatcher(watcher);
         }
 
-        public void _Sdestroy()
+        public virtual void _Sdestroy()
         {
             this.Destroy();
         }
 
-        public void _SremoveWatcher(Watcher watcher)
+        public virtual void _SremoveWatcher(Watcher watcher)
         {
             this.RemoveWatcher(watcher);
         }
 
-        public Watcher _Swatch(CombineType<object, string, Func<object, object, object>> expOrFn, Action<object, object, object> cb, CombineType<object, string, double, bool> loseValue, bool sync)
+        public virtual Watcher _Swatch(CombineType<object, string, Func<object, object, object>> expOrFn, Action<object, object, object> cb, CombineType<object, string, double, bool> loseValue, bool sync)
         {
             return this.Watch(expOrFn, cb, loseValue, sync);
         }
