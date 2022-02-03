@@ -1,4 +1,5 @@
 ﻿using DataBinding;
+using System;
 using System.Runtime.CompilerServices;
 using vm;
 
@@ -40,7 +41,6 @@ namespace RunDataBindDemo
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName, newValue, oldValue));
         }
-
 
         protected System.Collections.Generic.ICollection<Watcher> _Swatchers;
         System.Collections.Generic.ICollection<Watcher> GetWatchers()
@@ -99,6 +99,29 @@ namespace RunDataBindDemo
         public virtual int KKK2 { get; set; }
     }
 
+    public class TSampleHost2 : IHost, IStdHost
+    {
+        public void _SaddWatcher(Watcher watcher)
+        {
+            this.AddWatcher(watcher);
+        }
+
+        public void _Sdestroy()
+        {
+            this.Destroy();
+        }
+
+        public void _SremoveWatcher(Watcher watcher)
+        {
+            this.RemoveWatcher(watcher);
+        }
+
+        public Watcher _Swatch(CombineType<object, string, Func<object, object, object>> expOrFn, Action<object, object, object> cb, CombineType<object, string, double, bool> loseValue, bool sync)
+        {
+            return this.Watch(expOrFn, cb, loseValue, sync);
+        }
+    }
+
     public class TSubSampleObserver
     {
         public string CCC { get; set; } = "23";
@@ -143,5 +166,40 @@ namespace RunDataBindDemo
         public string wf3 { set { ffff = int.Parse(value); } }
 
         public TSubSampleObserver sub { get;set;} =new TSubSampleObserver();
+    }
+
+    public class AAA
+    {
+        protected int kk2=3;
+        public int kk=3;
+    }
+
+    [AutoFieldProperty]
+    public class BBB : AAA
+    {
+        public int ccc = 234;
+        public int eee = 234;
+    }
+
+    public class CCC : AAA
+    {
+        [AutoFieldProperty]
+        public int ddd = 235;
+
+        public int kkk = 235;
+    }
+
+    [StdHost]
+    public class TestStdHostAttr
+    {
+        public int aaa = 234;
+        public int bbb { get; set; } = 23;
+    }
+
+    [StdHost][AutoFieldProperty]
+    public class TestStdHostAttr2
+    {
+        public int aaa = 234;
+        public int bbb { get; set; } = 23;
     }
 }

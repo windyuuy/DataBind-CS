@@ -11,6 +11,41 @@ namespace DataBindService
 	{
 		public static AssemblyDefinition MainAssembly;
 		public static AssemblyDefinition SysAssembly;
+		public static void HandleAutoConvFieldToProperty(TypeDefinition typeDefinition, TypeReference AsPropertyAttr)
+        {
+			var attr = typeDefinition.CustomAttributes.FirstOrDefault(attr => CILUtils.IsSameAttr(attr, AsPropertyAttr));
+			typeDefinition.CustomAttributes.Remove(attr);
+			var fields=typeDefinition.Fields.ToArray();
+			foreach(var field in fields)
+            {
+				if(IsValidFieldConvToProperty(field))
+                {
+					CILUtils.ConvertFieldToProperty(MainAssembly, typeDefinition, field);
+				}
+            }
+        }
+
+		public static void HandleAutoConvFieldToPropertySeperately(TypeDefinition typeDefinition,TypeReference AsPropertyAttr)
+		{
+			foreach (var field in typeDefinition.Fields.ToArray())
+			{
+				var attr = field.CustomAttributes.FirstOrDefault(attr => CILUtils.IsSameAttr(attr, AsPropertyAttr));
+				if (attr!=null)
+                {
+                    if (IsValidFieldConvToProperty(field))
+                    {
+						field.CustomAttributes.Remove(attr);
+						CILUtils.ConvertFieldToProperty(MainAssembly, typeDefinition, field);
+					}
+				}
+			}
+		}
+
+		public static bool IsValidFieldConvToProperty(FieldDefinition field)
+        {
+			return field.IsPublic || field.IsFamily;
+		}
+
 		public static void HandleHost(TypeDefinition typeDefinition)
 		{
 			var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
@@ -42,6 +77,7 @@ namespace DataBindService
 			CILUtils.InjectGetOrCreateObjectMethod(MainAssembly, typeDefinition, "GetWatchers", "_Swatchers", IWatcherCollectionRef, TDefaultValueType);
 
 			CILUtils.InjectInteface(MainAssembly, typeDefinition, IFullHostRef);
+			//CILUtils.InjectInteface(MainAssembly, typeDefinition, IHostRef);
 
 			#endregion
 		}
@@ -234,7 +270,7 @@ namespace DataBindService
 								setFinalInst.Add(setWorker.Create(OpCodes.Nop));
 							}
 
-							var privateGetMethodName = $"<set_{setMethod.Name}>b__get0";
+							var privateGetMethodName = $"<{setMethod.Name}>b__pri_get0";
 							var privateGetMethod = CILUtils.CopyMethod(MainAssembly, typeDefinition, privateGetMethodName, typeDefinition, p.GetMethod);
 							privateGetMethod.Attributes = MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot;
 							privateGetMethod.SemanticsAttributes = MethodSemanticsAttributes.None;

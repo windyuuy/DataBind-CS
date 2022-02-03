@@ -366,11 +366,29 @@ namespace DataBinding.CollectionExt
 			return string.Join(v, list);
 		}
 
-		internal List<T> Clone()
+		public virtual List<T> Clone()
 		{
 			var ls = new TRawList();
 			ls.AddRange(list);
 			return new List<T>(ls);
+		}
+
+		public virtual int Push(params T[] ts)
+        {
+			ts.ForEach(t =>
+			{
+				list.Add(t);
+			});
+			return this.Count;
+        }
+
+		public virtual int Push(IEnumerable<T> ts)
+		{
+			ts.ForEach(t =>
+			{
+				list.Add(t);
+			});
+			return this.Count;
 		}
 
 	}

@@ -55,6 +55,7 @@ namespace vm
 namespace DataBinding
 {
 
+	// TODO: 支持自动注入IHost
 	/// <summary>
 	/// 用于标记需要作为观察者
 	/// </summary>
@@ -67,9 +68,9 @@ namespace DataBinding
 	/// 手动添加，标记这个类需要作为观察者
 	/// </summary>
 	[System.AttributeUsage(System.AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-	sealed class HostAttribute : System.Attribute
+	public sealed class StdHostAttribute : System.Attribute
 	{
-		public HostAttribute()
+		public StdHostAttribute()
 		{
 		}
 	}

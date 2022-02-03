@@ -109,17 +109,37 @@ namespace DataBindService
 				var MarkAttrCtor = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute).GetConstructor(new Type[] { typeof(int) }));
 				var MarkRecursiveAttr = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableRecursiveAttribute));
 
-				var MarkInterface = assembly.MainModule.ImportReference(typeof(DataBinding.IStdHost));
+				var StdHostInterface = assembly.MainModule.ImportReference(typeof(DataBinding.IStdHost));
 				var IntRef = assembly.MainModule.ImportReference(typeof(int));
+				var StdHostAttr = assembly.MainModule.ImportReference(typeof(DataBinding.StdHostAttribute));
 
 				// 模板
 				var ObservableAttrTemp = new CustomAttribute(MarkAttrCtor);
 				ObservableAttrTemp.ConstructorArguments.Add(new CustomAttributeArgument(IntRef, 1));
 
+				var AsPropertyAttr = assembly.MainModule.ImportReference(typeof(DataBinding.AutoFieldPropertyAttribute));
+
 				foreach (var type in types)
 				{
 
-					if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, MarkInterface)))
+					if(type.CustomAttributes.Any(attr=>CILUtils.IsSameAttr(attr, AsPropertyAttr)))
+                    {
+						DataBindTool.HandleAutoConvFieldToProperty(type,AsPropertyAttr);
+                    }
+                    else
+                    {
+						DataBindTool.HandleAutoConvFieldToPropertySeperately(type,AsPropertyAttr);
+					}
+
+					if(type.CustomAttributes.Any(attr=>CILUtils.IsSameAttr(attr, StdHostAttr)))
+                    {
+						if(type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, StdHostInterface)) == false)
+                        {
+							CILUtils.InjectInteface(assembly, type, StdHostInterface);
+						}
+					}
+
+					if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, StdHostInterface)))
 					{
 						DataBindTool.HandleHost(type);
 

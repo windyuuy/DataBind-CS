@@ -238,9 +238,14 @@ namespace CiLin
 			//Import the void type
 			TypeReference voidRef = assembly.MainModule.ImportReference(typeof(void));
 
-			//define the field we store the value in
-			FieldDefinition field = new FieldDefinition(ConvertToFieldName(propertyName), FieldAttributes.Private, propertyType);
-			targetType.Fields.Add(field);
+			var fieldName = ConvertToFieldName(propertyName);
+			var field=targetType.Fields.FirstOrDefault(f => f.Name == fieldName);
+            if (field == null)
+            {
+				//define the field we store the value in
+				field = new FieldDefinition(fieldName, FieldAttributes.Private, propertyType);
+				targetType.Fields.Add(field);
+			}
 
 			//Create the get method
 			MethodDefinition get = new MethodDefinition("get_" +
@@ -292,7 +297,7 @@ namespace CiLin
 
 			return propertyDefinition;
 		}
-		private static string ConvertToFieldName(string propertyName)
+		public static string ConvertToFieldName(string propertyName)
 		{
 			var fieldName = new System.Text.StringBuilder();
 			//<CCC>k__BackingField
@@ -302,6 +307,57 @@ namespace CiLin
 			fieldName.Append(">k__$BF");
 
 			return fieldName.ToString();
+		}
+
+		public static PropertyDefinition ConvertFieldToProperty(AssemblyDefinition assembly,TypeDefinition typeDefinition, FieldDefinition field)
+        {
+			var fieldName0 = field.Name;
+			field.Name = CILUtils.ConvertToFieldName(fieldName0);
+
+			var TCompilerGenerated = typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute);
+			var rCompilerGenerated = assembly.MainModule.ImportReference(TCompilerGenerated.GetConstructor(new Type[] { }));
+
+			var prop = CILUtils.InjectProperty(assembly, typeDefinition, fieldName0, field.FieldType);
+			PropertyAttributes propertyAttributes = PropertyAttributes.None;
+			if ((field.Attributes & FieldAttributes.HasDefault) != 0)
+			{
+				propertyAttributes |= PropertyAttributes.HasDefault;
+			}
+			prop.Attributes = propertyAttributes;
+			MethodAttributes methodAttributes;
+			if (field.IsStatic)
+			{
+				methodAttributes = MethodAttributes.Static;
+			}
+			else
+			{
+				methodAttributes = MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.NewSlot;
+			}
+			if (field.IsPublic)
+			{
+				methodAttributes |= MethodAttributes.Public;
+			}
+			if (field.IsFamily)
+			{
+				methodAttributes |= MethodAttributes.Family;
+			}
+			if (field.IsAssembly)
+			{
+				methodAttributes |= MethodAttributes.Assembly;
+			}
+			if (field.IsRuntimeSpecialName)
+			{
+				methodAttributes |= MethodAttributes.RTSpecialName;
+			}
+			methodAttributes |= MethodAttributes.SpecialName;
+			prop.GetMethod.Attributes = methodAttributes;
+			prop.GetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			prop.SetMethod.Attributes = methodAttributes;
+			prop.SetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+
+			field.Attributes = FieldAttributes.Private;
+
+			return prop;
 		}
 
 

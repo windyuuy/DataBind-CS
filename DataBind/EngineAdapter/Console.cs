@@ -32,7 +32,7 @@ namespace Game.Diagnostics
         {
             try
             {
-                UConsole.Log("test UConsole");
+                UConsole.Log("test UConsole validate");
                 isUnityEnv = true;
             }
             catch (System.Exception)
