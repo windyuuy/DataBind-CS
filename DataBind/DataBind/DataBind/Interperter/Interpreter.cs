@@ -1301,23 +1301,23 @@ namespace vm
 					}
 				}).ToConvableList();
 
-				if (ast.left is ValueASTNode)
+				if (ast.left is ValueASTNode valueL)
 				{
-					var ret = (ast.left as ValueASTNode).value.value;
+					var ret = valueL.value.value;
 					//全局函数
 					func = Utils.IndexMethodRecursive(environment, ret, Utils.ExtractValuesTypes(paramList));
 				}
-				else if (ast.left is BinaryASTNode)
+				else if (ast.left is BinaryASTNode bL)
 				{
-					self = Interpreter.srun(environment, (ast.left as BinaryASTNode).left);
+					self = Interpreter.srun(environment, bL.left);
 					if (self == null)
 					{
 						console.error(Interpreter.toStringAST(ast) + "\n" + "函数无法访问" + Interpreter.toStringAST((ast.left as BinaryASTNode).left));
 						return null;//self无法获取
 					}
-					if ((ast.left as BinaryASTNode).right is ValueASTNode)
+					if ((ast.left as BinaryASTNode).right is ValueASTNode nodeLR)
 					{
-						var ret = ((ast.left as BinaryASTNode).right as ValueASTNode).value.value;
+						var ret = nodeLR.value.value;
 						func = Utils.IndexMethodRecursive(self, ret, Utils.ExtractValuesTypes(paramList));
 					}
 					else

@@ -17,9 +17,9 @@ namespace vm
          */
 		public static Watcher _Swatch(this IHostAccessor self, CombineType<object, string, Func<object, object, object>> expOrFn, Action<object, object, object> cb, CombineType<object, string, number, boolean> loseValue = null, boolean sync = false)
 		{
-			if (self is IWithDestroyState)
+			if (self is IWithDestroyState self1)
 			{
-				if ((self as IWithDestroyState)._SIsDestroyed)
+				if (self1._SIsDestroyed)
 				{
 					console.error("the host is destroyed", self);
 					return null;
@@ -53,9 +53,9 @@ namespace vm
 				w.teardown();
 			}
 
-			if (self is IWithDestroyState)
+			if (self is IWithDestroyState self1)
 			{
-				(self as IWithDestroyState)._SIsDestroyed = true;
+				self1._SIsDestroyed = true;
 			}
 		}
 
@@ -70,9 +70,9 @@ namespace vm
 		}
 
 		public static void _SclearWatchers(this IHostAccessor self)
-        {
+		{
 			self.GetWatchers().Clear();
-        }
+		}
 	}
 
 }

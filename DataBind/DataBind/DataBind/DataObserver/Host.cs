@@ -134,9 +134,9 @@ namespace vm
 			if (obj is IObservable)
 			{
 				//实现基础方法，用于表达式中方便得调用
-				if (obj is IWithPrototype)
+				if (obj is IWithPrototype env)
 				{
-					InterpreterEnv.implementEnvironment(obj as IWithPrototype);
+					InterpreterEnv.implementEnvironment(env);
 				}
 
 				observe(obj);
@@ -152,9 +152,9 @@ namespace vm
 			if (obj is IObservable)
 			{
 				//实现基础方法，用于表达式中方便得调用
-				if (obj is IWithPrototype)
+				if (obj is IWithPrototype obj1)
 				{
-					InterpreterEnv.implementEnvironment(obj as IWithPrototype);
+					InterpreterEnv.implementEnvironment(obj1);
 				}
 
 				observe(obj);

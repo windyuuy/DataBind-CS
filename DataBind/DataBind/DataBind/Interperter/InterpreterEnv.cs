@@ -46,9 +46,8 @@ namespace vm
 		public static TEnv environment = new TEnv();
 		public static TEnv extendsEnvironment(TEnv ext)
 		{
-			if (ext is IWithPrototype)
+			if (ext is IWithPrototype ext1)
 			{
-				var ext1 = ext as IWithPrototype;
 				ext1.SetProto(environment);
 				//ext1._ = environment;
 			}

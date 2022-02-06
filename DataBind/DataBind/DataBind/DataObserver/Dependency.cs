@@ -16,9 +16,8 @@ namespace vm
 		 */
 		public static void dependCollection(System.Collections.IEnumerable value)
 		{
-			if (value is System.Collections.IDictionary)
+			if (value is System.Collections.IDictionary dict)
 			{
-				var dict = value as System.Collections.IDictionary;
 				foreach (var obj0 in dict.Values)
 				{
 					if (Utils.IsObservable(obj0))

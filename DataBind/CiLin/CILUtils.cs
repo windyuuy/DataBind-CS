@@ -218,16 +218,16 @@ namespace CiLin
 			return targetMethod;
 		}
 
-		public static CustomAttribute CopyCustomAttribute(AssemblyDefinition assembly,CustomAttribute customAttribute)
-        {
-			var copyAttr = new CustomAttribute(customAttribute.Constructor,customAttribute.GetBlob());
+		public static CustomAttribute CopyCustomAttribute(AssemblyDefinition assembly, CustomAttribute customAttribute)
+		{
+			var copyAttr = new CustomAttribute(customAttribute.Constructor, customAttribute.GetBlob());
 			customAttribute.ConstructorArguments.ForEach(argv =>
 			{
 				var argvCopy = new CustomAttributeArgument(argv.Type, argv.Value);
 				copyAttr.ConstructorArguments.Add(argvCopy);
 			});
 			return copyAttr;
-        }
+		}
 		public static PropertyDefinition InjectProperty(AssemblyDefinition assembly, TypeDefinition targetType, string propertyName, Type returnType)
 		{
 			TypeReference propertyType = assembly.MainModule.ImportReference(returnType);
@@ -239,9 +239,9 @@ namespace CiLin
 			TypeReference voidRef = assembly.MainModule.ImportReference(typeof(void));
 
 			var fieldName = ConvertToFieldName(propertyName);
-			var field=targetType.Fields.FirstOrDefault(f => f.Name == fieldName);
-            if (field == null)
-            {
+			var field = targetType.Fields.FirstOrDefault(f => f.Name == fieldName);
+			if (field == null)
+			{
 				//define the field we store the value in
 				field = new FieldDefinition(fieldName, FieldAttributes.Private, propertyType);
 				targetType.Fields.Add(field);
@@ -309,8 +309,8 @@ namespace CiLin
 			return fieldName.ToString();
 		}
 
-		public static PropertyDefinition ConvertFieldToProperty(AssemblyDefinition assembly,TypeDefinition typeDefinition, FieldDefinition field)
-        {
+		public static PropertyDefinition ConvertFieldToProperty(AssemblyDefinition assembly, TypeDefinition typeDefinition, FieldDefinition field)
+		{
 			var fieldName0 = field.Name;
 			field.Name = CILUtils.ConvertToFieldName(fieldName0);
 
@@ -532,9 +532,8 @@ namespace CiLin
 			// 替换直接跳转到ret的情况，避免衔接的指令失效
 			methodDefinition.Body.Instructions.ForEach(inst =>
 			{
-				if (inst.Operand is Instruction)
+				if (inst.Operand is Instruction secInst)
 				{
-					var secInst = (Instruction)inst.Operand;
 					if (secInst.OpCode == OpCodes.Ret)
 					{
 						inst.Operand = replaceRetInst;

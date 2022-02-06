@@ -18,17 +18,17 @@ namespace vm
 
 		public static bool IsTrue(object obj)
 		{
-			if (obj is bool)
+			if (obj is bool objBool)
 			{
-				return (bool)obj;
+				return objBool;
 			}
-			else if (obj is number)
+			else if (obj is number objNum)
 			{
-				return (number)obj != 0;
+				return objNum != 0;
 			}
-			else if (obj is string)
+			else if (obj is string objStr)
 			{
-				return (string)obj != "";
+				return !string.IsNullOrEmpty(objStr);
 			}
 			else
 			{
@@ -37,17 +37,17 @@ namespace vm
 		}
 		public static bool IsFalse(object obj)
 		{
-			if (obj is bool)
+			if (obj is bool objBool)
 			{
-				return !(bool)obj;
+				return !objBool;
 			}
-			else if (obj is number)
+			else if (obj is number objNum)
 			{
-				return (number)obj == 0;
+				return objNum == 0;
 			}
-			else if (obj is string)
+			else if (obj is string objStr)
 			{
-				return (string)obj == "";
+				return string.IsNullOrEmpty(objStr);
 			}
 			else
 			{
@@ -130,9 +130,8 @@ namespace vm
 			{
 				return value;
 			}
-			if (a is IWithPrototype)
+			if (a is IWithPrototype pa)
 			{
-				var pa = a as IWithPrototype;
 				var proto = pa.GetProto();
 				if (proto != null)
 				{
@@ -355,9 +354,8 @@ namespace vm
 			}
 			else
 			{
-				if (a is IWithPrototype)
+				if (a is IWithPrototype pa)
 				{
-					var pa = a as IWithPrototype;
 					var proto = pa.GetProto();
 					if (proto != null)
 					{
@@ -507,15 +505,14 @@ namespace vm
 		}
 		public static object InvokeMethod(object func, object obj, List<object> paramList0)
 		{
-			if (func is MethodInfo)
+			if (func is MethodInfo func1)
 			{
-				return InvokeMethodRaw((MethodInfo)func, obj, paramList0);
+				return InvokeMethodRaw(func1, obj, paramList0);
 			}
 			else
 			{
-				if (func is Delegate)
+				if (func is Delegate de)
 				{
-					var de = func as Delegate;
 					var ps = paramList0.ToArray();
 					var v = de.DynamicInvoke(ps);
 					return v;
@@ -589,9 +586,9 @@ namespace vm
 			}
 
 			var v = value;
-			if (v is F)
+			if (v is F vF)
 			{
-				return (F)v;
+				return vF;
 			}
 			else if (typeof(F).IsAssignableFrom(v.GetType()))
 			{
@@ -615,9 +612,9 @@ namespace vm
 
 		public static string ToIndexKey(object key)
 		{
-			if (key is string)
+			if (key is string skey)
 			{
-				return (string)key;
+				return skey;
 			}
 			else
 			{

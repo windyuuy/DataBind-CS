@@ -28,9 +28,8 @@ namespace vm
 
 		public static bool IsObserved(object obj)
 		{
-			if (obj is IObservable)
+			if (obj is IObservable obj1)
 			{
-				var obj1 = (IObservable)obj;
 				if (obj1._SgetOb() is Observer)
 				{
 					return true;
@@ -56,9 +55,9 @@ namespace vm
 		 */
 		public static Observer observe(object value)
 		{
-			if (value is Observer)
+			if (value is Observer value1)
 			{
-				return (Observer)value;
+				return value1;
 			}
 			else if (IsObservable(value))
 			{
@@ -114,57 +113,57 @@ namespace vm
 			var childOb = observe(val);
 			var obj = Utils.AsObservable(obj0);
 			var ob = obj._SgetOb();
-            System.Diagnostics.Debug.Assert(ob != null);
+			System.Diagnostics.Debug.Assert(ob != null);
 
-            {
-				PropertyGetEventHandler handle= (sender, e) =>
-				{
-                    System.Diagnostics.Debug.Assert(e.PropertyName == key);
-                    if (e.PropertyName != key)
-					{
-						return;
-					}
-					//进行依赖收集，依赖收集前 Dependency.collectTarget 会被赋值，收集完成后会置空。
-					if (Dep.target != null)
-					{
-						dep.asCurTargetDepend();//将自身加入到Dependency.collectTarget中
+			{
+				PropertyGetEventHandler handle = (sender, e) =>
+				 {
+					 System.Diagnostics.Debug.Assert(e.PropertyName == key);
+					 if (e.PropertyName != key)
+					 {
+						 return;
+					 }
+					 //进行依赖收集，依赖收集前 Dependency.collectTarget 会被赋值，收集完成后会置空。
+					 if (Dep.target != null)
+					 {
+						 dep.asCurTargetDepend();//将自身加入到Dependency.collectTarget中
 
-						if (childOb != null)
-						{
-							childOb.dep.asCurTargetDepend();
-							var value = e.Value;
-							if (Utils.IsCollection(value))
-							{
-								Dep.dependCollection(Utils.AsCollection(value));
-							}
-						}
-					}
-				};
+						 if (childOb != null)
+						 {
+							 childOb.dep.asCurTargetDepend();
+							 var value = e.Value;
+							 if (Utils.IsCollection(value))
+							 {
+								 Dep.dependCollection(Utils.AsCollection(value));
+							 }
+						 }
+					 }
+				 };
 				//var weakRef=new WeakReference<PropertyGetEventHandler>(handle);
 				var DictGotFuncs = ob.DictGotFuncs;
 				TGotFuncs funcs;
 				lock (DictGotFuncs)
 				{
 					DictGotFuncs.TryGetValue(key, out funcs);
-					if(funcs == null)
-                    {
+					if (funcs == null)
+					{
 						funcs = new TGotFuncs();
 						DictGotFuncs.Add(key, funcs);
 					}
 				}
-				if(funcs != null)
-                {
+				if (funcs != null)
+				{
 					lock (funcs)
 					{
 						funcs.Add(handle);
 					}
 				}
 			}
-            {
+			{
 				PropertyChangedEventHandler handle = (sender, e) =>
 				{
-                    System.Diagnostics.Debug.Assert(e.PropertyName == key);
-                    if (e.PropertyName != key)
+					System.Diagnostics.Debug.Assert(e.PropertyName == key);
+					if (e.PropertyName != key)
 					{
 						return;
 					}
@@ -184,8 +183,8 @@ namespace vm
 						DictChangedFuncs.Add(key, funcs);
 					}
 				}
-				if(funcs!= null)
-                {
+				if (funcs != null)
+				{
 					lock (funcs)
 					{
 						funcs.Add(handle);
@@ -214,34 +213,35 @@ namespace vm
 			value.PropertyGot += onPropertyGot;
 			value.PropertyChanged += onPropertyChanged;
 
-            //if (value is System.Collections.IEnumerable)
-            //{
-            //    this.observeCollection((System.Collections.IEnumerable)value);
-            //}
+			//if (value is System.Collections.IEnumerable)
+			//{
+			//    this.observeCollection((System.Collections.IEnumerable)value);
+			//}
 
-            {
+			{
 				this.walk(value);
 			}
 		}
 
-		protected virtual void onPropertyGot(object sender, PropertyGetEventArgs  e)
+		protected virtual void onPropertyGot(object sender, PropertyGetEventArgs e)
 		{
 			TGotFuncs funcs;
 			lock (DictGotFuncs)
-            {
+			{
 				DictGotFuncs.TryGetValue(e.PropertyName, out funcs);
-            }
-            if (funcs != null)
-            {
+			}
+			if (funcs != null)
+			{
 				PropertyGetEventHandler[] funcsArr;
-				lock(funcs){
+				lock (funcs)
+				{
 					funcsArr = funcs.ToArray();
-                }
-				foreach(var f in funcsArr)
-                {
+				}
+				foreach (var f in funcsArr)
+				{
 					f(sender, e);
 				}
-            }
+			}
 		}
 
 		protected virtual void onPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -258,8 +258,8 @@ namespace vm
 				{
 					funcsArr = funcs.ToArray();
 				}
-				foreach(var f in funcsArr)
-                {
+				foreach (var f in funcsArr)
+				{
 					f(sender, e);
 				}
 			}
@@ -291,27 +291,24 @@ namespace vm
 			// 监听集合事件
 			if (Utils.IsObservableCollection(obj))
 			{
-				if (obj is System.Collections.IDictionary)
+				if (obj is System.Collections.IDictionary dict)
 				{
-					var dict = obj as System.Collections.IDictionary;
 					foreach (var key in dict.Keys)
 					{
 						var value = dict[key];
 						Utils.defineReactive(obj, Utils.ToIndexKey(key), value);
 					}
 				}
-				else if (obj is System.Collections.IList)
+				else if (obj is System.Collections.IList list)
 				{
-					var list = obj as System.Collections.IList;
 					for (int index = 0; index < list.Count; index++)
 					{
 						var value = list[index];
 						Utils.defineReactive(obj, index.ToString(), value);
 					}
 				}
-				else if(obj is System.Collections.IEnumerable)
-                {
-					System.Collections.IEnumerable items=obj as System.Collections.IEnumerable;
+				else if (obj is System.Collections.IEnumerable items)
+				{
 					foreach (var item in items)
 					{
 						Utils.observe(item);
@@ -336,9 +333,8 @@ namespace vm
 		 */
 		public void observeCollection(System.Collections.IEnumerable items)
 		{
-			if (items is System.Collections.IDictionary)
+			if (items is System.Collections.IDictionary dict)
 			{
-				var dict = items as System.Collections.IDictionary;
 				foreach (var item in dict.Values)
 				{
 					Utils.observe(item);
@@ -353,5 +349,5 @@ namespace vm
 			}
 		}
 
-    }
+	}
 }

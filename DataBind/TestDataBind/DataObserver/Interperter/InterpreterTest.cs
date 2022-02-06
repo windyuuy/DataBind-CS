@@ -318,21 +318,19 @@ namespace TestDataBind
 				var tree0 = vm.Interpreter.toAST(nodeList, "a +  b - c", errorList);
 				expect(errorList.length).toBe(0);
 				expect(tree0).toBeInstanceOf(typeof(vm.BinaryASTNode));
-				if (tree0 is vm.BinaryASTNode)
+				if (tree0 is vm.BinaryASTNode tree)
 				{
-					var tree = tree0 as vm.BinaryASTNode;
 					expect(tree.operatorx).toBe(vm.TNodeType.Inst["-"]);
 					expect(tree.right.operatorx).toBe(vm.NodeType.word);
 					expect(tree.right).toBeInstanceOf(typeof(vm.ValueASTNode));
-					if (tree.right is vm.ValueASTNode)
+					if (tree.right is vm.ValueASTNode right)
 					{
-						expect((tree.right as vm.ValueASTNode).value.value).toBe("c");
+						expect(right.value.value).toBe("c");
 					};
 
 					expect(tree.left).toBeInstanceOf(typeof(vm.BinaryASTNode));
-					if (tree.left is vm.BinaryASTNode)
+					if (tree.left is vm.BinaryASTNode left)
 					{
-						var left = tree.left as vm.BinaryASTNode;
 						expect(left.operatorx).toBe(vm.TNodeType.Inst["+"]);
 						expect(left.left).toBeInstanceOf(typeof(vm.ValueASTNode));
 						expect(left.right).toBeInstanceOf(typeof(vm.ValueASTNode));

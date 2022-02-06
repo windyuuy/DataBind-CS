@@ -37,9 +37,9 @@ namespace vm
 		public virtual List<T> AsList<T>()
 		{
 			var v = this.RawObject;
-			if (v is List<T>)
+			if (v is List<T> lsT)
 			{
-				return (List<T>)v;
+				return lsT;
 			}
 			else
 			{
@@ -103,9 +103,9 @@ namespace vm
 		}
 		public override CombineType Set(object value)
 		{
-			if (value is T1)
+			if (value is T1 vT1)
 			{
-				this.value1 = (T1)value;
+				this.value1 = vT1;
 				return this;
 			}
 			else
@@ -156,9 +156,9 @@ namespace vm
 		}
 		public override CombineType Set(object value)
 		{
-			if (value is T2)
+			if (value is T2 vT2)
 			{
-				this.value2 = (T2)value;
+				this.value2 = vT2;
 				return this;
 			}
 			else
@@ -209,9 +209,9 @@ namespace vm
 		}
 		public override CombineType Set(object value)
 		{
-			if (value is T3)
+			if (value is T3 vT3)
 			{
-				this.value3 = (T3)value;
+				this.value3 = vT3;
 				return this;
 			}
 			else
@@ -273,9 +273,9 @@ namespace vm
 		}
 		public override CombineType Set(object value)
 		{
-			if (value is T4)
+			if (value is T4 vT4)
 			{
-				this.value4 = (T4)value;
+				this.value4 = vT4;
 				return this;
 			}
 			else
@@ -325,9 +325,9 @@ namespace vm
 		}
 		public override CombineType Set(object value)
 		{
-			if (value is T5)
+			if (value is T5 vT5)
 			{
-				this.value5 = (T5)value;
+				this.value5 = vT5;
 				return this;
 			}
 			else
@@ -377,9 +377,9 @@ namespace vm
 		}
 		public override CombineType Set(object value)
 		{
-			if (value is T6)
+			if (value is T6 vT6)
 			{
-				this.value6 = (T6)value;
+				this.value6 = vT6;
 				return this;
 			}
 			else
@@ -429,9 +429,9 @@ namespace vm
 		}
 		public override CombineType Set(object value)
 		{
-			if (value is T7)
+			if (value is T7 vT7)
 			{
-				this.value7 = (T7)value;
+				this.value7 = vT7;
 				return this;
 			}
 			else

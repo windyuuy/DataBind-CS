@@ -101,8 +101,22 @@ namespace RunDataBindDemo
 
     public class TSampleHost2 : IHost, IStdHost
     {
+        (int, int,int,int,int,int,int,int,int,int,int,int,int) ff = (32, 23,1,2,3,4,5,6,7,8,2,3,4);
+        (int, float) ff1 = (32, 23);
         public virtual void _SaddWatcher(Watcher watcher)
         {
+            object wfw = new TSampleTarget();
+            if(wfw is IStdHost)
+            {
+                var wef=wfw as IStdHost;
+                Console.Write(wef);
+            }
+
+            if (wfw is IStdHost wef2)
+            {
+                Console.Write(wef2);
+            }
+            (int, float) ff = (32, 23);
             this.AddWatcher(watcher);
         }
 
@@ -118,7 +132,7 @@ namespace RunDataBindDemo
 
         public virtual Watcher _Swatch(CombineType<object, string, Func<object, object, object>> expOrFn, Action<object, object, object> cb, CombineType<object, string, double, bool> loseValue, bool sync)
         {
-            return this.Watch(expOrFn, cb, loseValue, sync);
+            return HostExt2.Watch(this,expOrFn, cb, loseValue, sync);
         }
     }
 
