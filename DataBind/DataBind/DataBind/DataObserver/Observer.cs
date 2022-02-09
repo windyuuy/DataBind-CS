@@ -70,7 +70,15 @@ namespace vm
 					//只有普通的对象才可以进行观察
 					return new Observer(AsObservable(value));
 				}
-			}
+            }
+            else if(value != null && (
+				value.GetType().IsPrimitive
+				|| (value is string) 
+				|| (value.GetType().GetProperties().Length==0 && value.GetType().GetFields().Length==0)
+				)==false)
+            {
+				console.error($"该对象类型不可监测: type={value.GetType().Name}");
+            }
 			return null;
 		}
 
@@ -265,16 +273,9 @@ namespace vm
 			}
 		}
 
-		/**
-		 * 遍历所有属性，拦截get set
-		 */
-		public void walk(object obj)
-		{
+		protected virtual void ObserveNormalObject(object obj,System.Reflection.PropertyInfo[] keys)
+        {
 			var type = obj.GetType();
-			var keys = type.GetProperties(
-				System.Reflection.BindingFlags.Instance
-				| System.Reflection.BindingFlags.Public
-				);
 			for (var i = 0; i < keys.Length; i++)
 			{
 				var key = keys[i];
@@ -288,11 +289,30 @@ namespace vm
 					// 过滤 Item 属性
 				}
 			}
+		}
+		/**
+		 * 遍历所有属性，拦截get set
+		 */
+		public void walk(object obj)
+		{
+			var type = obj.GetType();
+			var keys = type.GetProperties(
+				System.Reflection.BindingFlags.Instance
+				| System.Reflection.BindingFlags.Public
+				);
+
 			// 监听集合事件
 			if (Utils.IsObservableCollection(obj))
 			{
 				if (obj is System.Collections.IDictionary dict)
 				{
+					//var IDictKeysDict = new Dictionary<string, bool>();
+					//typeof(System.Collections.IDictionary).GetProperties(
+					//	System.Reflection.BindingFlags.Instance
+					//	| System.Reflection.BindingFlags.Public).ForEach(k=>IDictKeysDict[k.Name] = true);
+
+					//var keys2 = keys.Where(k => IDictKeysDict.ContainsKey(k.Name)==false);
+					//ObserveNormalObject(obj, keys);
 					foreach (var key in dict.Keys)
 					{
 						var value = dict[key];
@@ -301,6 +321,7 @@ namespace vm
 				}
 				else if (obj is System.Collections.IList list)
 				{
+					//ObserveNormalObject(obj, keys);
 					for (int index = 0; index < list.Count; index++)
 					{
 						var value = list[index];
@@ -309,6 +330,7 @@ namespace vm
 				}
 				else if (obj is System.Collections.IEnumerable items)
 				{
+					//ObserveNormalObject(obj, keys);
 					foreach (var item in items)
 					{
 						Utils.observe(item);
@@ -325,6 +347,10 @@ namespace vm
 					}
 					ob.dep.notifyWatchers();
 				};
+            }
+            else
+            {
+				ObserveNormalObject(obj, keys);
 			}
 		}
 

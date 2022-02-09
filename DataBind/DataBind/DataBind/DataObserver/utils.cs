@@ -232,11 +232,20 @@ namespace vm
 							if (mhas != null)
 							{
 								hasKey = (bool)mhas.Invoke(a, new object[] { key });
-							}
+							}else if(key is int index && a is System.Collections.ICollection coll)
+                            {
+								hasKey = coll.Count > index;
+                            }
 							if (hasKey)
-							{
-								var v = mget.Invoke(a, new object[] { key });
-								return v;
+                            {
+                                try
+                                {
+									var v = mget.Invoke(a, new object[] { key });
+									return v;
+								}catch (Exception e)
+                                {
+									console.warn(e);
+                                }
 							}
 						}
 
@@ -250,16 +259,20 @@ namespace vm
 									break;
 								}
 							}
-							if (m == null)
-							{
-								exist = false;
-								return null;
-							}
-							else
+							if (m != null)
 							{
 								return m;
 							}
+
 						}
+
+						var field=type.GetField(skey);
+						if(field != null)
+                        {
+							console.error($"不可观测的对象字段: {type.Name}.{skey}");
+                        }
+						exist = false;
+						return null;
 					}
 					else
 					{
@@ -478,6 +491,13 @@ namespace vm
 							}
 							else
 							{
+
+								var field = type.GetField(skey);
+								if (field != null)
+								{
+									console.error($"不可观测的对象字段: {type.Name}.{skey}");
+								}
+
 								exist = false;
 								return null;
 							}

@@ -99,14 +99,29 @@ namespace RunDataBindDemo
         public virtual int KKK2 { get; set; }
     }
 
+    public struct Hello2
+    {
+        public int wfe;
+        public int fefge;
+    }
+
     public class TSampleHost2 : IHost, IStdHost
     {
         (int, int,int,int,int,int,int,int,int,int,int,int,int) ff = (32, 23,1,2,3,4,5,6,7,8,2,3,4);
-        (int, float) ff1 = (32, 23);
+        (int wef, float ff) ff1 = (32, 23);
+        Hello2 klwk = new Hello2();
+
+        System.Collections.Generic.Dictionary<string, string> wfe = new System.Collections.Generic.Dictionary<string, string>()
+        {
+            ["lwkjfe"] = "lkwefj",
+        };
+
         public virtual void _SaddWatcher(Watcher watcher)
         {
+            var wfd = ff1.wef;
+            var vwed=new Tuple<int,int>(0,0);
             object wfw = new TSampleTarget();
-            if(wfw is IStdHost)
+            if (wfw is IStdHost)
             {
                 var wef=wfw as IStdHost;
                 Console.Write(wef);
@@ -118,6 +133,33 @@ namespace RunDataBindDemo
             }
             (int, float) ff = (32, 23);
             this.AddWatcher(watcher);
+
+            var xzsxd = new Hello2
+            {
+                fefge = 234,
+                wfe = 243234,
+            };
+            var we = xzsxd;
+
+            var wef1 = new int[234];
+            var wef21 = new Hello2[234];
+
+            for(var i = 0; i < 23; i++)
+            {
+                wef1[i] = 234;
+            }
+
+            Console.Write(xzsxd.wfe);
+            Console.Write(we.wfe);
+
+            try
+            {
+                Console.Write(we.wfe);
+                throw new Exception("wekf");
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         public virtual void _Sdestroy()

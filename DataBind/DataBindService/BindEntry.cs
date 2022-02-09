@@ -122,6 +122,8 @@ namespace DataBindService
 				foreach (var type in types)
 				{
 
+					// field auto -> property
+#if false
 					if(type.CustomAttributes.Any(attr=>CILUtils.IsSameAttr(attr, AsPropertyAttr)))
                     {
 						DataBindTool.HandleAutoConvFieldToProperty(type,AsPropertyAttr);
@@ -130,6 +132,7 @@ namespace DataBindService
                     {
 						DataBindTool.HandleAutoConvFieldToPropertySeperately(type,AsPropertyAttr);
 					}
+#endif
 
 					if(type.CustomAttributes.Any(attr=>CILUtils.IsSameAttr(attr, StdHostAttr)))
                     {

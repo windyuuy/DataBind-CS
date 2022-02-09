@@ -1108,11 +1108,23 @@ namespace vm
 					}
 					if (ast.right is ValueASTNode)
 					{
-						return Utils.IndexValueRecursive(a, (ast.right as ValueASTNode).value.value);
+						bool exist;
+						var ret1=Utils.IndexValueRecursive(a, (ast.right as ValueASTNode).value.value, out exist);
+						if(exist == false)
+                        {
+							//console.warn(Interpreter.toStringAST(ast.left) + "\n" + "无法获取属性" + Interpreter.toStringAST(ast.right));
+						}
+						return ret1;
 					}
 					else
 					{
-						return Utils.IndexValueRecursive(a, Interpreter.srun(environment, ast.right));
+						bool exist;
+						var ret2=Utils.IndexValueRecursive(a, Interpreter.srun(environment, ast.right), out exist);
+                        if (exist == false)
+                        {
+							//console.warn(Interpreter.toStringAST(ast.left) + "\n" + "无法获取属性" + Interpreter.toStringAST(ast.right));
+						}
+						return ret2;
 					}
 				}
 
