@@ -10,6 +10,7 @@ namespace vm
 	using TDictChangedFuncs = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<PropertyChangedEventHandler>>;
 	using TChangedFuncs = System.Collections.Generic.List<PropertyChangedEventHandler>;
 
+	// TODO: 支持下对象销毁时, 把相关的表达式一起清除掉
 	public partial class Utils
 	{
 		/// <summary>
