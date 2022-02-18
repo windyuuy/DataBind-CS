@@ -241,6 +241,8 @@ namespace RunDataBindDemo
     {
         [AutoFieldProperty]
         public int ddd = 235;
+        [AutoFieldProperty]
+        public static int ddd2 = 235;
 
         public int kkk = 235;
     }
@@ -252,10 +254,59 @@ namespace RunDataBindDemo
         public int bbb { get; set; } = 23;
     }
 
-    [StdHost][AutoFieldProperty]
+    [StdHost]
+    [AutoFieldProperty]
     public class TestStdHostAttr2
     {
         public int aaa = 234;
         public int bbb { get; set; } = 23;
+    }
+
+    public class TSetFieldSample
+    {
+        public int aaa = 23;
+        public int bbb { get; set; } = 23;
+        public static int uuu = 3;
+        public static int xxx { get; set; } = 3;
+
+        public int fff
+        {
+            get
+            {
+                var ccc = new CCC();
+                return ccc.ddd;
+            }
+            set
+            {
+                var ccc = new CCC();
+                ccc.ddd = value;
+            }
+        }
+
+        public void setAA()
+        {
+            aaa = 24;
+            bbb = 24;
+            ref var qqq = ref aaa;
+            var kkk = uuu;
+            var zzz = xxx;
+        }
+
+        public void setBB()
+        {
+            var ddd = aaa;
+
+            var ccc= bbb;
+        }
+
+        public void setCC()
+        {
+            var ccc = new CCC();
+            var eee = ccc.ddd+2342;
+            ccc.ddd = 234;
+
+            var eee2 = CCC.ddd2 + 2342;
+            CCC.ddd2 = 234;
+        }
     }
 }

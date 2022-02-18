@@ -24,15 +24,15 @@ namespace TestWithInjected
             {
                 //if (false)
                 {
-                    var a = AssemblyDefinition.ReadAssembly(typeof(Tests).Assembly.Location);
+                    using var a = AssemblyDefinition.ReadAssembly(typeof(Tests).Assembly.Location);
                     var TString = typeof(string);
                     var rtstr = a.MainModule.ImportReference(TString);
 
-                    var db = AssemblyDefinition.ReadAssembly(typeof(vm.IObservable).Assembly.Location);
+                    using var db = AssemblyDefinition.ReadAssembly(typeof(vm.IObservable).Assembly.Location);
                     var tIObservable = db.MainModule.ImportReference(typeof(RunDataBindDemo.ITest));
                     var types = assembly.MainModule.GetTypes();
 
-                    var rd=AssemblyDefinition.ReadAssembly(typeof(RunDataBindDemo.Demo).Assembly.Location);
+                    using var rd=AssemblyDefinition.ReadAssembly(typeof(RunDataBindDemo.Demo).Assembly.Location);
                     var tDemo = assembly.MainModule.GetType(typeof(RunDataBindDemo.Demo).FullName);
 
                     //var corlibReference = new AssemblyNameReference("System.Runtime", new Version(4, 2, 1, 0))
@@ -41,7 +41,7 @@ namespace TestWithInjected
                     //};
                     //assembly.MainModule.AssemblyReferences.Add(corlibReference);
                     //var sys = AssemblyDefinition.ReadAssembly(typeof(System.Delegate).Assembly.Location);
-                    var sys = AssemblyDefinition.ReadAssembly("E:/DATA/Projects/unity/parentclient/meta-parent-client-u3d/client/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/src/main/assets/bin/Data/Managed/mscorlib.dll");
+                    using var sys = AssemblyDefinition.ReadAssembly("E:/DATA/Projects/unity/parentclient/meta-parent-client-u3d/client/Library/Bee/Android/Prj/Mono2x/Gradle/unityLibrary/src/main/assets/bin/Data/Managed/mscorlib.dll");
                     //sys.Name = new AssemblyNameDefinition("System.Runtime", sys.Name.Version);
                     //sys.MainModule.Name = "System.Runtime.dll";
                     CILUtils.SysAssembly = sys;
@@ -122,7 +122,7 @@ namespace TestWithInjected
             {
                 //if (false)
                 {
-                    var sys = AssemblyDefinition.ReadAssembly(typeof(void).Assembly.Location);
+                    using var sys = AssemblyDefinition.ReadAssembly(typeof(void).Assembly.Location);
                     CILUtils.SysAssembly = sys;
 
                     var types = assembly.MainModule.GetTypes();
@@ -171,6 +171,20 @@ namespace TestWithInjected
             var useSymbols = false;
             BindEntry.SupportDataBind(
                 @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll",
+                new BindOptions()
+                {
+                    useSymbols = useSymbols,
+                });
+            console.log("inject done.");
+        }
+
+        [Test]
+        [Order(1)]
+        public void TestInjectUnity()
+        {
+            var useSymbols = true;
+            BindEntry.SupportDataBind(
+                @"E:\DATA\Projects\unity\parentclient\hello\UnityDataBinding\client\Library\ScriptAssemblies\Assembly-CSharp.dll",
                 new BindOptions()
                 {
                     useSymbols = useSymbols,

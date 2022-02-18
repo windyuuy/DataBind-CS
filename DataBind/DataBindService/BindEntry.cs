@@ -13,42 +13,70 @@ namespace DataBindService
 	{
 		public bool writeImmediate = true;
 		public bool useSymbols = true;
-		public Action<AssemblyDefinition> onDone;
+		//public Action<AssemblyDefinition> onDone;
 		public System.IO.FileStream readStream;
 		public string outputPath;
 	}
 
 	public class BindEntry
 	{
-        //[System.Diagnostics.DebuggerStepThrough]
-        public static void SupportU3DDataBind()
+
+		//[System.Diagnostics.DebuggerStepThrough]
+		public static void SupportU3DDataBind()
 		{
 			var filePaths = System.IO.Directory.GetFiles(@".\Library\ScriptAssemblies\", @"*.dll", System.IO.SearchOption.TopDirectoryOnly);
-			var validDlls=filePaths
-				.Where(p=>IsValidDllToSupport(p))
-				.ToArray();
-			foreach (var dllPath in validDlls)
-			{
-				SupportDataBind(dllPath, new BindOptions());
-			}
+			SupportU3DDataBind(filePaths);
 		}
 		public static void SupportU3DDataBind(IEnumerable<string> filePaths)
 		{
+			var postTask = new PostTask();
+
+			postTask.Clear();
+
 			var validDlls=filePaths
 				.Where(p=>IsValidDllToSupport(p))
 				.ToArray();
+			var assmeblyList = new List<AssemblyDefinition>();
+			var buildOptions = new BindOptions();
 			foreach (var dllPath in validDlls)
 			{
                 try
                 {
-					SupportDataBind(dllPath, new BindOptions());
+					var assembly=LoadAssembly(dllPath, buildOptions);
+					assmeblyList.Add(assembly);
 				}
 				catch(Exception ex)
                 {
 					console.error(ex.ToString());
                 }
 			}
+			foreach(var assembly in assmeblyList)
+            {
+				SupportDataBindInMemory(assembly, buildOptions, postTask);
+            }
+			foreach (var assembly in assmeblyList)
+			{
+				SupportDataBindPostTask(assembly, buildOptions, postTask, assmeblyList);
+			}
+			foreach (var assembly in assmeblyList)
+			{
+				SaveAssembly(assembly, buildOptions);
+				assembly.Dispose();
+			}
+
+			postTask.Clear();
 		}
+
+		public static void SupportDataBindPostTask(AssemblyDefinition assembly, BindOptions options, PostTask postTask0, List<AssemblyDefinition> assmeblyList)
+        {
+			foreach(var refAssembly in assmeblyList)
+            {
+				foreach(var task in postTask0.field2PropInfos)
+                {
+					CILUtils.ReplaceFieldReferWithPropertyDef(refAssembly, task.fieldDef, task.propertyDef);
+				}
+			}
+        }
 
 		public static bool IsValidDllToSupport(string filePath)
         {
@@ -67,39 +95,39 @@ namespace DataBindService
 		}
 
         //[System.Diagnostics.DebuggerStepThrough]
-        public static void SupportDataBind(string inputPath, BindOptions options)
+        public static AssemblyDefinition LoadAssembly(string inputPath, BindOptions options)
 		{
 			var useSymbols = options.useSymbols;
 
-            try
+			AssemblyDefinition assembly;
+
+			try
 			{
-				using var assembly = AssemblyDefinition.ReadAssembly(inputPath, new ReaderParameters()
+				assembly = AssemblyDefinition.ReadAssembly(inputPath, new ReaderParameters()
 				{
 					ReadWrite = true,
 					ReadSymbols = useSymbols,
 				});
-				SupportDataBind(assembly, options);
 			}
 			catch (Exception ex)
             {
-				using var assembly = AssemblyDefinition.ReadAssembly(inputPath, new ReaderParameters()
+				assembly = AssemblyDefinition.ReadAssembly(inputPath, new ReaderParameters()
 				{
 					ReadWrite = true,
 					ReadSymbols = false,
 				});
-				options.useSymbols = false;
-				SupportDataBind(assembly, options);
-				options.useSymbols = useSymbols;
-			}
+            }
 
+			return assembly;
 		}
 
-		public static void SupportDataBind(AssemblyDefinition assembly, BindOptions options)
-		{
-			var useSymbols = options.useSymbols;
+		public static void SupportDataBindInMemory(AssemblyDefinition assembly, BindOptions options, PostTask postTask0)
+        {
 
 			{
-				var sys = AssemblyDefinition.ReadAssembly(typeof(void).Assembly.Location);
+				var postTask = new PostTask();
+
+				using var sys = AssemblyDefinition.ReadAssembly(typeof(void).Assembly.Location);
 				CILUtils.SysAssembly = sys;
 				DataBindTool.MainAssembly = assembly;
 				DataBindTool.SysAssembly = sys;
@@ -123,21 +151,21 @@ namespace DataBindService
 				{
 
 					// field auto -> property
-#if false
-					if(type.CustomAttributes.Any(attr=>CILUtils.IsSameAttr(attr, AsPropertyAttr)))
-                    {
-						DataBindTool.HandleAutoConvFieldToProperty(type,AsPropertyAttr);
-                    }
-                    else
-                    {
-						DataBindTool.HandleAutoConvFieldToPropertySeperately(type,AsPropertyAttr);
+#if true
+					if (type.CustomAttributes.Any(attr => CILUtils.IsSameAttr(attr, AsPropertyAttr)))
+					{
+						DataBindTool.HandleAutoConvFieldToProperty(type, AsPropertyAttr, postTask);
+					}
+					else
+					{
+						DataBindTool.HandleAutoConvFieldToPropertySeperately(type, AsPropertyAttr, postTask);
 					}
 #endif
 
-					if(type.CustomAttributes.Any(attr=>CILUtils.IsSameAttr(attr, StdHostAttr)))
-                    {
-						if(type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, StdHostInterface)) == false)
-                        {
+					if (type.CustomAttributes.Any(attr => CILUtils.IsSameAttr(attr, StdHostAttr)))
+					{
+						if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, StdHostInterface)) == false)
+						{
 							CILUtils.InjectInteface(assembly, type, StdHostInterface);
 						}
 					}
@@ -147,9 +175,9 @@ namespace DataBindService
 						DataBindTool.HandleHost(type);
 
 						DataBindTool.HandleObservable(type, ObservableAttrTemp);
-                    }
-                    else
-                    {
+					}
+					else
+					{
 						var attr = type.CustomAttributes.FirstOrDefault(c => CILUtils.IsSameAttr(c, MarkAttr));
 						if (attr != null)
 						{
@@ -158,18 +186,21 @@ namespace DataBindService
 					}
 
 					var attrRecursive = type.CustomAttributes.FirstOrDefault(c => CILUtils.IsSameAttr(c, MarkRecursiveAttr));
-					if(attrRecursive != null)
-                    {
+					if (attrRecursive != null)
+					{
 						DataBindTool.HandleObservableRecursive(type, ObservableAttrTemp);
-                    }
+					}
 
 				}
+
+				postTask0.Merge(postTask);
 			}
 
-			if (options.onDone != null)
-			{
-				options.onDone(assembly);
-			}
+		}
+
+		public static void SaveAssembly(AssemblyDefinition assembly, BindOptions options)
+        {
+			var useSymbols = options.useSymbols;
 
 			if (options.writeImmediate)
 			{
@@ -188,6 +219,15 @@ namespace DataBindService
 					});
 				}
 			}
+		}
+
+		public static void SupportDataBind(string assemblyPath, BindOptions options)
+		{
+			var postTask = new PostTask();
+			using var assembly = LoadAssembly(assemblyPath,options);
+			SupportDataBindInMemory(assembly,options, postTask);
+			SupportDataBindPostTask(assembly,options, postTask, new List<AssemblyDefinition>() { assembly });
+			SaveAssembly(assembly,options);
 		}
 
 	}

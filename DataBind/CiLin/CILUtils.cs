@@ -7,6 +7,14 @@ namespace CiLin
 {
 	public static class LinqExt
 	{
+		public static void ForEach<T>(this Mono.Collections.Generic.Collection<T> coll, Action<T,int> call)
+		{
+			for(var i=0;i<coll.Count;i++)
+			{
+				var item=coll[i];
+				call(item,i);
+			}
+		}
 		public static void ForEach<T>(this Mono.Collections.Generic.Collection<T> coll, Action<T> call)
 		{
 			foreach (var item in coll)
@@ -233,13 +241,17 @@ namespace CiLin
 			TypeReference propertyType = assembly.MainModule.ImportReference(returnType);
 			return InjectProperty(assembly, targetType, propertyName, propertyType);
 		}
-		public static PropertyDefinition InjectProperty(AssemblyDefinition assembly, TypeDefinition targetType, string propertyName, TypeReference propertyType)
+		public static PropertyDefinition InjectProperty(AssemblyDefinition assembly, TypeDefinition targetType, string propertyName, TypeReference propertyType, FieldDefinition fieldDefinition=null)
 		{
 			//Import the void type
 			TypeReference voidRef = assembly.MainModule.ImportReference(typeof(void));
 
 			var fieldName = ConvertToFieldName(propertyName);
-			var field = targetType.Fields.FirstOrDefault(f => f.Name == fieldName);
+			var field = fieldDefinition;
+            if(field == null)
+            {
+				field = targetType.Fields.FirstOrDefault(f => f.Name == fieldName);
+			}
 			if (field == null)
 			{
 				//define the field we store the value in
@@ -317,7 +329,7 @@ namespace CiLin
 			var TCompilerGenerated = typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute);
 			var rCompilerGenerated = assembly.MainModule.ImportReference(TCompilerGenerated.GetConstructor(new Type[] { }));
 
-			var prop = CILUtils.InjectProperty(assembly, typeDefinition, fieldName0, field.FieldType);
+			var prop = CILUtils.InjectProperty(assembly, typeDefinition, fieldName0, field.FieldType, field);
 			PropertyAttributes propertyAttributes = PropertyAttributes.None;
 			if ((field.Attributes & FieldAttributes.HasDefault) != 0)
 			{
@@ -333,14 +345,6 @@ namespace CiLin
 			{
 				methodAttributes = MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.NewSlot;
 			}
-			if (field.IsPublic)
-			{
-				methodAttributes |= MethodAttributes.Public;
-			}
-			if (field.IsFamily)
-			{
-				methodAttributes |= MethodAttributes.Family;
-			}
 			if (field.IsAssembly)
 			{
 				methodAttributes |= MethodAttributes.Assembly;
@@ -349,13 +353,48 @@ namespace CiLin
 			{
 				methodAttributes |= MethodAttributes.RTSpecialName;
 			}
+			var getMethodAttrs = methodAttributes;
+			var setMethodAttrs = methodAttributes;
+			if (field.IsPublic)
+			{
+				getMethodAttrs |= MethodAttributes.Public;
+
+				if (field.IsInitOnly)
+				{
+					setMethodAttrs |= MethodAttributes.Private;
+                }
+                else
+                {
+					setMethodAttrs |= MethodAttributes.Public;
+				}
+			}
+			if (field.IsFamily)
+			{
+				getMethodAttrs |= MethodAttributes.Family;
+
+				if (field.IsInitOnly)
+				{
+					setMethodAttrs |= MethodAttributes.Private;
+				}
+				else
+				{
+					setMethodAttrs |= MethodAttributes.Family;
+				}
+			}
 			methodAttributes |= MethodAttributes.SpecialName;
-			prop.GetMethod.Attributes = methodAttributes;
+			prop.GetMethod.Attributes = getMethodAttrs;
 			prop.GetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
-			prop.SetMethod.Attributes = methodAttributes;
+			prop.SetMethod.Attributes = setMethodAttrs;
 			prop.SetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
 
-			field.Attributes = FieldAttributes.Private;
+			var fieldAttributes = FieldAttributes.Private;
+            if (field.IsStatic)
+            {
+				fieldAttributes|=FieldAttributes.Static;
+			}
+			field.Attributes = fieldAttributes;
+
+			//ReplaceFieldReferWithPropertyDef(assembly,field,prop);
 
 			return prop;
 		}
@@ -561,5 +600,75 @@ namespace CiLin
 			typeDefinition.Interfaces.Add(InterfaceDef);
 			return InterfaceDef;
 		}
+
+		public static bool ReplaceFieldReferWithPropertyDef(AssemblyDefinition assembly,FieldDefinition fieldDefinition,PropertyDefinition property)
+        {
+			var anyReferExist = false;
+			assembly.Modules.ForEach((module) =>
+            {
+				module.Types.ForEach((type) =>
+				{
+					type.Methods.ForEach((method) => {
+                        if (method.Body != null && property.GetMethod!=method && property.SetMethod!=method && false==method.Name.EndsWith(">b__pri_get0"))
+                        {
+							var insts = method.Body.Instructions;
+							var isContructorInited = false;
+							var isConstructor = method.IsConstructor && type == fieldDefinition.DeclaringType;
+							insts.ForEach((inst,index) =>
+							{
+                                if (isConstructor)
+                                {
+                                    if (!isContructorInited)
+                                    {
+										// 跳过构造函数初始化阶段代码
+										if (inst.OpCode == OpCodes.Call && inst.Operand is MethodReference ctorB && ctorB.Name.Equals(".ctor")
+											&& (index >= 1 && insts[index - 1].OpCode == OpCodes.Ldarg_0)
+											)
+										{
+											isContructorInited = true;
+											return;
+										}
+										return;
+									}
+								}
+								var exist = true;
+                                // TODO: 考虑其他涉及fld的指令
+                                if (inst.OpCode == OpCodes.Ldfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
+                                {
+                                    inst.OpCode = OpCodes.Call;
+                                    inst.Operand = property.GetMethod;
+                                }
+                                else if (inst.OpCode == OpCodes.Ldsfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
+                                {
+                                    inst.OpCode = OpCodes.Call;
+                                    inst.Operand = property.GetMethod;
+                                }
+                                else if (inst.OpCode == OpCodes.Stfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
+                                {
+                                    inst.OpCode = OpCodes.Call;
+                                    inst.Operand = property.SetMethod;
+                                }
+                                else if (inst.OpCode == OpCodes.Stsfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
+                                {
+                                    inst.OpCode = OpCodes.Call;
+                                    inst.Operand = property.SetMethod;
+                                }
+                                else
+                                {
+									exist= false;
+                                }
+
+                                if (exist)
+                                {
+									anyReferExist = true;
+								}
+                            });
+						}
+					});
+				});
+			});
+
+			return anyReferExist;
+        }
 	}
 }

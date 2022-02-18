@@ -11,7 +11,8 @@ namespace DataBindService
 	{
 		public static AssemblyDefinition MainAssembly;
 		public static AssemblyDefinition SysAssembly;
-		public static void HandleAutoConvFieldToProperty(TypeDefinition typeDefinition, TypeReference AsPropertyAttr)
+
+		public static void HandleAutoConvFieldToProperty(TypeDefinition typeDefinition, TypeReference AsPropertyAttr, PostTask postTask)
         {
 			var attr = typeDefinition.CustomAttributes.FirstOrDefault(attr => CILUtils.IsSameAttr(attr, AsPropertyAttr));
 			typeDefinition.CustomAttributes.Remove(attr);
@@ -20,12 +21,13 @@ namespace DataBindService
             {
 				if(IsValidFieldConvToProperty(field))
                 {
-					CILUtils.ConvertFieldToProperty(MainAssembly, typeDefinition, field);
+					var prop = CILUtils.ConvertFieldToProperty(MainAssembly, typeDefinition, field);
+					postTask.AddField2PropInfo(MainAssembly.MainModule, typeDefinition, field, prop);
 				}
             }
         }
 
-		public static void HandleAutoConvFieldToPropertySeperately(TypeDefinition typeDefinition,TypeReference AsPropertyAttr)
+		public static void HandleAutoConvFieldToPropertySeperately(TypeDefinition typeDefinition,TypeReference AsPropertyAttr, PostTask postTask)
 		{
 			foreach (var field in typeDefinition.Fields.ToArray())
 			{
@@ -35,7 +37,8 @@ namespace DataBindService
                     if (IsValidFieldConvToProperty(field))
                     {
 						field.CustomAttributes.Remove(attr);
-						CILUtils.ConvertFieldToProperty(MainAssembly, typeDefinition, field);
+						var prop=CILUtils.ConvertFieldToProperty(MainAssembly, typeDefinition, field);
+						postTask.AddField2PropInfo(MainAssembly.MainModule, typeDefinition, field, prop);
 					}
 				}
 			}
@@ -43,13 +46,13 @@ namespace DataBindService
 
 		public static bool IsValidFieldConvToProperty(FieldDefinition field)
         {
-			return field.IsPublic || field.IsFamily;
+			return field.IsStatic==false && ( field.IsPublic || field.IsFamily);
 		}
 
 		public static void HandleHost(TypeDefinition typeDefinition)
 		{
-			var DataBindServiceAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
-			var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBinding.HostExt2).Assembly.Location);
+			using var DataBindServiceAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
+			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBinding.HostExt2).Assembly.Location);
 
 			var IFullHostRef = MainAssembly.MainModule.ImportReference(typeof(vm.IFullHost));
 			var IHostRef = MainAssembly.MainModule.ImportReference(typeof(vm.IHost));
@@ -215,7 +218,7 @@ namespace DataBindService
 			}
 
 			#region implement IObservable
-			var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
+			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
 
 			var DebuggerStepThroughAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerStepThroughAttribute).GetConstructor(new Type[0]));
 			var ObserverRef = MainAssembly.MainModule.ImportReference(typeof(vm.Observer));
@@ -379,9 +382,13 @@ namespace DataBindService
 							privateGetMethod.Attributes = MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot;
 							privateGetMethod.SemanticsAttributes = MethodSemanticsAttributes.None;
 							privateGetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+							var privateGetMethodWorker = privateGetMethod.Body.GetILProcessor();
 							getMethodInstCopy.ForEach(inst =>
 							{
-								privateGetMethod.Body.GetILProcessor().Append(inst);
+								var instCopy= Instruction.Create(OpCodes.Nop);
+								instCopy.OpCode = inst.OpCode;
+								instCopy.Operand = inst.Operand;
+								privateGetMethodWorker.Append(instCopy);
 							});
 
 

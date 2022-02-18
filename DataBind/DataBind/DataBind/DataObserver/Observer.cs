@@ -74,7 +74,8 @@ namespace vm
             }
             else if(value != null && (
 				value.GetType().IsPrimitive
-				|| (value is string) 
+				|| (value is string)
+				|| (value is Delegate)
 				|| (value.GetType().GetProperties().Length==0 && value.GetType().GetFields().Length==0)
 				)==false)
             {

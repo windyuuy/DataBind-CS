@@ -7,6 +7,22 @@ namespace TestWithInjected
 	public class Tests
 	{
 		[Test]
+		public void TestField2Prop()
+        {
+			var dv = new TestStdHostAttr2();
+			var host = new TestStdHostAttr2();
+			var nextValue = 0;
+			var watcher=host.Watch("aaa", (h, newValue, oldValue) =>
+			{
+				nextValue = (int)newValue;
+			});
+            Assert.AreEqual(watcher.value, dv.aaa);
+			host.aaa = nextValue;
+			vm.Tick.next();
+			Assert.AreEqual(watcher.value, nextValue);
+		}
+
+		[Test]
 		public void TestInjected()
 		{
 			var target = new TSampleTarget();
