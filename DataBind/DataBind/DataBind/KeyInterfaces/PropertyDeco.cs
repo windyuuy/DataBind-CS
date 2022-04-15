@@ -16,4 +16,15 @@ namespace DataBinding
 		{
 		}
 	}
+
+	/// <summary>
+	/// 使field自动转为property
+	/// </summary>
+	[System.AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
+	public sealed class KeepFieldPropertyAttribute : System.Attribute
+	{
+		public KeepFieldPropertyAttribute()
+		{
+		}
+	}
 }

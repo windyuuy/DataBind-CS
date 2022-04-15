@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Game.Diagnostics.IO;
 
 namespace DataBindService
 {
-    [System.Diagnostics.DebuggerStepThrough]
-    public class BindOptions
+	[System.Diagnostics.DebuggerStepThrough]
+	public class BindOptions
 	{
 		public bool writeImmediate = true;
 		public bool useSymbols = true;
@@ -33,27 +34,27 @@ namespace DataBindService
 
 			postTask.Clear();
 
-			var validDlls=filePaths
-				.Where(p=>IsValidDllToSupport(p))
+			var validDlls = filePaths
+				.Where(p => IsValidDllToSupport(p))
 				.ToArray();
 			var assmeblyList = new List<AssemblyDefinition>();
 			var buildOptions = new BindOptions();
 			foreach (var dllPath in validDlls)
 			{
-                try
-                {
-					var assembly=LoadAssembly(dllPath, buildOptions);
+				try
+				{
+					var assembly = LoadAssembly(dllPath, buildOptions);
 					assmeblyList.Add(assembly);
 				}
-				catch(Exception ex)
-                {
+				catch (Exception ex)
+				{
 					console.error(ex.ToString());
-                }
+				}
 			}
-			foreach(var assembly in assmeblyList)
-            {
+			foreach (var assembly in assmeblyList)
+			{
 				SupportDataBindInMemory(assembly, buildOptions, postTask);
-            }
+			}
 			foreach (var assembly in assmeblyList)
 			{
 				SupportDataBindPostTask(assembly, buildOptions, postTask, assmeblyList);
@@ -68,24 +69,24 @@ namespace DataBindService
 		}
 
 		public static void SupportDataBindPostTask(AssemblyDefinition assembly, BindOptions options, PostTask postTask0, List<AssemblyDefinition> assmeblyList)
-        {
-			foreach(var refAssembly in assmeblyList)
-            {
-				foreach(var task in postTask0.field2PropInfos)
-                {
+		{
+			foreach (var refAssembly in assmeblyList)
+			{
+				foreach (var task in postTask0.field2PropInfos)
+				{
 					CILUtils.ReplaceFieldReferWithPropertyDef(refAssembly, task.fieldDef, task.propertyDef);
 				}
 			}
-        }
+		}
 
 		public static bool IsValidDllToSupport(string filePath)
-        {
+		{
 			if (
 					filePath.Contains("Unity.")
 					|| filePath.Contains("UnityEngine.")
 					|| filePath.Contains("UnityEditor.")
-                    || filePath.StartsWith("DataBind.")
-                    || filePath.Contains(".Editor.")
+					|| filePath.StartsWith("DataBind.")
+					|| filePath.Contains(".Editor.")
 					|| filePath.Contains(".Cecil.")
 					)
 			{
@@ -94,10 +95,16 @@ namespace DataBindService
 			return true;
 		}
 
-        //[System.Diagnostics.DebuggerStepThrough]
-        public static AssemblyDefinition LoadAssembly(string inputPath, BindOptions options)
+		//[System.Diagnostics.DebuggerStepThrough]
+		public static AssemblyDefinition LoadAssembly(string inputPath, BindOptions options)
 		{
 			var useSymbols = options.useSymbols;
+
+			var resolver = new DefaultAssemblyResolver();
+			//resolver.AddSearchDirectory(@".");
+			//resolver.AddSearchDirectory(@"bin");
+			resolver.AddSearchDirectory(@".\Assets\Framework\Third\Demigiant\DOTween\");
+			resolver.AddSearchDirectory(@".\TestProjects\CommobLibs\Managed\UnityEngine\");
 
 			AssemblyDefinition assembly;
 
@@ -107,22 +114,24 @@ namespace DataBindService
 				{
 					ReadWrite = true,
 					ReadSymbols = useSymbols,
+					AssemblyResolver = resolver,
 				});
 			}
 			catch (Exception ex)
-            {
+			{
 				assembly = AssemblyDefinition.ReadAssembly(inputPath, new ReaderParameters()
 				{
 					ReadWrite = true,
 					ReadSymbols = false,
+					AssemblyResolver = resolver,
 				});
-            }
+			}
 
 			return assembly;
 		}
 
 		public static void SupportDataBindInMemory(AssemblyDefinition assembly, BindOptions options, PostTask postTask0)
-        {
+		{
 
 			{
 				var postTask = new PostTask();
@@ -199,7 +208,7 @@ namespace DataBindService
 		}
 
 		public static void SaveAssembly(AssemblyDefinition assembly, BindOptions options)
-        {
+		{
 			var useSymbols = options.useSymbols;
 
 			if (options.writeImmediate)
@@ -224,10 +233,10 @@ namespace DataBindService
 		public static void SupportDataBind(string assemblyPath, BindOptions options)
 		{
 			var postTask = new PostTask();
-			using var assembly = LoadAssembly(assemblyPath,options);
-			SupportDataBindInMemory(assembly,options, postTask);
-			SupportDataBindPostTask(assembly,options, postTask, new List<AssemblyDefinition>() { assembly });
-			SaveAssembly(assembly,options);
+			using var assembly = LoadAssembly(assemblyPath, options);
+			SupportDataBindInMemory(assembly, options, postTask);
+			SupportDataBindPostTask(assembly, options, postTask, new List<AssemblyDefinition>() { assembly });
+			SaveAssembly(assembly, options);
 		}
 
 	}

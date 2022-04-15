@@ -12,6 +12,7 @@ XCOPY %Source%\DataBindService.pdb %Bin%\Editor\Service /y
 XCOPY %Source%\Mono.Cecil.dll %Bin%\Editor\Service /y
 
 XCOPY %Source%\UnityDataBindService.dll %Bin%\Editor\Entry /y
+XCOPY %Source%\UnityDataBindService.pdb %Bin%\Editor\Entry /y
 
 XCOPY %Source%\DataBind.dll %Bin%\DataBind /y
 XCOPY %Source%\DataBind.xml %Bin%\DataBind /y

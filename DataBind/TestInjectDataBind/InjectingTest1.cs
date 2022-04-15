@@ -6,6 +6,7 @@ using CiLin;
 
 using Debug = Game.Diagnostics.Debug;
 using DataBindService;
+using Game.Diagnostics.IO;
 
 namespace TestWithInjected
 {

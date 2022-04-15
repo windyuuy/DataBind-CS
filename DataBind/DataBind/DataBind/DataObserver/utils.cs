@@ -2,6 +2,7 @@ using DataBinding.CollectionExt;
 using System;
 using System.Linq;
 using System.Reflection;
+using Game.Diagnostics.IO;
 
 namespace vm
 {

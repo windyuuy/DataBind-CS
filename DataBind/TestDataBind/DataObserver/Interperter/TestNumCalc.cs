@@ -1,5 +1,6 @@
 ﻿
 using DataBinding.CollectionExt;
+using Game.Diagnostics.IO;
 using NUnit.Framework;
 
 namespace TestDataBind.DataObserver.Interperter
