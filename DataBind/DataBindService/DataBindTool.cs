@@ -228,26 +228,30 @@ namespace DataBindService
 			CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "_SsetOb", "___Sob__", ObserverRef);
 
 			var GetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyGot", typeof(vm.PropertyGetEventHandler));
-			var SetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyChanged", typeof(vm.PropertyChangedEventHandler));
 			//GetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			GetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			GetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			var SetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyChanged", typeof(vm.PropertyChangedEventHandler));
 			//SetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			SetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			SetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 
+			var IObservableRef = MainAssembly.MainModule.ImportReference(typeof(vm.IObservable));
+			var IObservableDef = new InterfaceImplementation(IObservableRef);
+			typeDefinition.Interfaces.Add(IObservableDef);
+			
 			var RuntimeDemoRef = MainAssembly.MainModule.ImportReference(typeof(DataBindService.DBRuntimeDemo));
 			var RuntimeDemoDef = DataBindAssembly.MainModule.Types.First(t => t != null && t.Namespace == RuntimeDemoRef.Namespace && t.FullName == RuntimeDemoRef.FullName);
 			var NotifyPropertyGotMethod = RuntimeDemoDef.Methods.First(m => m.Name == "NotifyPropertyGot");
 			var NotifyPropertyChangedMethod = RuntimeDemoDef.Methods.First(m => m.Name == "NotifyPropertyChanged");
 			var GetMethodNotify = CILUtils.CopyMethod(MainAssembly, typeDefinition, "NotifyPropertyGot", RuntimeDemoDef, NotifyPropertyGotMethod);
 			var SetMethodNotify = CILUtils.CopyMethod(MainAssembly, typeDefinition, "NotifyPropertyChanged", RuntimeDemoDef, NotifyPropertyChangedMethod);
-
+			
 			{
 				var eventField = typeDefinition.Fields.First(f => f.Name == "PropertyGot");
 				var PropertyGetEventArgsCtor = MainAssembly.MainModule.ImportReference(typeof(vm.PropertyGetEventArgs).GetConstructor(new Type[] { typeof(string), typeof(object) }));
 				var PropertyGetEventHandler = MainAssembly.MainModule.ImportReference(typeof(vm.PropertyGetEventHandler).GetMethod("Invoke"));
-
+			
 				GetMethodNotify.Body.Instructions.Clear();
 				var worker = GetMethodNotify.Body.GetILProcessor();
 				worker.Append(worker.Create(OpCodes.Nop));
@@ -266,14 +270,14 @@ namespace DataBindService
 				worker.Append(worker.Create(OpCodes.Callvirt, PropertyGetEventHandler));
 				worker.Append(worker.Create(OpCodes.Nop));
 				worker.Append(inst2);
-
+			
 				GetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			}
 			{
 				var eventField = typeDefinition.Fields.First(f => f.Name == "PropertyChanged");
 				var PropertyChangeEventArgsCtor = MainAssembly.MainModule.ImportReference(typeof(vm.PropertyChangedEventArgs).GetConstructor(new Type[] { typeof(string), typeof(object), typeof(object) }));
 				var PropertyChangeEventHandler = MainAssembly.MainModule.ImportReference(typeof(vm.PropertyChangedEventHandler).GetMethod("Invoke"));
-
+			
 				SetMethodNotify.Body.Instructions.Clear();
 				var worker = SetMethodNotify.Body.GetILProcessor();
 				worker.Append(worker.Create(OpCodes.Nop));
@@ -293,25 +297,22 @@ namespace DataBindService
 				worker.Append(worker.Create(OpCodes.Callvirt, PropertyChangeEventHandler));
 				worker.Append(worker.Create(OpCodes.Nop));
 				worker.Append(inst2);
-
+			
 				SetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			}
-
+			
 			var NotifyPropertyGot = typeDefinition.Methods.First(m => m.Name == "NotifyPropertyGot");
 			var NotifyPropertyChanged = typeDefinition.Methods.First(m => m.Name == "NotifyPropertyChanged");
-
-			var IObservableRef = MainAssembly.MainModule.ImportReference(typeof(vm.IObservable));
-			var IObservableDef = new InterfaceImplementation(IObservableRef);
-			typeDefinition.Interfaces.Add(IObservableDef);
+			
 			var IObservableEventDelegateRef = MainAssembly.MainModule.ImportReference(typeof(vm.IObservableEventDelegate));
 			var IObservableEventDelegateDef = new InterfaceImplementation(IObservableEventDelegateRef);
 			typeDefinition.Interfaces.Add(IObservableEventDelegateDef);
 			var BoolRef = MainAssembly.MainModule.ImportReference(typeof(bool));
-
+			
 			typeDefinition.Properties.ForEach(p =>
 			{
 				Instruction[] getMethodInstCopy = null;
-
+			
 				var getMethod = p.GetMethod;
 				// get
 				{
@@ -319,9 +320,10 @@ namespace DataBindService
 					{
 						getMethodInstCopy = new Instruction[p.GetMethod.Body.Instructions.Count];
 						p.GetMethod.Body.Instructions.CopyTo(getMethodInstCopy, 0);
-
+						p.GetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			
 						var getWorker = getMethod.Body.GetILProcessor();
-
+			
 						VariableDefinition localVar;
 						localVar = getMethod.Body.Variables.FirstOrDefault(v => v.VariableType == getMethod.ReturnType);
 						if (localVar == null)
@@ -330,8 +332,9 @@ namespace DataBindService
 							getMethod.Body.Variables.Add(localVar);
 						}
 						List<Instruction> getFinalInst = new List<Instruction>();
+						getFinalInst.Add(getWorker.Create(OpCodes.Dup));
 						getFinalInst.Add(getWorker.Create(OpCodes.Stloc_S, localVar));
-						getFinalInst.Add(getWorker.Create(OpCodes.Ldloc_S, localVar));
+						// getFinalInst.Add(getWorker.Create(OpCodes.Ldloc_S, localVar));
 						getFinalInst.Add(getWorker.Create(OpCodes.Ldarg_0));
 						getFinalInst.Add(getWorker.Create(OpCodes.Ldloc_S, localVar));
 						if (getMethod.ReturnType.IsValueType)
@@ -341,24 +344,25 @@ namespace DataBindService
 						getFinalInst.Add(getWorker.Create(OpCodes.Ldstr, p.Name));
 						getFinalInst.Add(getWorker.Create(OpCodes.Callvirt, NotifyPropertyGot));
 						getFinalInst.Add(getWorker.Create(OpCodes.Nop));
-
+			
 						CILUtils.InjectBeforeReturn(getMethod, getFinalInst.ToArray());
 					}
 				}
-
+			
 				// set
 				{
 					// TODO: 优化value判定，优化效率
 					var setMethod = p.SetMethod;
+					setMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 					if (setMethod != null)
 					{
 						var setWorker = setMethod.Body.GetILProcessor();
-
+			
 						if (getMethodInstCopy != null)
 						{
 							var tempLocal = new VariableDefinition(p.PropertyType);
 							setMethod.Body.Variables.Add(tempLocal);
-
+			
 							List<Instruction> setFinalInst = new List<Instruction>();
 							{
 								setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_0));
@@ -376,7 +380,7 @@ namespace DataBindService
 								setFinalInst.Add(setWorker.Create(OpCodes.Callvirt, NotifyPropertyChanged));
 								setFinalInst.Add(setWorker.Create(OpCodes.Nop));
 							}
-
+			
 							var privateGetMethodName = $"<{setMethod.Name}>b__pri_get0";
 							var privateGetMethod = CILUtils.CopyMethod(MainAssembly, typeDefinition, privateGetMethodName, typeDefinition, p.GetMethod);
 							privateGetMethod.Attributes = MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot;
@@ -390,8 +394,8 @@ namespace DataBindService
 								instCopy.Operand = inst.Operand;
 								privateGetMethodWorker.Append(instCopy);
 							});
-
-
+			
+			
 							{
 								var getMethodInstList = new System.Collections.Generic.List<Instruction>();
 								Instruction retInst;
@@ -409,16 +413,16 @@ namespace DataBindService
 								getMethodInstList.Add(setWorker.Create(OpCodes.Ceq));
 								getMethodInstList.Add(setWorker.Create(OpCodes.Brtrue_S, retInst));
 								setMethod.Body.InitLocals = true;
-
+			
 								CILUtils.InjectBeforeReturn(setMethod, setFinalInst.ToArray());
-
+			
 								CILUtils.InjectAtMethodBegin(setMethod, getMethodInstList.ToArray());
-
+			
 							}
 						}
 						else
 						{
-
+			
 							List<Instruction> setFinalInst = new List<Instruction>();
 							{
 								setFinalInst.Add(setWorker.Create(OpCodes.Ldarg_0));
@@ -436,11 +440,11 @@ namespace DataBindService
 								setFinalInst.Add(setWorker.Create(OpCodes.Callvirt, NotifyPropertyChanged));
 								setFinalInst.Add(setWorker.Create(OpCodes.Nop));
 							}
-
+			
 							CILUtils.InjectBeforeReturn(setMethod, setFinalInst.ToArray());
 						}
-
-
+			
+			
 					}
 				}
 			});

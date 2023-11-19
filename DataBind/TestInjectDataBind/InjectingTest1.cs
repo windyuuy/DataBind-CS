@@ -185,9 +185,23 @@ namespace TestWithInjected
         {
             var useSymbols = true;
             BindEntry.SupportDataBind(
-                @"E:\DATA\Projects\unity\parentclient\hello\UnityDataBinding\client\Library\ScriptAssemblies\Assembly-CSharp.dll",
+		@"E:\DATA\Codes\UnityDataBinding\client\Library\ScriptAssemblies\Assembly-CSharp.dll",
                 new BindOptions()
                 {
+                    useSymbols = useSymbols,
+                });
+            console.log("inject done.");
+        }
+        
+        [Test]
+        public void Test0DebugRider()
+        {
+            var useSymbols = false;
+            BindEntry.SupportDataBind(
+                @"E:\DATA\Projects\test\TestDataBindDebug\TestDataType.dll",
+                new BindOptions()
+                {
+                    outputPath= @"E:\DATA\Projects\test\TestDataBindDebug\Assets\TestDataType.dll",
                     useSymbols = useSymbols,
                 });
             console.log("inject done.");

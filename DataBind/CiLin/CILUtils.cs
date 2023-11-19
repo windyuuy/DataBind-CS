@@ -269,10 +269,12 @@ namespace CiLin
 			Mono.Cecil.MethodAttributes.HideBySig, propertyType);
 			get.Body.GetILProcessor().Append(get.Body.GetILProcessor().Create(OpCodes.Ldarg_0));
 			get.Body.GetILProcessor().Append(get.Body.GetILProcessor().Create(OpCodes.Ldfld, field));
+#if false //应该是冗余的
 			get.Body.GetILProcessor().Append(get.Body.GetILProcessor().Create(OpCodes.Stloc_0));
 			Instruction inst = get.Body.GetILProcessor().Create(OpCodes.Ldloc_0);
 			get.Body.GetILProcessor().Append(get.Body.GetILProcessor().Create(OpCodes.Br_S, inst));
 			get.Body.GetILProcessor().Append(inst);
+#endif
 			get.Body.GetILProcessor().Append(get.Body.GetILProcessor().Create(OpCodes.Ret));
 			get.Body.Variables.Add(new VariableDefinition(propertyType));
 			get.Body.InitLocals = true;
@@ -488,7 +490,7 @@ namespace CiLin
 
 			assembly.MainModule.ImportReference(rCompilerGenerated);
 			assemblyTypes.Module.ImportReference(rCompilerGenerated);
-			add.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			// add.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
 			assemblyTypes.Methods.Add(add);
 
 			//Create the set method
@@ -525,9 +527,9 @@ namespace CiLin
 			remove.Body.Variables.Add(new VariableDefinition(propertyType));
 			remove.Body.Variables.Add(new VariableDefinition(propertyType));
 			remove.Body.InitLocals = true;
-			remove.Parameters.Add(new ParameterDefinition(propertyType));
+			remove.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, propertyType));
 			remove.SemanticsAttributes = MethodSemanticsAttributes.RemoveOn;
-			remove.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			// remove.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
 			assemblyTypes.Methods.Add(remove);
 
 			//create the event
