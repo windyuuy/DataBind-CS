@@ -55,35 +55,35 @@ namespace vm
 			object ret;
 			if (a is double || b is double)
 			{
-				ret = MathInsider.calcNumOp(op1, Convert.ToDouble(a), Convert.ToDouble(b));
+				ret = MathInsider.CalcNumOp(op1, Convert.ToDouble(a), Convert.ToDouble(b));
 			}
 			else if (a is float || b is float)
 			{
-				ret = MathInsider.calcNumOp(op1, Convert.ToSingle(a), Convert.ToSingle(b));
+				ret = MathInsider.CalcNumOp(op1, Convert.ToSingle(a), Convert.ToSingle(b));
 			}
 			else if (a is ulong || b is ulong)
 			{
-				ret = MathInsider.calcNumOp(op1, Convert.ToInt64(a), Convert.ToInt64(b));
+				ret = MathInsider.CalcNumOp(op1, Convert.ToInt64(a), Convert.ToInt64(b));
 			}
 			else if (a is long || b is long)
 			{
-				ret = MathInsider.calcNumOp(op1, Convert.ToInt64(a), Convert.ToInt64(b));
+				ret = MathInsider.CalcNumOp(op1, Convert.ToInt64(a), Convert.ToInt64(b));
 			}
 			else if (a is uint || b is uint)
 			{
-				ret = MathInsider.calcNumOp(op1, Convert.ToUInt32(a), Convert.ToUInt32(b));
+				ret = MathInsider.CalcNumOp(op1, Convert.ToUInt32(a), Convert.ToUInt32(b));
 			}
 			else if (a is int || b is int)
 			{
-				ret = MathInsider.calcNumOp(op1, Convert.ToInt32(a), Convert.ToInt32(b));
+				ret = MathInsider.CalcNumOp(op1, Convert.ToInt32(a), Convert.ToInt32(b));
 			}
 			else if (a is ushort || b is ushort)
 			{
-				ret = MathInsider.calcNumOp(op1, Convert.ToUInt16(a), Convert.ToUInt16(b));
+				ret = MathInsider.CalcNumOp(op1, Convert.ToUInt16(a), Convert.ToUInt16(b));
 			}
 			else if (a is short || b is short)
 			{
-				ret = MathInsider.calcNumOp(op1, Convert.ToInt16(a), Convert.ToInt16(b));
+				ret = MathInsider.CalcNumOp(op1, Convert.ToInt16(a), Convert.ToInt16(b));
 			}
 			else
 			{
@@ -123,7 +123,7 @@ namespace vm
 		{
 			return (ushort)Math.Pow(a, b);
 		}
-		public static object calcNumOp(number op1, double a1, double b1)
+		public static object CalcNumOp(number op1, double a1, double b1)
 		{
 			switch (op1)
 			{
@@ -156,7 +156,7 @@ namespace vm
 			}
 		}
 
-		public static object calcNumOp(number op1, float a1, float b1)
+		public static object CalcNumOp(number op1, float a1, float b1)
 		{
 			switch (op1)
 			{
@@ -189,7 +189,7 @@ namespace vm
 			}
 		}
 
-		public static object calcNumOp(number op1, int a1, int b1)
+		public static object CalcNumOp(number op1, int a1, int b1)
 		{
 			switch (op1)
 			{
@@ -222,7 +222,7 @@ namespace vm
 			}
 		}
 
-		public static object calcNumOp(number op1, uint a1, uint b1)
+		public static object CalcNumOp(number op1, uint a1, uint b1)
 		{
 			switch (op1)
 			{
@@ -255,7 +255,7 @@ namespace vm
 			}
 		}
 
-		public static object calcNumOp(number op1, short a1, short b1)
+		public static object CalcNumOp(number op1, short a1, short b1)
 		{
 			switch (op1)
 			{
@@ -288,7 +288,7 @@ namespace vm
 			}
 		}
 
-		public static object calcNumOp(number op1, ushort a1, ushort b1)
+		public static object CalcNumOp(number op1, ushort a1, ushort b1)
 		{
 			switch (op1)
 			{
@@ -321,7 +321,7 @@ namespace vm
 			}
 		}
 
-		public static object calcNumOp(number op1, long a1, long b1)
+		public static object CalcNumOp(number op1, long a1, long b1)
 		{
 			switch (op1)
 			{
@@ -354,7 +354,7 @@ namespace vm
 			}
 		}
 
-		public static object calcNumOp(number op1, ulong a1, ulong b1)
+		public static object CalcNumOp(number op1, ulong a1, ulong b1)
 		{
 			switch (op1)
 			{

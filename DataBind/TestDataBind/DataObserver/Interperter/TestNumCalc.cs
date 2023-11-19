@@ -111,33 +111,33 @@ namespace TestDataBind.DataObserver.Interperter
 			// 监听表达式
 			sampleHost._Swatch("QQ+hello.KKK", (host, value, oldValue) =>
 			{
-				console.log("value changed:");
-				console.log(value);
+				Console.Log("value changed:");
+				Console.Log(value);
 			});
 			sampleHost.QQ = 2134;
 			sampleHost.hello.KKK = 3242;
 			// 通知表达式值变化
-			vm.Tick.next();
+			vm.Tick.Next();
 
 			// 监听表达式
 			sampleHost._Swatch("hello.IntList[2]", (host, value, oldValue) =>
 			{
-				console.log("value changed:");
-				console.log(value);
+				Console.Log("value changed:");
+				Console.Log(value);
 			});
 			sampleHost.hello.IntList[2] = 44;
 			// 通知表达式值变化
-			vm.Tick.next();
+			vm.Tick.Next();
 
 			// 监听表达式
 			sampleHost._Swatch("hello.NumDictionary[123]", (host, value, oldValue) =>
 			{
-				console.log("value changed:");
-				console.log(value);
+				Console.Log("value changed:");
+				Console.Log(value);
 			});
 			sampleHost.hello.NumDictionary[123] = "你变了";
 			// 通知表达式值变化
-			vm.Tick.next();
+			vm.Tick.Next();
 
 		}
 	}

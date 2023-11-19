@@ -2,6 +2,7 @@
 using System.Linq;
 using vm;
 using Game.Diagnostics.IO;
+using Console = Game.Diagnostics.IO.Console;
 
 namespace vm
 {
@@ -22,7 +23,7 @@ namespace vm
 			{
 				if (self1._SIsDestroyed)
 				{
-					console.error("the host is destroyed", self);
+					Console.Error("the host is destroyed", self);
 					return null;
 				}
 			}

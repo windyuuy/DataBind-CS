@@ -248,11 +248,11 @@ namespace TestDataBind.DataObserver
 			});
 
 			host.TestString = "哈哈哈";
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.testString).toEqual("哈哈哈");
 
 			host.TstNumber = 22;
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.tstNumber).toEqual(22);
 
 		}
@@ -306,20 +306,20 @@ namespace TestDataBind.DataObserver
 			}
 
 			host.A.TestString = "哈哈哈";
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.testString).toEqual("哈哈哈");
 
 			host.A.TstNumber = 13;
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.tstNumber).toEqual(13);
 			expect(view.computValue).toEqual(14);
 
 			host.A.SubObj.TestString = "哈哈哈2";
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.subTestString).toEqual("哈哈哈2");
 
 			host.A.SubObj.TstNumber = 333;
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.subTstNumber).toEqual(333);
 
 			host.A.SubObj = new TestHost1()
@@ -327,17 +327,17 @@ namespace TestDataBind.DataObserver
 				testString = "测试对象",
 				tstNumber = 666,
 			};
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.subTestString).toEqual("测试对象");
 			expect(view.subTstNumber).toEqual(666);
 
 
 			host.A.Sub2.A = 32;
-			vm.Tick.next();
+			vm.Tick.Next();
 			// expect(view.testSub2.a).toEqual(32);
 
 			host.A.Sub3.Add(new Dictionary<string, int> { { "e", 5 } });
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.testSub3?[0]?["e"]).toEqual(3);
 
 
@@ -361,7 +361,7 @@ namespace TestDataBind.DataObserver
 					},
 				},
 			};
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.testString).toEqual("测试1");
 			expect(view.tstNumber).toEqual(3);
 			expect(view.subTestString).toEqual("测试2");
@@ -385,20 +385,20 @@ namespace TestDataBind.DataObserver
 						progress = (number)newVal;
 					});
 					progress = (number)w?.value;
-					vm.Tick.next();
+					vm.Tick.Next();
 					Boos["boss"] = new TBoss()
 					{
 						active = false,
 						hpMax = 10,
 						hp = 1,
 					};
-					vm.Tick.next();
+					vm.Tick.Next();
 					expect(progress).toBe(0.1);
 				}
 
 				(Boos["boss"] as TBoss).HpMax = 10;
 				(Boos["boss"] as TBoss).Hp = 5;
-				vm.Tick.next();
+				vm.Tick.Next();
 				expect(progress).toBe(0.5);
 			}
 
@@ -421,19 +421,19 @@ namespace TestDataBind.DataObserver
 						progress = (number)newVal;
 					});
 					progress = (number)w?.value;
-					vm.Tick.next();
+					vm.Tick.Next();
 					Boos["boss"] = new Dictionary<string, object>(){
 						{"active" , false},
 						{"HpMax" , (double)10},
 						{"Hp" , (double)1},
 					};
-					vm.Tick.next();
+					vm.Tick.Next();
 					expect(progress).toBe(0.1);
 				}
 
 				(Boos["boss"] as Dictionary<string, object>)["HpMax"] = (double)10;
 				(Boos["boss"] as Dictionary<string, object>)["Hp"] = (double)5;
-				vm.Tick.next();
+				vm.Tick.Next();
 				expect(progress).toBe(0.5);
 			}
 
@@ -457,31 +457,31 @@ namespace TestDataBind.DataObserver
 			});
 
 			host.a.push("对象1");
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.length).toEqual(1);
 			expect(view.list0).toEqual("对象1");
 
 			host.a.push("对象2");
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.length).toEqual(2);
 			expect(view.list1).toEqual("对象2");
 
 			host.a.push("对象3");
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.length).toEqual(3);
 			expect(view.list2).toEqual("对象3");
 
 			host.a.push("对象4");
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.length).toEqual(4);
 
 
 			host.a[1] = "修改对象2";
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.list1).toEqual("修改对象2");
 
 			host.a.RemoveAt(2);
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(view.list1).toEqual("修改对象2");
 			expect(view.list2).toEqual("对象4");
 
@@ -527,7 +527,7 @@ namespace TestDataBind.DataObserver
 			host.SubObj.TstNumber = 33;
 			host.TestArr[1] = 44;
 
-			vm.Tick.next();
+			vm.Tick.Next();
 
 			expect(view.testString).toEqual("哈哈哈");
 			expect(view.tstNumber).toEqual(22);
@@ -557,11 +557,11 @@ namespace TestDataBind.DataObserver
 					progress = (number)newVal;
 				}, -1);
 				progress = (number)w?.value;
-				vm.Tick.next();
+				vm.Tick.Next();
 				expect(progress).toBe(0.5);
 
 				Boos["boss"] = null;
-				vm.Tick.next();
+				vm.Tick.Next();
 				expect(progress).toBe(-1);
 
 				Boos["boss"] = new TBoss()
@@ -570,13 +570,13 @@ namespace TestDataBind.DataObserver
 					hpMax = 10,
 					hp = 1,
 				};
-				vm.Tick.next();
+				vm.Tick.Next();
 				expect(progress).toBe(0.1);
 			}
 
 			(Boos["boss"] as TBoss).HpMax = 10;
 			(Boos["boss"] as TBoss).Hp = 5;
-			vm.Tick.next();
+			vm.Tick.Next();
 			expect(progress).toBe(0.5);
 		}
 	}

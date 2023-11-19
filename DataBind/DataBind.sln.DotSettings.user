@@ -1,0 +1,11 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f57ab136_002D6d09_002D4346_002D91e5_002Dc5299305e823/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Test0DebugRider" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::EBF94F84-CD93-4431-8C0A-D4050B2DF29F::.NETFramework,Version=v4.7.1::TestWithInjected.Tests.Test0DebugRider&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+    &lt;Project Location="E:\DATA\Codes\DataBind\DataBind\TestDataBind" Presentation="&amp;lt;TestDataBind&amp;gt;" /&gt;&#xD;
+    &lt;Project Location="E:\DATA\Codes\DataBind\DataBind\TestInjectDataBind" Presentation="&amp;lt;TestInjectDataBind&amp;gt;" /&gt;&#xD;
+    &lt;Project Location="E:\DATA\Codes\DataBind\DataBind\TestWithInjected" Presentation="&amp;lt;TestWithInjected&amp;gt;" /&gt;&#xD;
+  &lt;/Or&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

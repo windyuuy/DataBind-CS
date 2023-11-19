@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Game.Diagnostics.IO;
+using Console = Game.Diagnostics.IO.Console;
 
 namespace vm
 {
@@ -76,7 +77,7 @@ namespace vm
 				func = (object self, object env) =>
 				{
 					var env1 = (IWithPrototype)env;
-					return i.run(env1);
+					return i.Run(env1);
 				};
 			}
 #else
@@ -245,7 +246,7 @@ namespace vm
 									return v;
 								}catch (Exception e)
                                 {
-									console.warn(e);
+									Console.Warn(e);
                                 }
 							}
 						}
@@ -270,7 +271,7 @@ namespace vm
 						var field=type.GetField(skey);
 						if(field != null)
                         {
-							console.error($"不可观测的对象字段: {type.Name}.{skey}");
+							Console.Error($"不可观测的对象字段: {type.Name}.{skey}");
                         }
 						exist = false;
 						return null;
@@ -496,7 +497,7 @@ namespace vm
 								var field = type.GetField(skey);
 								if (field != null)
 								{
-									console.error($"不可观测的对象字段: {type.Name}.{skey}");
+									Console.Error($"不可观测的对象字段: {type.Name}.{skey}");
 								}
 
 								exist = false;

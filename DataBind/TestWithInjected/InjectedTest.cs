@@ -19,7 +19,7 @@ namespace TestWithInjected
 			});
 			Assert.AreEqual(watcher.value, dv.aaa);
 			host.aaa = nextValue;
-			vm.Tick.next();
+			vm.Tick.Next();
 			Assert.AreEqual(watcher.value, nextValue);
 		}
 
@@ -34,19 +34,19 @@ namespace TestWithInjected
 				var qq = ((ITest)(object)target);
 				qq.PropertyGet2 += (a, b) =>
 				{
-					console.log("event called");
+					Console.Log("event called");
 				};
 				//target.emit();
 				//qq.Print();
-				console.log("yes");
+				Console.Log("yes");
 				qq.CCC = 2323;
 				qq.SS = "lwkje";
-				console.log("CCC:", qq.CCC);
-				console.log("SS:", qq.SS);
+				Console.Log("CCC:", qq.CCC);
+				Console.Log("SS:", qq.SS);
 			}
 			else
 			{
-				console.log("not");
+				Console.Log("not");
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace TestWithInjected
 				sampleObs1.PropertyChanged += (host, e) =>
 				{
 					rets.Add(e.NewValue as string);
-					console.log("value changed:", e.NewValue);
+					Console.Log("value changed:", e.NewValue);
 				};
 				sampleObs.wf = demos[0];
 				sampleObs.wf = demos[0];
@@ -82,7 +82,7 @@ namespace TestWithInjected
 				sampleObs.sub.PropertyChanged += (host, e) =>
 				  {
 					  rets.Add(e.NewValue as string);
-					  console.log("sub value changed:", e.NewValue);
+					  Console.Log("sub value changed:", e.NewValue);
 				  };
 				sampleObs.sub.CCC = demos[0];
 				sampleObs.sub.CCC = demos[0];
@@ -111,25 +111,25 @@ namespace TestWithInjected
 			var sampleHost = new TSampleHost();
 			if (sampleHost is IStdHost sampleHost1)
 			{
-				console.log(sampleHost1.IsHostDestroyed());
+				Console.Log(sampleHost1.IsHostDestroyed());
 				sampleHost1.ClearWatchers();
 				sampleHost1.Watch("KKK", (host, newValue, oldValue) =>
 				{
 					rets.Add(newValue as string);
-					console.log("value changed:", newValue);
+					Console.Log("value changed:", newValue);
 				});
 				sampleHost.KKK = demos[0];
-				vm.Tick.next();
+				vm.Tick.Next();
 				sampleHost.KKK = demos[0];
-				vm.Tick.next();
+				vm.Tick.Next();
 				sampleHost.KKK = demos[1];
-				vm.Tick.next();
+				vm.Tick.Next();
 				sampleHost.KKK = demos[1];
-				vm.Tick.next();
+				vm.Tick.Next();
 				sampleHost.KKK = demos[2];
-				vm.Tick.next();
+				vm.Tick.Next();
 				sampleHost.KKK = demos[2];
-				vm.Tick.next();
+				vm.Tick.Next();
 
 				Assert.AreEqual(rets.Count, demos.Count);
 				Assert.AreEqual(rets, demos);
@@ -139,23 +139,23 @@ namespace TestWithInjected
 				sampleHost1.Watch("FFFF", (host, newValue, oldValue) =>
 				{
 					rets.Add(newValue as string);
-					console.log("value changed:", newValue);
+					Console.Log("value changed:", newValue);
 				});
 				sampleObs.FFFF = 234;
 				sampleHost.KKK2 = 2;
-				vm.Tick.next();
+				vm.Tick.Next();
 
 				var value = vm.Utils.IndexValueRecursive(sampleHost, "FFFF");
-				console.log("value:", value);
+				Console.Log("value:", value);
 
 				var exp = new vm.Interpreter("KKK2+FFFF");
-				var ret = exp.run(sampleHost);
+				var ret = exp.Run(sampleHost);
 
-				console.log("true");
+				Console.Log("true");
 			}
 			else
 			{
-				console.log("false");
+				Console.Log("false");
 			}
 		}
 	}

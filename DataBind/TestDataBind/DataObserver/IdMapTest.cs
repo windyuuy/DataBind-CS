@@ -11,13 +11,13 @@ namespace TestDataBind
 		public void test()
 		{
 			var map = new vm.IdMap();
-			Assert.AreEqual(map.has(10),false);
-			map.add(10);
-			Assert.AreEqual(map.has(10),true);
-			map.add(10);
-			Assert.AreEqual(map.has(10),true);
-			map.clear();
-			Assert.AreEqual(map.has(10), false);
+			Assert.AreEqual(map.Has(10),false);
+			map.Add(10);
+			Assert.AreEqual(map.Has(10),true);
+			map.Add(10);
+			Assert.AreEqual(map.Has(10),true);
+			map.Clear();
+			Assert.AreEqual(map.Has(10), false);
 
 		}
 	}

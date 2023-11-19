@@ -5,25 +5,25 @@ namespace vm
 
 	public class Tick
 	{
-		protected static List<Watcher> temp = new List<Watcher>();
-		public static List<Watcher> queue = new List<Watcher>();
-		public static IIdMap queueMap = new IdMap();
+		protected static List<Watcher> Temp = new List<Watcher>();
+		public static List<Watcher> Queue = new List<Watcher>();
+		public static IIdMap QueueMap = new IdMap();
 
-		public static void add(Watcher w)
+		public static void Add(Watcher w)
 		{
-			if (!Tick.queueMap.has(w.id))
+			if (!Tick.QueueMap.Has(w.id))
 			{
-				Tick.queueMap.add(w.id);
-				Tick.queue.Add(w);
+				Tick.QueueMap.Add(w.id);
+				Tick.Queue.Add(w);
 			}
 		}
 
-		public static void next()
+		public static void Next()
 		{
-			Tick.queueMap.clear();
-			var temp = Tick.queue;
-			Tick.queue = Tick.temp;
-			Tick.temp = temp;
+			Tick.QueueMap.Clear();
+			var temp = Tick.Queue;
+			Tick.Queue = Tick.Temp;
+			Tick.Temp = temp;
 
 			foreach (var w in temp.ToArray())
 			{

@@ -3,6 +3,7 @@ using System.Linq;
 using DataBinding.CollectionExt;
 using System.Runtime.CompilerServices;
 using Game.Diagnostics.IO;
+using Console = Game.Diagnostics.IO.Console;
 
 namespace vm
 {
@@ -57,7 +58,7 @@ namespace vm
 		{
 			if (this._SisDestroyed)
 			{
-				console.error("the host is destroyed", this);
+				Console.Error("the host is destroyed", this);
 				return null;
 			}
 			if (!Utils.IsObserved(this))
@@ -137,7 +138,7 @@ namespace vm
 				//实现基础方法，用于表达式中方便得调用
 				if (obj is IWithPrototype env)
 				{
-					InterpreterEnv.implementEnvironment(env);
+					InterpreterEnv.ImplementEnvironment(env);
 				}
 
 				observe(obj);
@@ -155,7 +156,7 @@ namespace vm
 				//实现基础方法，用于表达式中方便得调用
 				if (obj is IWithPrototype obj1)
 				{
-					InterpreterEnv.implementEnvironment(obj1);
+					InterpreterEnv.ImplementEnvironment(obj1);
 				}
 
 				observe(obj);

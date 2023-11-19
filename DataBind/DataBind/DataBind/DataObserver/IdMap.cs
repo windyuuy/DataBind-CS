@@ -7,30 +7,36 @@ namespace vm
 
 	public interface IIdMap
 	{
-		IIdMap add(number value);
-		void clear();
-		boolean has(number value);
+		IIdMap Add(number value);
+		void Clear();
+		boolean Has(number value);
 	}
 
 	public class IdMap : IIdMap
 	{
-		Dictionary<number, bool> set = new Dictionary<number, bool>();
-		public bool has(number key)
+		Dictionary<number, bool> _set = new Dictionary<number, bool>();
+
+		/// <inheritdoc />
+		public bool Has(number key)
 		{
-            if (this.set.ContainsKey(key))
+            if (this._set.TryGetValue(key, out var value))
             {
-				return this.set[key] == true;
+				return value == true;
 			}
 			return false;
 		}
-		public IIdMap add(number key)
+
+		/// <inheritdoc />
+		public IIdMap Add(number key)
 		{
-			this.set[key] = true;
+			this._set[key] = true;
 			return this;
 		}
-		public void clear()
+
+		/// <inheritdoc />
+		public void Clear()
 		{
-			this.set = new Dictionary<number, bool>();
+			this._set = new Dictionary<number, bool>();
 		}
 	}
 

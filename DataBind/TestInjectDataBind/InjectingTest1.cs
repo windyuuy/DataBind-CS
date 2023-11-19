@@ -7,6 +7,7 @@ using CiLin;
 using Debug = Game.Diagnostics.Debug;
 using DataBindService;
 using Game.Diagnostics.IO;
+using Console = Game.Diagnostics.IO.Console;
 
 namespace TestWithInjected
 {
@@ -134,7 +135,7 @@ namespace TestWithInjected
                         {
                             if (Prop.Name == "DoubleFV")
                             {
-                                Console.Out.WriteLine("start");
+                                System.Console.Out.WriteLine("start");
 
                                 CILUtils.InjectProperty(assembly, type, "CCC", typeof(double));
                                 break;
@@ -148,7 +149,7 @@ namespace TestWithInjected
                 {
                     WriteSymbols = useSymbols,
                 });
-                Console.Out.WriteLine("donex22x");
+                System.Console.Out.WriteLine("donex22x");
             }
         }
 
@@ -163,7 +164,7 @@ namespace TestWithInjected
                     outputPath= @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll",
                     useSymbols = useSymbols,
                 });
-            console.log("inject done.");
+            Console.Log("inject done.");
         }
 
         [Test][Order(1)]
@@ -176,7 +177,7 @@ namespace TestWithInjected
                 {
                     useSymbols = useSymbols,
                 });
-            console.log("inject done.");
+            Console.Log("inject done.");
         }
 
         [Test]
@@ -190,7 +191,7 @@ namespace TestWithInjected
                 {
                     useSymbols = useSymbols,
                 });
-            console.log("inject done.");
+            Console.Log("inject done.");
         }
         
         [Test]
@@ -204,7 +205,7 @@ namespace TestWithInjected
                     outputPath= @"E:\DATA\Projects\test\TestDataBindDebug\Assets\TestDataType.dll",
                     useSymbols = useSymbols,
                 });
-            console.log("inject done.");
+            Console.Log("inject done.");
         }
 
     }

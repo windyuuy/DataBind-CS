@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Game.Diagnostics.IO;
+using Console = Game.Diagnostics.IO.Console;
 
 namespace DataBindService
 {
@@ -48,7 +49,7 @@ namespace DataBindService
 				}
 				catch (Exception ex)
 				{
-					console.error(ex.ToString());
+					Console.Error(ex.ToString());
 				}
 			}
 			foreach (var assembly in assmeblyList)

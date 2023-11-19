@@ -25,35 +25,35 @@ namespace vm
 			methods.ForEach(m =>
 			{
 				var key = m.Name.ToUpper();
-				if (environment.ContainsKey(key))
+				if (Environment.ContainsKey(key))
 				{
 					var ps = m.GetParameters();
 					var doubleNum = ps.Count(p => p.ParameterType == TNumber);
 					doubleNum += ps.Count(p => p.ParameterType == TNumbers);
 					if (doubleNum > 0)
 					{
-						environment[key] = m;
+						Environment[key] = m;
 					}
 				}
 				else
 				{
-					environment[key] = m;
+					Environment[key] = m;
 				}
 			});
-			fields.ForEach(f => environment.Add(f.Name.ToUpper(), f.GetValue(TMath)));
-			props.ForEach(p => environment.Add(p.Name.ToUpper(), p.GetValue(TMath)));
+			fields.ForEach(f => Environment.Add(f.Name.ToUpper(), f.GetValue(TMath)));
+			props.ForEach(p => Environment.Add(p.Name.ToUpper(), p.GetValue(TMath)));
 		}
-		public static TEnv environment = new TEnv();
-		public static TEnv extendsEnvironment(TEnv ext)
+		public static readonly TEnv Environment = new TEnv();
+		public static TEnv ExtendsEnvironment(TEnv ext)
 		{
 			if (ext is IWithPrototype ext1)
 			{
-				ext1.SetProto(environment);
+				ext1.SetProto(Environment);
 				//ext1._ = environment;
 			}
 			else
 			{
-				foreach (var kv in environment)
+				foreach (var kv in Environment)
 				{
 					ext.Add(kv.Key, kv.Value);
 				}
@@ -61,9 +61,9 @@ namespace vm
 			return ext;
 		}
 
-		public static TEnv implementEnvironment(TEnv b)
+		public static TEnv ImplementEnvironment(TEnv b)
 		{
-			foreach (var kv in environment)
+			foreach (var kv in Environment)
 			{
 				if (kv.Key == "___Sob__")
 				{
@@ -73,11 +73,11 @@ namespace vm
 			}
 			return b;
 		}
-		public static IWithPrototype implementEnvironment(IWithPrototype b)
+		public static IWithPrototype ImplementEnvironment(IWithPrototype b)
 		{
 			var envDict = new TEnv();
 			b.SetProto(envDict);
-			foreach (var kv in environment)
+			foreach (var kv in Environment)
 			{
 				if (kv.Key == "___Sob__")
 				{

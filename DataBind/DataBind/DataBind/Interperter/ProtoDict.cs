@@ -14,12 +14,12 @@ namespace vm
 			this.dict = (System.Collections.Generic.IDictionary<K, object>)dict.RawDict;
 		}
 
-		protected virtual V getProtoValue(K key, out bool exist)
+		protected virtual V GetProtoValue(K key, out bool exist)
 		{
 			return Utils.IndexValue<V>(Proto, key, out exist);
 		}
 
-		protected virtual V getProtoValue(K key)
+		protected virtual V GetProtoValue(K key)
 		{
 			bool exist;
 			return Utils.IndexValue<V>(Proto, key, out exist);
@@ -37,7 +37,7 @@ namespace vm
 				{
 					if (this.Proto != null)
 					{
-						var v = getProtoValue(key);
+						var v = GetProtoValue(key);
 						return v;
 					}
 					else
@@ -59,7 +59,7 @@ namespace vm
 				return GetValue(k);
 			}
 			bool exist;
-			var value = getProtoValue(k, out exist);
+			var value = GetProtoValue(k, out exist);
 			if (exist)
 			{
 				return value;

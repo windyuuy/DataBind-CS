@@ -2,6 +2,7 @@ using System;
 using DataBinding.CollectionExt;
 using System.Linq;
 using Game.Diagnostics.IO;
+using Console = Game.Diagnostics.IO.Console;
 
 
 namespace vm
@@ -80,7 +81,7 @@ namespace vm
 				|| (value.GetType().GetProperties().Length==0 && value.GetType().GetFields().Length==0)
 				)==false)
             {
-				console.error($"该对象类型不可监测: type={value.GetType().Name}");
+				Console.Error($"该对象类型不可监测: type={value.GetType().Name}");
             }
 			return null;
 		}

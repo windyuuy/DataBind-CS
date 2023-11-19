@@ -3,6 +3,7 @@ using System;
 using DataBinding.CollectionExt;
 using DataBinding;
 using Game.Diagnostics.IO;
+using Console = Game.Diagnostics.IO.Console;
 
 namespace vm
 {
@@ -116,7 +117,7 @@ namespace vm
 				if (this.getter == null)
 				{
 					this.getter = (a, b) => { return null; };
-					console.warn(
+					Console.Warn(
 						$"expOrFn 路径异常: \"{expOrFn}\" "
 					);
 				}
@@ -142,7 +143,7 @@ namespace vm
 			}
 			catch (Exception e)
 			{
-				console.error(e);
+				Console.Error(e);
 				value = null;
 			}
 
@@ -166,14 +167,14 @@ namespace vm
 		{
 			var id = dep.id;
 
-			if (!this.newDepIds.has(id))
+			if (!this.newDepIds.Has(id))
 			{
-				this.newDepIds.add(id);
+				this.newDepIds.Add(id);
 
 				this.newDeps.push(dep);
 
 				//向dep添加自己，实现双向访问，depIds用作重复添加的缓存
-				if (!this.depIds.has(id))
+				if (!this.depIds.Has(id))
 				{
 					dep.add(this);
 
@@ -194,7 +195,7 @@ namespace vm
 			{
 				var dep = this.deps[i];
 
-				if (!this.newDepIds.has(dep.id))
+				if (!this.newDepIds.Has(dep.id))
 				{
 					dep.remove(this);
 
@@ -205,7 +206,7 @@ namespace vm
 			var tmp1 = this.depIds;
 			this.depIds = this.newDepIds;
 			this.newDepIds = tmp1;
-			this.newDepIds.clear();
+			this.newDepIds.Clear();
 
 			var tmp2 = this.deps;
 			this.deps = this.newDeps;
@@ -226,7 +227,7 @@ namespace vm
 			else
 			{
 				//下一帧渲染，可以降低重复渲染的概率
-				Tick.add(this);
+				Tick.Add(this);
 			}
 		}
 

@@ -3,9 +3,9 @@ using Game.Diagnostics;
 
 namespace Game.Diagnostics.IO
 {
-	public class console
+	public class Console
 	{
-		public static void error(params object[] ps)
+		public static void Error(params object[] ps)
 		{
 			var sbd = new StringBuilder();
 			foreach (var p in ps)
@@ -13,9 +13,9 @@ namespace Game.Diagnostics.IO
 				sbd.Append(p.ToString());
 			}
 			var ret = sbd.ToString();
-			Console.LogError(ret);
+			Diagnostics.Console.LogError(ret);
 		}
-		public static void log(params object[] ps)
+		public static void Log(params object[] ps)
 		{
 			var sbd = new StringBuilder();
 			foreach (var p in ps)
@@ -23,9 +23,9 @@ namespace Game.Diagnostics.IO
 				sbd.Append(p.ToString());
 			}
 			var ret = sbd.ToString();
-			Console.Log(ret);
+			Diagnostics.Console.Log(ret);
 		}
-		public static void warn(params object[] ps)
+		public static void Warn(params object[] ps)
 		{
 			var sbd = new StringBuilder();
 			foreach (var p in ps)
@@ -33,7 +33,7 @@ namespace Game.Diagnostics.IO
 				sbd.Append(p.ToString());
 			}
 			var ret = sbd.ToString();
-			Console.LogWarning(ret);
+			Diagnostics.Console.LogWarning(ret);
 		}
 	}
 }
