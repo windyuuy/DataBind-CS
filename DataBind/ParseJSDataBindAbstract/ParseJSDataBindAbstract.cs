@@ -8,6 +8,7 @@ namespace ParseJSDataBindAbstract
 	public class ClassInfo
 	{
 		public string Name;
+		public bool IsUsedAsValueEver = false;
 		public Dictionary<string, MemberInfo> MemberMap = new Dictionary<string, MemberInfo>();
 		public MemberInfo[] Members => MemberMap.Values.ToArray();
 
@@ -125,10 +126,29 @@ namespace ParseJSDataBindAbstract
 
 	}
 
-	public class BasicTypeInfo : ClassInfo { }
-	public class NumberTypeInfo : BasicTypeInfo { }
-	public class StringTypeInfo : BasicTypeInfo { }
-	public class BoolTypeInfo : BasicTypeInfo { }
+	public class BasicTypeInfo : ClassInfo
+	{
+		public virtual string TypeLiteral
+		{
+			get => "unkown_basic";
+			set => throw new NotImplementedException();
+		}
+	}
+
+	public class NumberTypeInfo : BasicTypeInfo
+	{
+		public override string TypeLiteral { get; set; }="number";
+	}
+
+	public class StringTypeInfo : BasicTypeInfo
+	{
+		public override string TypeLiteral { get; set; }="string";
+	}
+
+	public class BoolTypeInfo : BasicTypeInfo
+	{
+		public override string TypeLiteral { get; set; }="bool";
+	}
 	public class UnknownTypeInfo : ClassInfo
 	{
 
@@ -216,6 +236,7 @@ namespace ParseJSDataBindAbstract
 				{
 					Name = callerMember.Type.Name,
 					Parent = callerMember.Type.Parent,
+					IsUsedAsValueEver = true,
 				};
 				callerMember.Type.Parent.InsideTypeMap[callerMember.Type.Name] = callerMember.Type;
 				var callerType = callerMember.Type as FuncInfo;
