@@ -1,11 +1,13 @@
 ﻿using NUnit.Framework;
-using DataBinding.CollectionExt;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnitTestUitls;
 using vm;
 
 namespace TestDataBind
 {
-	using Node = vm.CombineType<object, List<vm.WordNode>, vm.WordNode, vm.ASTNodeBase>;
+	using Node = vm.CombineType<object, DataBinding.CollectionExt.List<vm.WordNode>, vm.WordNode, vm.ASTNodeBase>;
 	using TObj = vm.ProtoDict<string, object>;
 	using TEnvExt = vm.ProtoDict<string, object>;
 	using number = System.Double;
@@ -274,7 +276,7 @@ namespace TestDataBind
 		[Test]
 		public void test语法分析()
 		{
-			List<string> errorList = new List<string>();
+			DataBinding.CollectionExt.List<string> errorList = new DataBinding.CollectionExt.List<string>();
 			{
 				//单个值
 				var nodeList = vm.Interpreter.ToWords("a");
@@ -326,7 +328,9 @@ namespace TestDataBind
 					if (tree.Right is vm.ValueASTNode right)
 					{
 						expect(right.Value.Value).toBe("c");
-					};
+					}
+
+					;
 
 					expect(tree.Left).toBeInstanceOf(typeof(vm.BinaryASTNode));
 					if (tree.Left is vm.BinaryASTNode left)
@@ -336,9 +340,13 @@ namespace TestDataBind
 						expect(left.Right).toBeInstanceOf(typeof(vm.ValueASTNode));
 						expect((left.Left as vm.ValueASTNode).Value.Value).toBe("a");
 						expect((left.Right as vm.ValueASTNode).Value.Value).toBe("b");
-					};
+					}
 
-				};
+					;
+
+				}
+
+				;
 			}
 			{
 				//包含括号;
@@ -379,7 +387,8 @@ namespace TestDataBind
 				var nodeList = vm.Interpreter.ToWords("a.b['c'] +  b['b']['c'] * c.b.c");
 				var tree = vm.Interpreter.ToAst(nodeList, "a.b['c'] +  b['b']['c'] * c.b.c", errorList);
 				expect(errorList.length).toBe(0);
-				expect(vm.Interpreter.ToStringAst(tree, true)).toBe("(((a.b)[\"c\"]) + (((b[\"b\"])[\"c\"]) * ((c.b).c)))");
+				expect(vm.Interpreter.ToStringAst(tree, true))
+					.toBe("(((a.b)[\"c\"]) + (((b[\"b\"])[\"c\"]) * ((c.b).c)))");
 			}
 			{
 				// //！运算符;
@@ -469,17 +478,18 @@ namespace TestDataBind
 		[Test]
 		public void testSpecial1()
 		{
-			List<string> errorList = new List<string>();
+			DataBinding.CollectionExt.List<string> errorList = new DataBinding.CollectionExt.List<string>();
 			var nodeList = vm.Interpreter.ToWords("!cur.greatProperty || cur.greatProperty.length <= 0");
 			var tree = vm.Interpreter.ToAst(nodeList, "!cur.greatProperty || cur.greatProperty.length <= 0", errorList);
 			expect(errorList.TryGet(0)).toBe(null);
-			expect(vm.Interpreter.ToStringAst(tree, true)).toBe("((!(cur.greatProperty)) || (((cur.greatProperty).length) <= 0))");
+			expect(vm.Interpreter.ToStringAst(tree, true))
+				.toBe("((!(cur.greatProperty)) || (((cur.greatProperty).length) <= 0))");
 		}
 
 		[Test]
 		public void test语法分析复杂()
 		{
-			List<string> errorList = new List<string>();
+			DataBinding.CollectionExt.List<string> errorList = new DataBinding.CollectionExt.List<string>();
 			{
 				var nodeList = vm.Interpreter.ToWords("cc.lib.format(\"玩家等级 %d Lv\",100)");
 				var tree = vm.Interpreter.ToAst(nodeList, "cc.lib.format(\"玩家等级 %d Lv\",100)", errorList);
@@ -496,7 +506,8 @@ namespace TestDataBind
 				var nodeList = vm.Interpreter.ToWords("Min(1,暴击/(暴击+韧性)*(LvA*2/(LvA+LvB)))");
 				var tree = vm.Interpreter.ToAst(nodeList, "Min(1,暴击/(暴击+韧性)*(LvA*2/(LvA+LvB)))", errorList);
 				expect(errorList.TryGet(0)).toBe(null);
-				expect(vm.Interpreter.ToStringAst(tree, true)).toBe("(Min( 1, ((暴击 / ((暴击 + 韧性))) * (((LvA * 2) / ((LvA + LvB)))))))");
+				expect(vm.Interpreter.ToStringAst(tree, true))
+					.toBe("(Min( 1, ((暴击 / ((暴击 + 韧性))) * (((LvA * 2) / ((LvA + LvB)))))))");
 			}
 
 			{
@@ -509,7 +520,8 @@ namespace TestDataBind
 				var nodeList = vm.Interpreter.ToWords("SUM(装备列表,{等级*加成+100-10},{等级*加成})");
 				var tree = vm.Interpreter.ToAst(nodeList, "SUM(装备列表,{等级*加成+100-10},{等级*加成})", errorList);
 				expect(errorList.TryGet(0)).toBe(null);
-				expect(vm.Interpreter.ToStringAst(tree, true)).toBe("(SUM( 装备列表, {(((等级 * 加成) + 100) - 10)}, {(等级 * 加成)}))");
+				expect(vm.Interpreter.ToStringAst(tree, true))
+					.toBe("(SUM( 装备列表, {(((等级 * 加成) + 100) - 10)}, {(等级 * 加成)}))");
 			}
 
 			{
@@ -659,12 +671,12 @@ namespace TestDataBind
 				{"a",a },
 				{"b",b},
 				{"p",2},
-				{"list",new Dictionary<string,number>[]{
-					 new Dictionary<string, number>(){
+				{"list",new DataBinding.CollectionExt.Dictionary<string,number>[]{
+					 new DataBinding.CollectionExt.Dictionary<string, number>(){
 						 {"攻击力",10.0 },
 						 {"攻击力加成",0.5 },
 					 },
-					 new Dictionary<string, number>(){
+					 new DataBinding.CollectionExt.Dictionary<string, number>(){
 						 {"攻击力",20.0 },
 						 {"攻击力加成",0.5 },
 					 },

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace TestDataBind
+namespace UnitTestUitls
 {
 	public class Expect<T>
 	{

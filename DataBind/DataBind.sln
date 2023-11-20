@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RunDataBindDemo", "RunDataBindDemo\RunDataBindDemo.csproj", "{E4E8F34B-9B8D-4BD2-8B1D-F26D86921EBD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestDataBind", "TestDataBind\TestDataBind.csproj", "{8C6FFEF2-4CEE-46FF-B498-384DECEA8490}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8A728BC5-4BF8-42EA-9545-929F713BC6E2} = {8A728BC5-4BF8-42EA-9545-929F713BC6E2}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWithInjected", "TestWithInjected\TestWithInjected.csproj", "{A7E92FEA-6467-40A9-863F-EAE6BC371EAD}"
 EndProject
@@ -23,7 +26,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnityDataBindService", "Uni
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnityBuiltinLibs", "UnityBuiltinLibs\UnityBuiltinLibs.csproj", "{33DC53A1-7FB0-4407-8922-FED874014FFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Publish", "Publish\Publish.csproj", "{DE19222B-3AFC-4A19-BA7C-E26E642B85AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publish", "Publish\Publish.csproj", "{DE19222B-3AFC-4A19-BA7C-E26E642B85AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestUtils", "UnitTestUtils\UnitTestUtils.csproj", "{8A728BC5-4BF8-42EA-9545-929F713BC6E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseJSDataBindAbstract", "ParseJSDataBindAbstract\ParseJSDataBindAbstract.csproj", "{E4D32BB7-3AE5-4B42-A632-A2CB6E1D1974}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DB26575E-398A-4C1F-801C-59E6F79620D3} = {DB26575E-398A-4C1F-801C-59E6F79620D3}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestParseJSDataBindAbstract", "TestParseJSDataBindAbstract\TestParseJSDataBindAbstract.csproj", "{70B2772F-0C1C-4910-ADF6-D094B0D2007B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +87,18 @@ Global
 		{DE19222B-3AFC-4A19-BA7C-E26E642B85AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE19222B-3AFC-4A19-BA7C-E26E642B85AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE19222B-3AFC-4A19-BA7C-E26E642B85AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A728BC5-4BF8-42EA-9545-929F713BC6E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A728BC5-4BF8-42EA-9545-929F713BC6E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A728BC5-4BF8-42EA-9545-929F713BC6E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A728BC5-4BF8-42EA-9545-929F713BC6E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4D32BB7-3AE5-4B42-A632-A2CB6E1D1974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4D32BB7-3AE5-4B42-A632-A2CB6E1D1974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4D32BB7-3AE5-4B42-A632-A2CB6E1D1974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4D32BB7-3AE5-4B42-A632-A2CB6E1D1974}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70B2772F-0C1C-4910-ADF6-D094B0D2007B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70B2772F-0C1C-4910-ADF6-D094B0D2007B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70B2772F-0C1C-4910-ADF6-D094B0D2007B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70B2772F-0C1C-4910-ADF6-D094B0D2007B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

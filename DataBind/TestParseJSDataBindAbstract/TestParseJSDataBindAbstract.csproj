@@ -1,25 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
 
     <IsPackable>false</IsPackable>
-	  <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.VsixColorCompiler" Version="17.5.33428.366" />
-    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CiLin\CiLin.csproj" />
     <ProjectReference Include="..\DataBind\DataBind.csproj" />
-    <ProjectReference Include="..\EngineAdapter\EngineAdapter.csproj" />
-    <ProjectReference Include="..\RunDataBindDemo\RunDataBindDemo.csproj" />
+    <ProjectReference Include="..\ParseJSDataBindAbstract\ParseJSDataBindAbstract.csproj" />
     <ProjectReference Include="..\UnitTestUtils\UnitTestUtils.csproj" />
   </ItemGroup>
 

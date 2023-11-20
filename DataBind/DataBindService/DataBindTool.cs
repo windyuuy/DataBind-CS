@@ -353,9 +353,9 @@ namespace DataBindService
 				{
 					// TODO: 优化value判定，优化效率
 					var setMethod = p.SetMethod;
-					setMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 					if (setMethod != null)
 					{
+						setMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 						var setWorker = setMethod.Body.GetILProcessor();
 			
 						if (getMethodInstCopy != null)

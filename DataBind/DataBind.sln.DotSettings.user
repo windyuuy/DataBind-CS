@@ -3,6 +3,7 @@
   &lt;Or&gt;&#xD;
     &lt;TestAncestor&gt;&#xD;
       &lt;TestId&gt;NUnit3x::EBF94F84-CD93-4431-8C0A-D4050B2DF29F::.NETFramework,Version=v4.7.1::TestWithInjected.Tests.Test0DebugRider&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::70B2772F-0C1C-4910-ADF6-D094B0D2007B::.NETFramework,Version=v4.7.1::Tests.TestParseJSDataBindAbstract&lt;/TestId&gt;&#xD;
     &lt;/TestAncestor&gt;&#xD;
     &lt;Project Location="E:\DATA\Codes\DataBind\DataBind\TestDataBind" Presentation="&amp;lt;TestDataBind&amp;gt;" /&gt;&#xD;
     &lt;Project Location="E:\DATA\Codes\DataBind\DataBind\TestInjectDataBind" Presentation="&amp;lt;TestInjectDataBind&amp;gt;" /&gt;&#xD;

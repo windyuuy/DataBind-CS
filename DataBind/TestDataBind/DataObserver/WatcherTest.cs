@@ -4,6 +4,7 @@ using DataBinding.CollectionExt;
 using System.Text;
 using vm;
 using DataBinding;
+using UnitTestUitls;
 
 namespace TestDataBind.DataObserver
 {
