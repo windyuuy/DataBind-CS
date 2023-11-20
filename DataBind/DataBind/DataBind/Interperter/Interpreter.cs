@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DataBinding.CollectionExt;
@@ -34,7 +35,7 @@ namespace vm
 	using boolean = System.Boolean;
 	using number = System.Double;
 
-	using ENodeType = System.Double;
+	using ENodeType = System.Int32;
 	using TEnv = Dictionary<string, object>;
 
 	public class TNodeType
@@ -69,11 +70,11 @@ namespace vm
 		};
 
 		public static readonly TNodeType Inst = new TNodeType();
-		public number this[string x]
+		public ENodeType this[string x]
 		{
 			get => Symbols.IndexOf(x);
 		}
-		public string this[number x]
+		public string this[ENodeType x]
 		{
 			get => Symbols[(int)x];
 		}
@@ -81,51 +82,52 @@ namespace vm
 		/// <summary>
 		/// [
 		/// </summary>
-		public static number BracketL => Symbols.IndexOf("[");
+		public static ENodeType BracketL => Symbols.IndexOf("[");
 		/// <summary>
 		/// ]
 		/// </summary>
-		public static number BracketR => Symbols.IndexOf("]");
+		public static ENodeType BracketR => Symbols.IndexOf("]");
 		/// <summary>
 		/// {
 		/// </summary>
-		public static number BraceL => Symbols.IndexOf("{");
+		public static ENodeType BraceL => Symbols.IndexOf("{");
 		/// <summary>
 		/// }
 		/// </summary>
-		public static number BraceR => Symbols.IndexOf("}");
+		public static ENodeType BraceR => Symbols.IndexOf("}");
 		/// <summary>
 		/// (
 		/// </summary>
-		public static number ParenthesesL => Symbols.IndexOf("(");
+		public static ENodeType ParenthesesL => Symbols.IndexOf("(");
 		/// <summary>
 		/// )
 		/// </summary>
-		public static number ParenthesesR => Symbols.IndexOf(")");
+		public static ENodeType ParenthesesR => Symbols.IndexOf(")");
 
-		public static number P0 => Symbols.IndexOf("P0");
-		public static number P1 => Symbols.IndexOf("P1");
-		public static number P2 => Symbols.IndexOf("P2");
-		public static number P3 => Symbols.IndexOf("P3");
-		public static number P4 => Symbols.IndexOf("P4");
-		public static number P5 => Symbols.IndexOf("P5");
-		public static number P6 => Symbols.IndexOf("P6");
-		public static number P7 => Symbols.IndexOf("P7");
-		public static number P8 => Symbols.IndexOf("P8");
-		public static number P9 => Symbols.IndexOf("P9");
-		public static number P10 => Symbols.IndexOf("P10");
-		public static number P11 => Symbols.IndexOf("P11");
-		public static number P12 => Symbols.IndexOf("P12");
-		public static number Number => Symbols.IndexOf("number");
-		public static number Word => Symbols.IndexOf("word");
-		public static number Stringx => Symbols.IndexOf("string");
-		public static number Boolean => Symbols.IndexOf("boolean");
-		public static number Nullx => Symbols.IndexOf("null");
-		public static number Annotation => Symbols.IndexOf("annotation");
-		public static number Call => Symbols.IndexOf("call");
-		public static number Lambda => Symbols.IndexOf("lambda");
+		public static ENodeType P0 => Symbols.IndexOf("P0");
+		public static ENodeType P1 => Symbols.IndexOf("P1");
+		public static ENodeType P2 => Symbols.IndexOf("P2");
+		public static ENodeType P3 => Symbols.IndexOf("P3");
+		public static ENodeType P4 => Symbols.IndexOf("P4");
+		public static ENodeType P5 => Symbols.IndexOf("P5");
+		public static ENodeType P6 => Symbols.IndexOf("P6");
+		public static ENodeType P7 => Symbols.IndexOf("P7");
+		public static ENodeType P8 => Symbols.IndexOf("P8");
+		public static ENodeType P9 => Symbols.IndexOf("P9");
+		public static ENodeType P10 => Symbols.IndexOf("P10");
+		public static ENodeType P11 => Symbols.IndexOf("P11");
+		public static ENodeType P12 => Symbols.IndexOf("P12");
+		public static ENodeType Number => Symbols.IndexOf("number");
+		public static ENodeType Word => Symbols.IndexOf("word");
+		public static ENodeType Stringx => Symbols.IndexOf("string");
+		public static ENodeType Boolean => Symbols.IndexOf("boolean");
+		public static ENodeType Nullx => Symbols.IndexOf("null");
+		public static ENodeType Annotation => Symbols.IndexOf("annotation");
+		public static ENodeType Call => Symbols.IndexOf("call");
+		public static ENodeType Lambda => Symbols.IndexOf("lambda");
 
 	}
+    
 	public class NodeType : TNodeType { };
 
 	public class WordNode
@@ -167,6 +169,7 @@ namespace vm
 	}
 
 
+	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class ASTNodeBase
 	{
 		//父节点
@@ -174,9 +177,14 @@ namespace vm
 		/**
          * 相关注释
          */
-		public string FrontAnnotation;
-		public string BehindAnnotation;
+		// public virtual string FrontAnnotation=>"";
+		// public virtual string BehindAnnotation=>"";
+		/// <summary>
+		/// @type: ENodeType
+		/// </summary>
 		public ENodeType OperatorX;
+
+		public string OperatorName => TNodeType.Inst[OperatorX];
 
 		public ASTNodeBase(
 			/**
@@ -188,8 +196,10 @@ namespace vm
 			this.OperatorX = operatorX;
 		}
 
+		internal virtual string DebuggerDisplay => $"{OperatorName}";
 	}
 
+	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class ValueASTNode : ASTNodeBase
 	{
 		public WordNode Value;
@@ -199,8 +209,11 @@ namespace vm
 		{
 			this.Value = value;
 		}
+		
+		internal override string DebuggerDisplay => $"{Value.Value}";
 	}
 
+	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class BracketASTNode : ASTNodeBase
 	{
 		public ASTNode Node;
@@ -213,8 +226,10 @@ namespace vm
 			this.Node = node;
 		}
 
+		internal override string DebuggerDisplay => $"({Node.DebuggerDisplay})";
 	}
 
+	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class UnitaryASTNode : ASTNodeBase
 	{
 		/**
@@ -233,8 +248,11 @@ namespace vm
 			this.Right = right;
 			this.Right.Parent = this;
 		}
+		
+		internal override string DebuggerDisplay => $"{OperatorName}{Right.DebuggerDisplay}";
 	}
 
+	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class BinaryASTNode : ASTNodeBase
 	{
 		/**
@@ -267,8 +285,11 @@ namespace vm
 			this.Left.Parent = this;
 			this.Right.Parent = this;
 		}
+		
+		internal override string DebuggerDisplay => $"{Left.DebuggerDisplay}{OperatorName}{Right.DebuggerDisplay}";
 	}
 
+	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class CallASTNode : ASTNodeBase
 	{
 		/**
@@ -296,6 +317,8 @@ namespace vm
 			this.Left.Parent = this;
 			this.Parameters.ForEach(a => a.Parent = this);
 		}
+		
+		internal override string DebuggerDisplay => $"{Left.DebuggerDisplay}()";
 	}
 
 	public class Interpreter
@@ -613,13 +636,13 @@ namespace vm
 						ENodeType nextEndType;
 						switch (current.Type)
 						{
-							case number type when type == TNodeType.Inst["("]:
+							case ENodeType type when type == TNodeType.Inst["("]:
 								nextEndType = TNodeType.Inst[")"];
 								break;
-							case number type when type == TNodeType.Inst["["]:
+							case ENodeType type when type == TNodeType.Inst["["]:
 								nextEndType = TNodeType.Inst["]"];
 								break;
-							case number type when type == TNodeType.Inst["{"]:
+							case ENodeType type when type == TNodeType.Inst["{"]:
 								nextEndType = TNodeType.Inst["}"];
 								break;
 							default:
@@ -1089,7 +1112,7 @@ namespace vm
 				var b = Interpreter.SRun(environment, ast.Right);
 				switch (ast.OperatorX)
 				{
-					case number type when type == TNodeType.Inst["!"]:
+					case ENodeType type when type == TNodeType.Inst["!"]:
 						return Utils.IsFalse(b);
 					default:
 						throw new Exception($"意外的一元运算符[{TNodeType.Inst[ast.OperatorX]}]");
@@ -1197,74 +1220,74 @@ namespace vm
 							// TODO: 支持自动定位运算符
 							switch (ast.OperatorX)
 							{
-								case number op when op == TNodeType.Inst["**"]:
+								case ENodeType op when op == TNodeType.Inst["**"]:
 									{
 										var mOp = a.GetType().GetMethod("op_Pow", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst["*"]:
+								case ENodeType op when op == TNodeType.Inst["*"]:
 									{
 										var mOp = a.GetType().GetMethod("op_Multiply", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst["/"]:
+								case ENodeType op when op == TNodeType.Inst["/"]:
 									{
 										var mOp = a.GetType().GetMethod("op_Division", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst["%"]:
+								case ENodeType op when op == TNodeType.Inst["%"]:
 									{
 										var mOp = a.GetType().GetMethod("op_Modulus", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst["+"]:
+								case ENodeType op when op == TNodeType.Inst["+"]:
 									{
 										var mOp = a.GetType().GetMethod("op_Addition", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst["-"]:
+								case ENodeType op when op == TNodeType.Inst["-"]:
 									{
 										var mOp = a.GetType().GetMethod("op_Subtraction", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst[">"]:
+								case ENodeType op when op == TNodeType.Inst[">"]:
 									{
 										var mOp = a.GetType().GetMethod("op_GreaterThan", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst["<"]:
+								case ENodeType op when op == TNodeType.Inst["<"]:
 									{
 										var mOp = a.GetType().GetMethod("op_LessThan", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst[">="]:
+								case ENodeType op when op == TNodeType.Inst[">="]:
 									{
 										var mOp = a.GetType().GetMethod("op_GreaterThanOrEqual", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst["<="]:
+								case ENodeType op when op == TNodeType.Inst["<="]:
 									{
 										var mOp = a.GetType().GetMethod("op_LessThanOrEqual", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										var ret = mOp.Invoke(a, new object[] { b });
 										return ret;
 									}
-								case number op when op == TNodeType.Inst["!="]:
+								case ENodeType op when op == TNodeType.Inst["!="]:
 									{
 										//var mOp = a.GetType().GetMethod("op_Inequality", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										//var ret = mOp.Invoke(a, new object[] { b });
 										//return ret;
 										return a != b;
 									}
-								case number op when op == TNodeType.Inst["=="]:
+								case ENodeType op when op == TNodeType.Inst["=="]:
 									{
 										//var mOp = a.GetType().GetMethod("op_Equality", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
 										//var ret = mOp.Invoke(a, new object[] { b });

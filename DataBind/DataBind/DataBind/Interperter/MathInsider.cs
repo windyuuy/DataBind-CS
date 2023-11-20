@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace vm
 {
 	using number = System.Double;
+	using ENodeType=System.Int32;
 
 	public class MathInsider
 	{
@@ -50,7 +51,7 @@ namespace vm
 
 			throw new NotImplementedException($"temp: {temp}");
 		}
-		public static object CalcUnkownNumOp(number op1, object a, object b)
+		public static object CalcUnkownNumOp(ENodeType op1, object a, object b)
 		{
 			object ret;
 			if (a is double || b is double)
@@ -63,7 +64,7 @@ namespace vm
 			}
 			else if (a is ulong || b is ulong)
 			{
-				ret = MathInsider.CalcNumOp(op1, Convert.ToInt64(a), Convert.ToInt64(b));
+				ret = MathInsider.CalcNumOp(op1, Convert.ToUInt64(a), Convert.ToUInt64(b));
 			}
 			else if (a is long || b is long)
 			{
@@ -123,264 +124,264 @@ namespace vm
 		{
 			return (ushort)Math.Pow(a, b);
 		}
-		public static object CalcNumOp(number op1, double a1, double b1)
+		public static object CalcNumOp(ENodeType op1, double a1, double b1)
 		{
 			switch (op1)
 			{
-				case number op when op == TNodeType.Inst["**"]:
+				case ENodeType op when op == TNodeType.Inst["**"]:
 					return Pow(a1, b1);
-				case number op when op == TNodeType.Inst["*"]:
+				case ENodeType op when op == TNodeType.Inst["*"]:
 					return a1 * b1;
-				case number op when op == TNodeType.Inst["/"]:
+				case ENodeType op when op == TNodeType.Inst["/"]:
 					return a1 / b1;
-				case number op when op == TNodeType.Inst["%"]:
+				case ENodeType op when op == TNodeType.Inst["%"]:
 					return a1 % b1;
-				case number op when op == TNodeType.Inst["+"]:
+				case ENodeType op when op == TNodeType.Inst["+"]:
 					return a1 + b1;
-				case number op when op == TNodeType.Inst["-"]:
+				case ENodeType op when op == TNodeType.Inst["-"]:
 					return a1 - b1;
-				case number op when op == TNodeType.Inst[">"]:
+				case ENodeType op when op == TNodeType.Inst[">"]:
 					return a1 > b1;
-				case number op when op == TNodeType.Inst["<"]:
+				case ENodeType op when op == TNodeType.Inst["<"]:
 					return a1 < b1;
-				case number op when op == TNodeType.Inst[">="]:
+				case ENodeType op when op == TNodeType.Inst[">="]:
 					return a1 >= b1;
-				case number op when op == TNodeType.Inst["<="]:
+				case ENodeType op when op == TNodeType.Inst["<="]:
 					return a1 <= b1;
-				case number op when op == TNodeType.Inst["!="]:
+				case ENodeType op when op == TNodeType.Inst["!="]:
 					return a1 != b1;
-				case number op when op == TNodeType.Inst["=="]:
+				case ENodeType op when op == TNodeType.Inst["=="]:
 					return a1 == b1;
 				default:
 					throw new Exception($"意外的二元运算符[{TNodeType.Inst[op1]}]");
 			}
 		}
 
-		public static object CalcNumOp(number op1, float a1, float b1)
+		public static object CalcNumOp(ENodeType op1, float a1, float b1)
 		{
 			switch (op1)
 			{
-				case number op when op == TNodeType.Inst["**"]:
+				case ENodeType op when op == TNodeType.Inst["**"]:
 					return Pow(a1, b1);
-				case number op when op == TNodeType.Inst["*"]:
+				case ENodeType op when op == TNodeType.Inst["*"]:
 					return a1 * b1;
-				case number op when op == TNodeType.Inst["/"]:
+				case ENodeType op when op == TNodeType.Inst["/"]:
 					return a1 / b1;
-				case number op when op == TNodeType.Inst["%"]:
+				case ENodeType op when op == TNodeType.Inst["%"]:
 					return a1 % b1;
-				case number op when op == TNodeType.Inst["+"]:
+				case ENodeType op when op == TNodeType.Inst["+"]:
 					return a1 + b1;
-				case number op when op == TNodeType.Inst["-"]:
+				case ENodeType op when op == TNodeType.Inst["-"]:
 					return a1 - b1;
-				case number op when op == TNodeType.Inst[">"]:
+				case ENodeType op when op == TNodeType.Inst[">"]:
 					return a1 > b1;
-				case number op when op == TNodeType.Inst["<"]:
+				case ENodeType op when op == TNodeType.Inst["<"]:
 					return a1 < b1;
-				case number op when op == TNodeType.Inst[">="]:
+				case ENodeType op when op == TNodeType.Inst[">="]:
 					return a1 >= b1;
-				case number op when op == TNodeType.Inst["<="]:
+				case ENodeType op when op == TNodeType.Inst["<="]:
 					return a1 <= b1;
-				case number op when op == TNodeType.Inst["!="]:
+				case ENodeType op when op == TNodeType.Inst["!="]:
 					return a1 != b1;
-				case number op when op == TNodeType.Inst["=="]:
+				case ENodeType op when op == TNodeType.Inst["=="]:
 					return a1 == b1;
 				default:
 					throw new Exception($"意外的二元运算符[{TNodeType.Inst[op1]}]");
 			}
 		}
 
-		public static object CalcNumOp(number op1, int a1, int b1)
+		public static object CalcNumOp(ENodeType op1, int a1, int b1)
 		{
 			switch (op1)
 			{
-				case number op when op == TNodeType.Inst["**"]:
+				case ENodeType op when op == TNodeType.Inst["**"]:
 					return Pow(a1, b1);
-				case number op when op == TNodeType.Inst["*"]:
+				case ENodeType op when op == TNodeType.Inst["*"]:
 					return a1 * b1;
-				case number op when op == TNodeType.Inst["/"]:
+				case ENodeType op when op == TNodeType.Inst["/"]:
 					return a1 / b1;
-				case number op when op == TNodeType.Inst["%"]:
+				case ENodeType op when op == TNodeType.Inst["%"]:
 					return a1 % b1;
-				case number op when op == TNodeType.Inst["+"]:
+				case ENodeType op when op == TNodeType.Inst["+"]:
 					return a1 + b1;
-				case number op when op == TNodeType.Inst["-"]:
+				case ENodeType op when op == TNodeType.Inst["-"]:
 					return a1 - b1;
-				case number op when op == TNodeType.Inst[">"]:
+				case ENodeType op when op == TNodeType.Inst[">"]:
 					return a1 > b1;
-				case number op when op == TNodeType.Inst["<"]:
+				case ENodeType op when op == TNodeType.Inst["<"]:
 					return a1 < b1;
-				case number op when op == TNodeType.Inst[">="]:
+				case ENodeType op when op == TNodeType.Inst[">="]:
 					return a1 >= b1;
-				case number op when op == TNodeType.Inst["<="]:
+				case ENodeType op when op == TNodeType.Inst["<="]:
 					return a1 <= b1;
-				case number op when op == TNodeType.Inst["!="]:
+				case ENodeType op when op == TNodeType.Inst["!="]:
 					return a1 != b1;
-				case number op when op == TNodeType.Inst["=="]:
+				case ENodeType op when op == TNodeType.Inst["=="]:
 					return a1 == b1;
 				default:
 					throw new Exception($"意外的二元运算符[{TNodeType.Inst[op1]}]");
 			}
 		}
 
-		public static object CalcNumOp(number op1, uint a1, uint b1)
+		public static object CalcNumOp(ENodeType op1, uint a1, uint b1)
 		{
 			switch (op1)
 			{
-				case number op when op == TNodeType.Inst["**"]:
+				case ENodeType op when op == TNodeType.Inst["**"]:
 					return Pow(a1, b1);
-				case number op when op == TNodeType.Inst["*"]:
+				case ENodeType op when op == TNodeType.Inst["*"]:
 					return a1 * b1;
-				case number op when op == TNodeType.Inst["/"]:
+				case ENodeType op when op == TNodeType.Inst["/"]:
 					return a1 / b1;
-				case number op when op == TNodeType.Inst["%"]:
+				case ENodeType op when op == TNodeType.Inst["%"]:
 					return a1 % b1;
-				case number op when op == TNodeType.Inst["+"]:
+				case ENodeType op when op == TNodeType.Inst["+"]:
 					return a1 + b1;
-				case number op when op == TNodeType.Inst["-"]:
+				case ENodeType op when op == TNodeType.Inst["-"]:
 					return a1 - b1;
-				case number op when op == TNodeType.Inst[">"]:
+				case ENodeType op when op == TNodeType.Inst[">"]:
 					return a1 > b1;
-				case number op when op == TNodeType.Inst["<"]:
+				case ENodeType op when op == TNodeType.Inst["<"]:
 					return a1 < b1;
-				case number op when op == TNodeType.Inst[">="]:
+				case ENodeType op when op == TNodeType.Inst[">="]:
 					return a1 >= b1;
-				case number op when op == TNodeType.Inst["<="]:
+				case ENodeType op when op == TNodeType.Inst["<="]:
 					return a1 <= b1;
-				case number op when op == TNodeType.Inst["!="]:
+				case ENodeType op when op == TNodeType.Inst["!="]:
 					return a1 != b1;
-				case number op when op == TNodeType.Inst["=="]:
+				case ENodeType op when op == TNodeType.Inst["=="]:
 					return a1 == b1;
 				default:
 					throw new Exception($"意外的二元运算符[{TNodeType.Inst[op1]}]");
 			}
 		}
 
-		public static object CalcNumOp(number op1, short a1, short b1)
+		public static object CalcNumOp(ENodeType op1, short a1, short b1)
 		{
 			switch (op1)
 			{
-				case number op when op == TNodeType.Inst["**"]:
+				case ENodeType op when op == TNodeType.Inst["**"]:
 					return Pow(a1, b1);
-				case number op when op == TNodeType.Inst["*"]:
+				case ENodeType op when op == TNodeType.Inst["*"]:
 					return a1 * b1;
-				case number op when op == TNodeType.Inst["/"]:
+				case ENodeType op when op == TNodeType.Inst["/"]:
 					return a1 / b1;
-				case number op when op == TNodeType.Inst["%"]:
+				case ENodeType op when op == TNodeType.Inst["%"]:
 					return a1 % b1;
-				case number op when op == TNodeType.Inst["+"]:
+				case ENodeType op when op == TNodeType.Inst["+"]:
 					return a1 + b1;
-				case number op when op == TNodeType.Inst["-"]:
+				case ENodeType op when op == TNodeType.Inst["-"]:
 					return a1 - b1;
-				case number op when op == TNodeType.Inst[">"]:
+				case ENodeType op when op == TNodeType.Inst[">"]:
 					return a1 > b1;
-				case number op when op == TNodeType.Inst["<"]:
+				case ENodeType op when op == TNodeType.Inst["<"]:
 					return a1 < b1;
-				case number op when op == TNodeType.Inst[">="]:
+				case ENodeType op when op == TNodeType.Inst[">="]:
 					return a1 >= b1;
-				case number op when op == TNodeType.Inst["<="]:
+				case ENodeType op when op == TNodeType.Inst["<="]:
 					return a1 <= b1;
-				case number op when op == TNodeType.Inst["!="]:
+				case ENodeType op when op == TNodeType.Inst["!="]:
 					return a1 != b1;
-				case number op when op == TNodeType.Inst["=="]:
+				case ENodeType op when op == TNodeType.Inst["=="]:
 					return a1 == b1;
 				default:
 					throw new Exception($"意外的二元运算符[{TNodeType.Inst[op1]}]");
 			}
 		}
 
-		public static object CalcNumOp(number op1, ushort a1, ushort b1)
+		public static object CalcNumOp(ENodeType op1, ushort a1, ushort b1)
 		{
 			switch (op1)
 			{
-				case number op when op == TNodeType.Inst["**"]:
+				case ENodeType op when op == TNodeType.Inst["**"]:
 					return Pow(a1, b1);
-				case number op when op == TNodeType.Inst["*"]:
+				case ENodeType op when op == TNodeType.Inst["*"]:
 					return a1 * b1;
-				case number op when op == TNodeType.Inst["/"]:
+				case ENodeType op when op == TNodeType.Inst["/"]:
 					return a1 / b1;
-				case number op when op == TNodeType.Inst["%"]:
+				case ENodeType op when op == TNodeType.Inst["%"]:
 					return a1 % b1;
-				case number op when op == TNodeType.Inst["+"]:
+				case ENodeType op when op == TNodeType.Inst["+"]:
 					return a1 + b1;
-				case number op when op == TNodeType.Inst["-"]:
+				case ENodeType op when op == TNodeType.Inst["-"]:
 					return a1 - b1;
-				case number op when op == TNodeType.Inst[">"]:
+				case ENodeType op when op == TNodeType.Inst[">"]:
 					return a1 > b1;
-				case number op when op == TNodeType.Inst["<"]:
+				case ENodeType op when op == TNodeType.Inst["<"]:
 					return a1 < b1;
-				case number op when op == TNodeType.Inst[">="]:
+				case ENodeType op when op == TNodeType.Inst[">="]:
 					return a1 >= b1;
-				case number op when op == TNodeType.Inst["<="]:
+				case ENodeType op when op == TNodeType.Inst["<="]:
 					return a1 <= b1;
-				case number op when op == TNodeType.Inst["!="]:
+				case ENodeType op when op == TNodeType.Inst["!="]:
 					return a1 != b1;
-				case number op when op == TNodeType.Inst["=="]:
+				case ENodeType op when op == TNodeType.Inst["=="]:
 					return a1 == b1;
 				default:
 					throw new Exception($"意外的二元运算符[{TNodeType.Inst[op1]}]");
 			}
 		}
 
-		public static object CalcNumOp(number op1, long a1, long b1)
+		public static object CalcNumOp(ENodeType op1, long a1, long b1)
 		{
 			switch (op1)
 			{
-				case number op when op == TNodeType.Inst["**"]:
+				case ENodeType op when op == TNodeType.Inst["**"]:
 					return Pow(a1, b1);
-				case number op when op == TNodeType.Inst["*"]:
+				case ENodeType op when op == TNodeType.Inst["*"]:
 					return a1 * b1;
-				case number op when op == TNodeType.Inst["/"]:
+				case ENodeType op when op == TNodeType.Inst["/"]:
 					return a1 / b1;
-				case number op when op == TNodeType.Inst["%"]:
+				case ENodeType op when op == TNodeType.Inst["%"]:
 					return a1 % b1;
-				case number op when op == TNodeType.Inst["+"]:
+				case ENodeType op when op == TNodeType.Inst["+"]:
 					return a1 + b1;
-				case number op when op == TNodeType.Inst["-"]:
+				case ENodeType op when op == TNodeType.Inst["-"]:
 					return a1 - b1;
-				case number op when op == TNodeType.Inst[">"]:
+				case ENodeType op when op == TNodeType.Inst[">"]:
 					return a1 > b1;
-				case number op when op == TNodeType.Inst["<"]:
+				case ENodeType op when op == TNodeType.Inst["<"]:
 					return a1 < b1;
-				case number op when op == TNodeType.Inst[">="]:
+				case ENodeType op when op == TNodeType.Inst[">="]:
 					return a1 >= b1;
-				case number op when op == TNodeType.Inst["<="]:
+				case ENodeType op when op == TNodeType.Inst["<="]:
 					return a1 <= b1;
-				case number op when op == TNodeType.Inst["!="]:
+				case ENodeType op when op == TNodeType.Inst["!="]:
 					return a1 != b1;
-				case number op when op == TNodeType.Inst["=="]:
+				case ENodeType op when op == TNodeType.Inst["=="]:
 					return a1 == b1;
 				default:
 					throw new Exception($"意外的二元运算符[{TNodeType.Inst[op1]}]");
 			}
 		}
 
-		public static object CalcNumOp(number op1, ulong a1, ulong b1)
+		public static object CalcNumOp(ENodeType op1, ulong a1, ulong b1)
 		{
 			switch (op1)
 			{
-				case number op when op == TNodeType.Inst["**"]:
+				case ENodeType op when op == TNodeType.Inst["**"]:
 					return Pow(a1, b1);
-				case number op when op == TNodeType.Inst["*"]:
+				case ENodeType op when op == TNodeType.Inst["*"]:
 					return a1 * b1;
-				case number op when op == TNodeType.Inst["/"]:
+				case ENodeType op when op == TNodeType.Inst["/"]:
 					return a1 / b1;
-				case number op when op == TNodeType.Inst["%"]:
+				case ENodeType op when op == TNodeType.Inst["%"]:
 					return a1 % b1;
-				case number op when op == TNodeType.Inst["+"]:
+				case ENodeType op when op == TNodeType.Inst["+"]:
 					return a1 + b1;
-				case number op when op == TNodeType.Inst["-"]:
+				case ENodeType op when op == TNodeType.Inst["-"]:
 					return a1 - b1;
-				case number op when op == TNodeType.Inst[">"]:
+				case ENodeType op when op == TNodeType.Inst[">"]:
 					return a1 > b1;
-				case number op when op == TNodeType.Inst["<"]:
+				case ENodeType op when op == TNodeType.Inst["<"]:
 					return a1 < b1;
-				case number op when op == TNodeType.Inst[">="]:
+				case ENodeType op when op == TNodeType.Inst[">="]:
 					return a1 >= b1;
-				case number op when op == TNodeType.Inst["<="]:
+				case ENodeType op when op == TNodeType.Inst["<="]:
 					return a1 <= b1;
-				case number op when op == TNodeType.Inst["!="]:
+				case ENodeType op when op == TNodeType.Inst["!="]:
 					return a1 != b1;
-				case number op when op == TNodeType.Inst["=="]:
+				case ENodeType op when op == TNodeType.Inst["=="]:
 					return a1 == b1;
 				default:
 					throw new Exception($"意外的二元运算符[{TNodeType.Inst[op1]}]");
