@@ -8,7 +8,7 @@ namespace TestDataBind
 	internal class TestIdMap
 	{
 		[Test]
-		public void test()
+		public void Test()
 		{
 			var map = new vm.IdMap();
 			Assert.AreEqual(map.Has(10),false);

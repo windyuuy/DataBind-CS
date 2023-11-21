@@ -99,7 +99,7 @@ namespace TestDataBind
 	internal class Observer
 	{
 		[Test]
-		public void testObserve()
+		public void TestObserve()
 		{
 			var obj = new SampleOBD();
 			var obj2 = Utils.observe(obj);
@@ -112,7 +112,7 @@ namespace TestDataBind
 		}
 
 		[Test]
-		public void testDefineReactive()
+		public void TestDefineReactive()
 		{
 			var o = new SampleOBD2() { a = 1, b = 2, c = 3, };
 			vm.Utils.observe(o);

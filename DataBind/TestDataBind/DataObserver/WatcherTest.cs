@@ -230,7 +230,7 @@ namespace TestDataBind.DataObserver
 	public class WatcherTest : TestEnv
 	{
 		[Test]
-		public void test简单数值绑定()
+		public void Test简单数值绑定()
 		{
 			var view = new TestHost1()
 			{
@@ -259,7 +259,7 @@ namespace TestDataBind.DataObserver
 		}
 
 		[Test]
-		public void test深层数据绑定()
+		public void Test深层数据绑定()
 		{
 			var view = new View2();
 
@@ -441,7 +441,7 @@ namespace TestDataBind.DataObserver
 		}
 
 		[Test]
-		public void test深层数组()
+		public void Test深层数组()
 		{
 			var view = new View3();
 			var host = new TestHost2<List<string>>()
@@ -489,7 +489,7 @@ namespace TestDataBind.DataObserver
 		}
 
 		[Test]
-		public void testthis解释()
+		public void Testthis解释()
 		{
 			var view = new View4();
 
@@ -539,7 +539,7 @@ namespace TestDataBind.DataObserver
 		}
 
 		[Test]
-		public void testTick()
+		public void TestTick()
 		{
 			var Boos = new Dictionary<string, object>()
 			{

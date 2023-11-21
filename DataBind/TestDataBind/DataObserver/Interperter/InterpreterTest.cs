@@ -274,7 +274,7 @@ namespace TestDataBind
 		}
 
 		[Test]
-		public void test语法分析()
+		public void Test语法分析()
 		{
 			DataBinding.CollectionExt.List<string> errorList = new DataBinding.CollectionExt.List<string>();
 			{
@@ -476,7 +476,7 @@ namespace TestDataBind
 		/// !cur.greatProperty || cur.greatProperty.length <= 0
 		/// </summary>
 		[Test]
-		public void testSpecial1()
+		public void TestSpecial1()
 		{
 			DataBinding.CollectionExt.List<string> errorList = new DataBinding.CollectionExt.List<string>();
 			var nodeList = vm.Interpreter.ToWords("!cur.greatProperty || cur.greatProperty.length <= 0");
@@ -487,7 +487,7 @@ namespace TestDataBind
 		}
 
 		[Test]
-		public void test语法分析复杂()
+		public void Test语法分析复杂()
 		{
 			DataBinding.CollectionExt.List<string> errorList = new DataBinding.CollectionExt.List<string>();
 			{
@@ -559,7 +559,7 @@ namespace TestDataBind
 
 
 		[Test]
-		public void test环境测试()
+		public void Test环境测试()
 		{
 			{
 				var v = ((System.Reflection.MethodInfo)InterpreterEnv.Environment["MIN"])
@@ -721,7 +721,7 @@ namespace TestDataBind
 		}
 
 		[Test]
-		public void test测试操作符执行顺序()
+		public void Test测试操作符执行顺序()
 		{
 			{
 				var exp = new vm.Interpreter("a && a.b && a.b.c || 6");
