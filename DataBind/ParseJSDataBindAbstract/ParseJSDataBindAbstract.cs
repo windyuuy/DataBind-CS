@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using vm;
 
 namespace ParseJSDataBindAbstract
 {
+	[DebuggerDisplay("{TypeLiteral} {Name}")]
 	public class ClassInfo
 	{
 		public string Name;
-		public bool IsUsedAsValueEver = false;
+		internal virtual string TypeLiteral => "class";
 		public Dictionary<string, MemberInfo> MemberMap = new Dictionary<string, MemberInfo>();
 		public MemberInfo[] Members => MemberMap.Values.ToArray();
 
@@ -69,6 +72,13 @@ namespace ParseJSDataBindAbstract
 
 	public class EnvInfo : ClassInfo
 	{
+		internal override string TypeLiteral => "env";
+		public EnvInfo(){}
+
+		public EnvInfo(string name)
+		{
+			Name = name;
+		}
 		public static NumberTypeInfo TNumber = new NumberTypeInfo();
 		public static StringTypeInfo TString = new StringTypeInfo();
 		public static BoolTypeInfo TBool = new BoolTypeInfo();
@@ -154,10 +164,12 @@ namespace ParseJSDataBindAbstract
 
 	}
 
+	[DebuggerDisplay("public {Type.TypeLiteral}<{Type.Name}> {Name};")]
 	public class MemberInfo
 	{
 		public string Name;
 		public ClassInfo Type;
+		public List<string> UsedCases = new List<string>();
 	}
 
 	public class ListInfo : ClassInfo
@@ -173,6 +185,7 @@ namespace ParseJSDataBindAbstract
 
 	public class FuncInfo : ClassInfo
 	{
+		internal override string TypeLiteral => "func";
 		public DataBinding.CollectionExt.List<MemberInfo> Paras = new DataBinding.CollectionExt.List<MemberInfo>();
 		public MemberInfo RetType;
 
@@ -236,7 +249,6 @@ namespace ParseJSDataBindAbstract
 				{
 					Name = callerMember.Type.Name,
 					Parent = callerMember.Type.Parent,
-					IsUsedAsValueEver = true,
 				};
 				callerMember.Type.Parent.InsideTypeMap[callerMember.Type.Name] = callerMember.Type;
 				var callerType = callerMember.Type as FuncInfo;
@@ -257,7 +269,46 @@ namespace ParseJSDataBindAbstract
 				if (astNode.OperatorX == TNodeType.Inst["."])
 				{
 					var parent = HandleOperator(root, null, binaryAstNode.Left);
-					return HandleOperator(root, parent.Type, binaryAstNode.Right);
+					var right=HandleOperator(root, parent.Type, binaryAstNode.Right);
+					if (astNode.Parent!=null && astNode.Parent.OperatorX != TNodeType.Inst["."])
+					{
+						string GetNodeIndexPath(ValueASTNode targetNode)
+						{
+							var sb = new StringBuilder();
+							var parentNode = targetNode.Parent as BinaryASTNode;
+							while (parentNode!=null && parentNode.OperatorX == TNodeType.Inst["."])
+							{
+								if (parentNode.Right is ValueASTNode rightNode)
+								{
+									sb.Insert(0, rightNode.Value.Value.ToString());
+								}
+								else
+								{
+									sb.Insert(0, "Unkown");
+								}
+								var leftNode = parentNode.Left;
+								if (leftNode is BinaryASTNode binaryAstNode1 && leftNode.OperatorX==TNodeType.Inst["."])
+								{
+									sb.Insert(0, ".");
+									parentNode = binaryAstNode1;
+								}
+								else if (leftNode is ValueASTNode valueNode)
+								{
+									sb.Insert(0, ".");
+									sb.Insert(0, valueNode.Value.Value.ToString());
+									break;
+								}
+								else
+								{
+									break;
+								}
+							}
+
+							return sb.ToString();
+						}
+						right.UsedCases.Add(GetNodeIndexPath(binaryAstNode.Right as ValueASTNode));
+					}
+					return right;
 				}
 				else
 				{
@@ -273,7 +324,7 @@ namespace ParseJSDataBindAbstract
 
 		public static EnvInfo ParseTypeInfo(ASTNodeBase astNode)
 		{
-			var envInfo = new EnvInfo();
+			var envInfo = new EnvInfo("test1");
 			var retType = HandleOperator(envInfo, null, astNode);
 			envInfo.StatementReturnType = retType;
 			return envInfo;

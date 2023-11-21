@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 
 namespace ParseJSDataBindAbstract.CodeWriter
 {
@@ -75,6 +76,13 @@ namespace ParseJSDataBindAbstract.CodeWriter
             public string UnknownTypeMark = "object?";
             public void ExpressMember(CodeBuffer cb, MemberInfo member)
             {
+                if (member.UsedCases.Count > 0)
+                {
+                    cb.AppendCodeLine("/// <usecase>");
+                    member.UsedCases.ForEach(useCase => cb.AppendCodeLine($"/// {useCase}<br/>"));
+                    cb.AppendCodeLine("/// </usecase>");
+                }
+                
                 if (member.Type is BasicTypeInfo basicTypeInfo)
                 {
                     cb.AppendCodeLine($"public {basicTypeInfo.TypeLiteral} {member.Name} {{get;set;}}");
@@ -85,6 +93,8 @@ namespace ParseJSDataBindAbstract.CodeWriter
                 }
                 else
                 {
+                    cb.AppendCodeLine($"public {member.Type.Name} {member.Name} {{get;set;}} = new {member.Type.Name}();");
+                    
                     cb.AppendCodeLine($"public class {member.Type.Name}");
                     cb.AppendCodeSegBegin("{");
 
@@ -94,8 +104,6 @@ namespace ParseJSDataBindAbstract.CodeWriter
                     }
 
                     cb.AppendCodeSegEnd("}");
-
-                    cb.AppendCodeLine($"public {member.Type.Name} {member.Name} {{get;set;}} = new {member.Type.Name}();");
                 }
             }
 
