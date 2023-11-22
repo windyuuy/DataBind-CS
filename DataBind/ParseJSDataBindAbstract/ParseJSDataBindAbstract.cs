@@ -11,7 +11,18 @@ namespace ParseJSDataBindAbstract
 	public class ClassInfo
 	{
 		public string Name;
+
+		public void ChangeName(string name)
+		{
+			this.Parent.InsideTypeMap[name] = this.Parent.InsideTypeMap[this.Name];
+			this.Parent.InsideTypeMap.Remove(this.Name);
+			this.Name = name;
+		}
 		internal virtual string TypeLiteral => "class";
+		/// <summary>
+		/// 手工书写的声明
+		/// </summary>
+		public string MemberManualCodeLine;
 		public Dictionary<string, MemberInfo> MemberMap = new Dictionary<string, MemberInfo>();
 		public MemberInfo[] Members => MemberMap.Values.ToArray();
 
@@ -170,6 +181,10 @@ namespace ParseJSDataBindAbstract
 		public string Name;
 		public ClassInfo Type;
 		public List<string> UsedCases = new List<string>();
+		/// <summary>
+		/// 手工书写的声明
+		/// </summary>
+		public string MemberManualCodeLine;
 	}
 
 	public class ListInfo : ClassInfo
@@ -188,6 +203,7 @@ namespace ParseJSDataBindAbstract
 		internal override string TypeLiteral => "func";
 		public DataBinding.CollectionExt.List<MemberInfo> Paras = new DataBinding.CollectionExt.List<MemberInfo>();
 		public MemberInfo RetType;
+		public string[] FuncBodyManualCodeLines;
 
 		public void SetParas(IEnumerable<MemberInfo> members)
 		{

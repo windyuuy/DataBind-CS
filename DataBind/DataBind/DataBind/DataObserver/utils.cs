@@ -362,7 +362,17 @@ namespace vm
 		}
 		public static object IndexMethodRecursive(object a, object key, Type[] types, out bool exist)
 		{
-			var v = IndexMethod(a, key, types, out exist);
+			object v;
+			if (types.Contains(null))
+			{
+				// 如果类型中包含null，那么无法推断类型信息，尝试只以参数数量推断
+				// Console.Warn($"call func {key} para-types contains null, may infer incorrect");
+				v = IndexMethodByParasCount(a, key, types.Length, out exist);
+			}
+			else
+			{
+				v = IndexMethod(a, key, types, out exist);
+			}
 			if (exist)
 			{
 				return v;
@@ -385,6 +395,143 @@ namespace vm
 				else
 				{
 					return null;
+				}
+			}
+		}
+
+		public static bool IsMethodCountMatched(MethodInfo m, int parasCount)
+		{
+			var noDefaultCount = m.GetParameters().Select(p => !p.HasDefaultValue).Count();
+			if (m.GetParameters().Length >= parasCount && parasCount >= noDefaultCount)
+			{
+				return true;
+			}
+			return false;
+		}
+		
+		public static object IndexMethodByParasCount(object a, object key, int parasCount, out bool exist)
+		{
+			if (a == null)
+			{
+				throw new Exception($"Uncaught TypeError: Cannot read property '{key.ToString()}' of null");
+			}
+			else
+			{
+				exist = true;
+
+				string skey;
+				if (key is string)
+				{
+					skey = (string)key;
+				}
+				else
+				{
+					skey = key.ToString();
+				}
+				var isClass = a is Type;
+				Type type;
+				if (isClass)
+				{
+					type = (Type)a;
+				}
+				else
+				{
+					type = a.GetType();
+				}
+				var m = type.GetMethod(key.ToString());
+
+				if (m != null)
+				{
+					if (IsMethodCountMatched(m, parasCount))
+					{
+						return m;
+					}
+					else
+					{
+						m = null;
+					}
+				}
+				if (m == null)
+				{
+					m = type.GetMethods().FirstOrDefault(m1 => IsMethodCountMatched(m1, parasCount));
+				}
+				if (m == null)
+				{
+					System.Reflection.MethodInfo[] methods;
+					if (type.IsClass)
+					{
+						methods = type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance);
+					}
+					else
+					{
+						methods = type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+					}
+					// 尝试获取近似项
+					MethodInfo matchedMethodInfo = methods.FirstOrDefault(m1 => IsMethodCountMatched(m1, parasCount));
+					if (matchedMethodInfo != null)
+					{
+						return matchedMethodInfo;
+					}
+					else
+					{
+						// 尝试从索引中获取
+						var mget = type.GetMethod("get_Item", new Type[] { key.GetType() });
+						if (mget != null)
+						{
+							var hasKey = true;
+							var mhas = type.GetMethod("ContainsKey", new Type[] { key.GetType() });
+							if (mhas != null)
+							{
+								hasKey = (bool)mhas.Invoke(a, new object[] { key });
+							}
+							if (hasKey)
+							{
+								var v = mget.Invoke(a, new object[] { key });
+								return v;
+							}
+						}
+
+						// try extend method
+						{
+							if (matchedMethodInfo == null)
+							{
+								matchedMethodInfo = GetExtensionMethods(Assembly.GetExecutingAssembly(), type)
+									.FirstOrDefault(m1 => IsMethodCountMatched(m1, parasCount));
+							}
+							if (matchedMethodInfo == null)
+							{
+								var pkey = "_P_" + skey;
+								foreach (var method in GetExtensionMethods(Assembly.GetExecutingAssembly(), type))
+								{
+									if (method.Name == pkey && method.GetParameters().Length == 1 && type.IsAssignableFrom(method.ReturnType))
+									{
+										var v = method.Invoke(null, new object[] { a });
+										return v;
+									}
+								}
+							}
+							if (matchedMethodInfo != null)
+							{
+								return matchedMethodInfo;
+							}
+							else
+							{
+
+								var field = type.GetField(skey);
+								if (field != null)
+								{
+									Console.Error($"不可观测的对象字段: {type.Name}.{skey}");
+								}
+
+								exist = false;
+								return null;
+							}
+						}
+					}
+				}
+				else
+				{
+					return m;
 				}
 			}
 		}
@@ -591,13 +738,13 @@ namespace vm
 
 		}
 
-		public static Type[] ExtractValuesTypes(object[] values)
-		{
-			return values.Select(x => x.GetType()).ToArray();
-		}
+		// public static Type[] ExtractValuesTypes(object[] values)
+		// {
+		// 	return values.Select(x => x?.GetType()).ToArray();
+		// }
 		public static Type[] ExtractValuesTypes(List<object> values)
 		{
-			return values.Select(x => x.GetType()).ToArray();
+			return values.Select(x => x?.GetType()).ToArray();
 		}
 
 		public static F ConvItem<F>(object value)
