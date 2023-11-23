@@ -63,7 +63,6 @@ namespace ParseJSDataBindAbstract
                                     pos++;
                                 }
                                 var endPos = pos;
-                                pos++;
                                 handler.HandleFunc(cls, funcName, line, beginPos, endPos);
                             }
                             else
