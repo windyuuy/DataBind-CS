@@ -115,6 +115,7 @@ namespace ParseJSDataBindAbstract
 		public static BoolTypeInfo TBool = new BoolTypeInfo();
 
 		public MemberInfo StatementReturnType;
+		public List<string> FileHeaders = new();
 		public override MemberInfo TryAddMember(string name, (int, Func<ClassInfo>) typeGen)
 		{
 			if (!MemberMap.TryGetValue(name, out var memberInfo))
@@ -207,6 +208,20 @@ namespace ParseJSDataBindAbstract
 		public string MemberManualCodeLine;
 
 		public string[] AnnotationLines;
+		
+		
+		public FuncInfo CastToFunc()
+		{
+			var funcInfo = new FuncInfo
+			{
+				Name = this.Type.Name,
+				Parent = this.Type.Parent,
+			};
+			this.Type = funcInfo;
+			this.Type.Parent.InsideTypeMap[funcInfo.Name] = funcInfo;
+			return funcInfo;
+		}
+
 	}
 
 	public class ListInfo : ClassInfo
@@ -235,7 +250,6 @@ namespace ParseJSDataBindAbstract
 				Paras.Add(member);
 			}
 		}
-
 	}
 
 	public class ParseJSDataBind
@@ -324,12 +338,7 @@ namespace ParseJSDataBindAbstract
 			else if (astNode is CallASTNode callAstNode)
 			{
 				var callerMember = HandleOperator(root, null, callAstNode.Left);
-				callerMember.Type = new FuncInfo
-				{
-					Name = callerMember.Type.Name,
-					Parent = callerMember.Type.Parent,
-				};
-				callerMember.Type.Parent.InsideTypeMap[callerMember.Type.Name] = callerMember.Type;
+				callerMember.CastToFunc();
 				var callerType = callerMember.Type as FuncInfo;
 				var paras = callAstNode.Parameters.Select(para => HandleOperator(root, null, para)).ToArray();
 				callerType.SetParas(paras);

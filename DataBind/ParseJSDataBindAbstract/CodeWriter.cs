@@ -227,8 +227,21 @@ namespace ParseJSDataBindAbstract.CodeWriter
             public string WriteCode(EnvInfo envInfo)
             {
                 var cb = new CodeBuffer();
-                cb.AppendCodeLine("using number = System.Double;");
-                cb.AppendLine("");
+
+                var fileHeaders = envInfo.FileHeaders;
+                if (fileHeaders.Count > 0)
+                {
+                    for (var i = 0; i < fileHeaders.Count; i++)
+                    {
+                        cb.AppendLine(fileHeaders[i]);
+                    }
+                }
+                else
+                {
+                    cb.AppendCodeLine("using number = System.Double;");
+                    cb.AppendLine("");
+                }
+                
                 cb.AppendCodeLine("namespace TestingCode");
                 cb.AppendCodeSegBegin("{");
                 cb.AppendCodeLine($"public class {envInfo.Name}: vm.Host");

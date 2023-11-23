@@ -86,5 +86,24 @@ namespace Tests
             var codeText = codeWriter.WriteCode(envInfo);
             expect(codeText).toBe(contentOutput);
         }
+        
+        
+        [Test]
+        public void TestModifyCodeWithCase4()
+        {
+            var interpreter = new vm.Interpreter("a.b.c");
+            var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestWriteCodeCase4");
+            
+            var codeLoader = new CodeLoader();
+            var content = File.ReadAllText("../../../DataBindGen4.cs");
+            var contentOutput = File.ReadAllText("../../../DataBindGen4.txt");
+            codeLoader.ModifyCode(envInfo,typeof(TestWriteCodeCase3),content);
+            
+            var codeWriter = new CodeWriter();
+            codeWriter.UnknownTypeMark = "object";
+            var codeText = codeWriter.WriteCode(envInfo);
+            // File.WriteAllText("../../../DataBindGen4.txt", codeText,Encoding.UTF8);
+            expect(codeText).toBe(contentOutput);
+        }
     }
 }

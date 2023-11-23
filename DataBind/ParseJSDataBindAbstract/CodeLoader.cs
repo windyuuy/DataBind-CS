@@ -133,6 +133,7 @@ namespace ParseJSDataBindAbstract
         public void ParseContent(Type root, string[] lines, LineHandler handler)
         {
             var indentTabs = new string('\t', 2);
+            var isParsingHead = true;
             var pos = 0;
             for (pos = 0; pos < lines.Length; pos++)
             {
@@ -140,12 +141,26 @@ namespace ParseJSDataBindAbstract
                 {
                     break;
                 }
+
+                var line = lines[pos];
+                if (isParsingHead)
+                {
+                    if (line.StartsWith("namespace "))
+                    {
+                        isParsingHead = false;
+                    }
+                    else
+                    {
+                        handler.HandleFileHeader(line);
+                    }
+                }
             }
             ParseClassMembers(root,lines,ref pos,2, handler);
         }
 
         public class LineHandler
         {
+            public Action<string> HandleFileHeader;
             public Action<string, Type, string, string[]> HandleProp;
             public Action<string, Type, string, int, int, string[]> HandleFunc;
             public Action<string, Type, Type, string[]> HandleClassBegin;
@@ -158,6 +173,10 @@ namespace ParseJSDataBindAbstract
             var lines = content.Replace("\r","").Split('\n');
             ParseContent(root, lines, new LineHandler
             {
+                HandleFileHeader = (line)=>
+                {
+                    envInfo.FileHeaders.Add(line);
+                },
                 HandleProp = (line, cls, propName, annos) =>
                 {
                     if (curCls.MemberMap.TryGetValue(propName, out var member))
@@ -181,10 +200,16 @@ namespace ParseJSDataBindAbstract
                     if (curCls.MemberMap.TryGetValue(funcName, out var member))
                     {
                         member.MemberManualCodeLine = line;
-                        var funcInfo = member.Type as FuncInfo;
-                        if (funcInfo == null)
+                        if (member.Type is not FuncInfo funcInfo)
                         {
-                            throw new Exception($"func info cannot be null: {funcName}");
+                            if (member.Type != null)
+                            {
+                                funcInfo = member.CastToFunc();
+                            }
+                            else
+                            {
+                                throw new Exception($"func info cannot be null: {funcName}");
+                            }
                         }
                         funcInfo.FuncBodyManualCodeLines = lines.Slice(beginPos, endPos);
                         member.AnnotationLines = funcInfo.AnnotationLines = annos;
