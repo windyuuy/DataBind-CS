@@ -56,18 +56,35 @@ namespace Tests
         [Test]
         public void TestModifyCodeWithCase2()
         {
-            var interpreter = new vm.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fe['ds']+few[wf.f]+few[0]+!wef");
-            var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast);
+            var interpreter = new vm.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fe['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
+            var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestWriteCodeCase2");
             
             var codeLoader = new CodeLoader();
             var content = File.ReadAllText("../../../DataBindGen2.cs");
-            codeLoader.ModifyCode(envInfo,typeof(TestWriteCodeCase1),content);
+            codeLoader.ModifyCode(envInfo,typeof(TestWriteCodeCase2),content);
             
             var codeWriter = new CodeWriter();
             codeWriter.UnknownTypeMark = "object";
-            var codeText = codeWriter.WriteCode(envInfo,"TestWriteCodeCase2");
-            File.WriteAllText("../../../DataBindGen2.cs", codeText,Encoding.UTF8);
+            var codeText = codeWriter.WriteCode(envInfo);
+            File.WriteAllText("../../../DataBindGen2.txt", codeText,Encoding.UTF8);
             expect(codeText).toBe(content);
+        }
+        
+        [Test]
+        public void TestModifyCodeWithCase3()
+        {
+            var interpreter = new vm.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fe['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
+            var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestWriteCodeCase3");
+            
+            var codeLoader = new CodeLoader();
+            var content = File.ReadAllText("../../../DataBindGen3.cs");
+            var contentOutput = File.ReadAllText("../../../DataBindGen3.txt");
+            codeLoader.ModifyCode(envInfo,typeof(TestWriteCodeCase3),content);
+            
+            var codeWriter = new CodeWriter();
+            codeWriter.UnknownTypeMark = "object";
+            var codeText = codeWriter.WriteCode(envInfo);
+            expect(codeText).toBe(contentOutput);
         }
     }
 }

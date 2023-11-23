@@ -1,7 +1,7 @@
 ﻿namespace TestingCode
 {
 	public class TestWriteCodeCase1: vm.Host
-		{
+	{
 		/// <note>
 		/// env::a
 		/// </note>

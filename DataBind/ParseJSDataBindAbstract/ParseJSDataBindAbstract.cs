@@ -12,6 +12,24 @@ namespace ParseJSDataBindAbstract
 	{
 		public string Name;
 
+		public string FullName
+		{
+			get
+			{
+				var sb = new StringBuilder();
+				var curType = this;
+				sb.Append(curType.Name);
+				while (curType.Parent != null && curType.Parent is not EnvInfo)
+				{
+					curType = curType.Parent;
+					sb.Insert(0, ".");
+					sb.Insert(0, curType.Name);
+				}
+
+				return sb.ToString();
+			}
+		}
+
 		public void ChangeName(string name)
 		{
 			this.Parent.InsideTypeMap[name] = this.Parent.InsideTypeMap[this.Name];
@@ -22,7 +40,9 @@ namespace ParseJSDataBindAbstract
 		/// <summary>
 		/// 手工书写的声明
 		/// </summary>
-		public string MemberManualCodeLine;
+		public string TypeDefManualCodeLine;
+
+		public string[] AnnotationLines;
 		public Dictionary<string, MemberInfo> MemberMap = new Dictionary<string, MemberInfo>();
 		public MemberInfo[] Members => MemberMap.Values.ToArray();
 
@@ -158,17 +178,17 @@ namespace ParseJSDataBindAbstract
 
 	public class NumberTypeInfo : BasicTypeInfo
 	{
-		public override string TypeLiteral { get; set; }="number";
+		public override string TypeLiteral { get; set; } = "number";
 	}
 
 	public class StringTypeInfo : BasicTypeInfo
 	{
-		public override string TypeLiteral { get; set; }="string";
+		public override string TypeLiteral { get; set; } = "string";
 	}
 
 	public class BoolTypeInfo : BasicTypeInfo
 	{
-		public override string TypeLiteral { get; set; }="bool";
+		public override string TypeLiteral { get; set; } = "bool";
 	}
 	public class UnknownTypeInfo : ClassInfo
 	{
@@ -185,6 +205,8 @@ namespace ParseJSDataBindAbstract
 		/// 手工书写的声明
 		/// </summary>
 		public string MemberManualCodeLine;
+
+		public string[] AnnotationLines;
 	}
 
 	public class ListInfo : ClassInfo
@@ -222,7 +244,14 @@ namespace ParseJSDataBindAbstract
 		{
 			if (astNode.OperatorX == TNodeType.Word)
 			{
-				return (astNode.OperatorX, () => new ClassInfo());
+				if (astNode.Parent.OperatorX == TNodeType.Inst["!"])
+				{
+					return (astNode.OperatorX, () => new BoolTypeInfo());
+				}
+				else
+				{
+					return (astNode.OperatorX, () => new ClassInfo());
+				}
 			}
 			else if (astNode.OperatorX == TNodeType.Number)
 			{
@@ -244,6 +273,40 @@ namespace ParseJSDataBindAbstract
 			{
 				throw new InvalidCastException();
 			}
+		}
+		public static string GetNodeIndexPath(ValueASTNode targetNode)
+		{
+			var sb = new StringBuilder();
+			var parentNode = targetNode.Parent as BinaryASTNode;
+			while (parentNode!=null && parentNode.OperatorX == TNodeType.Inst["."])
+			{
+				if (parentNode.Right is ValueASTNode rightNode)
+				{
+					sb.Insert(0, rightNode.Value.Value.ToString());
+				}
+				else
+				{
+					sb.Insert(0, "Unkown");
+				}
+				var leftNode = parentNode.Left;
+				if (leftNode is BinaryASTNode binaryAstNode1 && leftNode.OperatorX==TNodeType.Inst["."])
+				{
+					sb.Insert(0, ".");
+					parentNode = binaryAstNode1;
+				}
+				else if (leftNode is ValueASTNode valueNode)
+				{
+					sb.Insert(0, ".");
+					sb.Insert(0, valueNode.Value.Value.ToString());
+					break;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			return sb.ToString();
 		}
 		public static MemberInfo HandleOperator(ClassInfo root, ClassInfo current, ASTNodeBase astNode)
 		{
@@ -286,42 +349,9 @@ namespace ParseJSDataBindAbstract
 				{
 					var parent = HandleOperator(root, null, binaryAstNode.Left);
 					var right=HandleOperator(root, parent.Type, binaryAstNode.Right);
-					if (astNode.Parent!=null && astNode.Parent.OperatorX != TNodeType.Inst["."])
+					if (astNode.Parent==null ||
+					    (astNode.Parent != null && astNode.Parent.OperatorX != TNodeType.Inst["."]))
 					{
-						string GetNodeIndexPath(ValueASTNode targetNode)
-						{
-							var sb = new StringBuilder();
-							var parentNode = targetNode.Parent as BinaryASTNode;
-							while (parentNode!=null && parentNode.OperatorX == TNodeType.Inst["."])
-							{
-								if (parentNode.Right is ValueASTNode rightNode)
-								{
-									sb.Insert(0, rightNode.Value.Value.ToString());
-								}
-								else
-								{
-									sb.Insert(0, "Unkown");
-								}
-								var leftNode = parentNode.Left;
-								if (leftNode is BinaryASTNode binaryAstNode1 && leftNode.OperatorX==TNodeType.Inst["."])
-								{
-									sb.Insert(0, ".");
-									parentNode = binaryAstNode1;
-								}
-								else if (leftNode is ValueASTNode valueNode)
-								{
-									sb.Insert(0, ".");
-									sb.Insert(0, valueNode.Value.Value.ToString());
-									break;
-								}
-								else
-								{
-									break;
-								}
-							}
-
-							return sb.ToString();
-						}
 						right.UsedCases.Add(GetNodeIndexPath(binaryAstNode.Right as ValueASTNode));
 					}
 					return right;
@@ -338,9 +368,9 @@ namespace ParseJSDataBindAbstract
 			}
 		}
 
-		public static EnvInfo ParseTypeInfo(ASTNodeBase astNode)
+		public static EnvInfo ParseTypeInfo(ASTNodeBase astNode, string name)
 		{
-			var envInfo = new EnvInfo("test1");
+			var envInfo = new EnvInfo(name);
 			var retType = HandleOperator(envInfo, null, astNode);
 			envInfo.StatementReturnType = retType;
 			return envInfo;

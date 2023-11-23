@@ -1,12 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Ext;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ParseJSDataBindAbstract
 {
+    public class AnnotationCollector
+    {
+        public List<string> Annotations = new();
+        public static Regex AnnotationRegex = new(@"^\s*//");
+
+        public bool FilterAnnotation(string line)
+        {
+            if (AnnotationRegex.IsMatch(line))
+            {
+                Annotations.Add(line);
+                return true;
+            }
+
+            return false;
+        }
+
+        public string[] PopAnnotations()
+        {
+            var annos = Annotations.ToArray();
+            Annotations.Clear();
+            return annos;
+        }
+    }
     public class CodeLoader
     {
+        public AnnotationCollector AnnotationCollector = new();
+        public static readonly Regex TabsMatcher = new("(\t*)");
         void ParseClassMembers(Type cls,string[] lines,ref int pos, int indentCount, LineHandler handler)
         {
             var indentTabs = new string('\t', indentCount);
@@ -28,6 +55,7 @@ namespace ParseJSDataBindAbstract
                     {
                         if (isClass)
                         {
+                            pos++;
                             ParseClassMembers(subClass,lines,ref pos,indentCount+1, handler);
                             handler.HandleClassEnd(cls, subClass);
                             isClass = false;
@@ -36,50 +64,65 @@ namespace ParseJSDataBindAbstract
                     }
                     else
                     {
-                        var memberProperty = new Regex(@"(\w+) {get;set;}");
-                        var memberFunc = new Regex(@"public(?: static)? (\w+) (\w+)\(");
-                        var memberClass = new Regex(@"class (\w+)");
-                        var matchProp = memberProperty.Match(line);
-                        if (matchProp.Success)
+                        if (!AnnotationCollector.FilterAnnotation(line))
                         {
-                            var propName = matchProp.Groups[1].Value;
-                            handler.HandleProp(cls, propName, line);
-                        }
-                        else
-                        {
-                            var matchFunc = memberFunc.Match(line);
-                            if (matchFunc.Success)
+                            var memberProperty = new Regex(@"(\w+) {get;set;}");
+                            var memberFunc = new Regex(@"public(?: static)? (\w+) (\w+)\(");
+                            var memberClass = new Regex(@"class (\w+)");
+                            var matchProp = memberProperty.Match(line);
+                            if (matchProp.Success)
                             {
-                                var funcName = matchFunc.Groups[2].Value;
-                                // var funcBodyIndent = new string('\t', indentCount + 1);
-                                while (!lines[pos].StartsWith(indentTabs+"{"))
-                                {
-                                    pos++;
-                                }
-                                pos++;
-                                var beginPos = pos;
-                                while (!lines[pos].StartsWith(indentTabs+"}"))
-                                {
-                                    pos++;
-                                }
-                                var endPos = pos;
-                                handler.HandleFunc(cls, funcName, line, beginPos, endPos);
+                                var propName = matchProp.Groups[1].Value;
+                                handler.HandleProp(line, cls, propName, AnnotationCollector.PopAnnotations());
                             }
                             else
                             {
-                                var matchClass = memberClass.Match(line);
-                                if (matchClass.Success)
+                                var matchFunc = memberFunc.Match(line);
+                                if (matchFunc.Success)
                                 {
-                                    var className = matchClass.Groups[1].Value;
-                                    isClass = true;
-                                    subClass = cls.GetNestedType(className);
-                                    if (subClass == null)
+                                    var funcName = matchFunc.Groups[2].Value;
+                                    // var funcBodyIndent = new string('\t', indentCount + 1);
+                                    while (!lines[pos].StartsWith(indentTabs+"{"))
                                     {
-                                        throw new Exception("class cannot be null");
+                                        pos++;
                                     }
-                                    handler.HandleClassBegin(cls, subClass, line);
+                                    pos++;
+                                    var beginPos = pos;
+                                    while (!lines[pos].StartsWith(indentTabs+"}"))
+                                    {
+                                        pos++;
+                                    }
+                                    var endPos = pos;
+                                    handler.HandleFunc(line, cls, funcName, beginPos, endPos, AnnotationCollector.PopAnnotations());
+                                }
+                                else
+                                {
+                                    var matchClass = memberClass.Match(line);
+                                    if (matchClass.Success)
+                                    {
+                                        var className = matchClass.Groups[1].Value;
+                                        isClass = true;
+                                        subClass = cls.GetNestedType(className);
+                                        if (subClass == null)
+                                        {
+                                            throw new Exception("class cannot be null");
+                                        }
+                                        handler.HandleClassBegin(line, cls, subClass, AnnotationCollector.PopAnnotations());
+                                    }
                                 }
                             }
+                        }
+                    }
+                }
+                else
+                {
+                    // check line indent only
+                    var m = TabsMatcher.Match(line);
+                    if (m.Success)
+                    {
+                        if (m.Groups[1].Length != indentCount)
+                        {
+                            throw new Exception("unmatched indente count");
                         }
                     }
                 }
@@ -103,9 +146,9 @@ namespace ParseJSDataBindAbstract
 
         public class LineHandler
         {
-            public Action<Type, string, string> HandleProp;
-            public Action<Type, string, string, int, int> HandleFunc;
-            public Action<Type, Type, string> HandleClassBegin;
+            public Action<string, Type, string, string[]> HandleProp;
+            public Action<string, Type, string, int, int, string[]> HandleFunc;
+            public Action<string, Type, Type, string[]> HandleClassBegin;
             public Action<Type, Type> HandleClassEnd;
         }
         public void ModifyCode(EnvInfo envInfo, Type root, string content)
@@ -115,11 +158,12 @@ namespace ParseJSDataBindAbstract
             var lines = content.Replace("\r","").Split('\n');
             ParseContent(root, lines, new LineHandler
             {
-                HandleProp = (cls, propName, line) =>
+                HandleProp = (line, cls, propName, annos) =>
                 {
                     if (curCls.MemberMap.TryGetValue(propName, out var member))
                     {
                         member.MemberManualCodeLine = line;
+                        member.AnnotationLines = annos;
 
                         var prop = cls.GetProperty(propName)?.PropertyType;
                         if (prop == null)
@@ -132,7 +176,7 @@ namespace ParseJSDataBindAbstract
                         }
                     }
                 },
-                HandleFunc = (cls, funcName, line, beginPos, endPos) =>
+                HandleFunc = (line, cls, funcName,  beginPos, endPos, annos) =>
                 {
                     if (curCls.MemberMap.TryGetValue(funcName, out var member))
                     {
@@ -143,13 +187,16 @@ namespace ParseJSDataBindAbstract
                             throw new Exception($"func info cannot be null: {funcName}");
                         }
                         funcInfo.FuncBodyManualCodeLines = lines.Slice(beginPos, endPos);
+                        member.AnnotationLines = funcInfo.AnnotationLines = annos;
                     }
                 },
-                HandleClassBegin = (cls, subClass, line) =>
+                HandleClassBegin = (line, cls, subClass, annos) =>
                 {
                     if(curCls.InsideTypeMap.TryGetValue(subClass.Name,out var subClsInfo))
                     {
                         curCls = subClsInfo;
+                        curCls.AnnotationLines = annos;
+                        curCls.TypeDefManualCodeLine = line;
                     }
                     else
                     {

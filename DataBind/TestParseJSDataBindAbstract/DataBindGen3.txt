@@ -2,7 +2,7 @@
 
 namespace TestingCode
 {
-	public class TestWriteCodeCase2: vm.Host
+	public class TestWriteCodeCase3: vm.Host
 	{
 		/// <note>
 		/// env::a
@@ -99,10 +99,6 @@ namespace TestingCode
 			/// <usecase>
 			/// ke.jf<br/>
 			/// </usecase>
-			/// <summary>
-			/// wjflkjwelj
-			/// klew//we///welkj
-			/// </summary>
 			public void jf()
 			{
 			}

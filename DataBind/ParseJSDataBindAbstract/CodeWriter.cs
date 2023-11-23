@@ -83,7 +83,14 @@ namespace ParseJSDataBindAbstract.CodeWriter
             public string UnknownTypeMark = "object?";
             public void ExpressMember(CodeBuffer cb, MemberInfo member)
             {
-                if (member.UsedCases.Count > 0)
+                if (member.AnnotationLines?.Length > 0)
+                {
+                    foreach (var memberAnnotationLine in member.AnnotationLines)
+                    {
+                        cb.AppendLine(memberAnnotationLine);
+                    }
+                }
+                else if (member.UsedCases.Count > 0)
                 {
                     cb.AppendCodeLine("/// <usecase>");
                     member.UsedCases.ForEach(useCase => cb.AppendCodeLine($"/// {useCase}<br/>"));
@@ -92,7 +99,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                 
                 if (member.Type is BasicTypeInfo basicTypeInfo)
                 {
-                    if (string.IsNullOrEmpty(member.MemberManualCodeLine))
+                    if (!string.IsNullOrEmpty(member.MemberManualCodeLine))
                     {
                         cb.AppendLine(member.MemberManualCodeLine);
                     }
@@ -113,22 +120,47 @@ namespace ParseJSDataBindAbstract.CodeWriter
                         if (funcInfo.Paras.Count > 0)
                         {
                             var para1 = funcInfo.Paras[0];
-                            cb.Append($"{para1.Type.Name} {para1.Name}");
-                            funcInfo.Paras.Skip(1).ForEach(para =>
+
+                            void AppendPara(MemberInfo para, int index)
                             {
-                                cb.Append(",");
-                                if (member.Type is BasicTypeInfo basicTypeInfo2)
+                                if (para.Type is BasicTypeInfo basicTypeInfo2)
                                 {
-                                    cb.Append($"{basicTypeInfo2.TypeLiteral} {member.Name}");
+                                    if (para.Type is StringTypeInfo)
+                                    {
+                                        cb.Append($"{basicTypeInfo2.TypeLiteral} p_{index}");
+                                    }
+                                    else
+                                    {
+                                        cb.Append($"{basicTypeInfo2.TypeLiteral} p_{para.Name}");
+                                    }
                                 }
-                                else if (member.Type.Members.Length == 0)
+                                else if (para.Type.Members.Length == 0)
                                 {
-                                    cb.Append($"{UnknownTypeMark} {member.Name}");
+                                    cb.Append($"{UnknownTypeMark} {para.Name}");
                                 }
                                 else
                                 {
-                                    cb.Append($"{para.Type.Name} {para.Name}");
+                                    cb.Append($"{para.Type.FullName} {para.Name}");
                                 }
+                            }
+                            // cb.Append($"{para1.Type.Name} {para1.Name}");
+                            AppendPara(para1, 0);
+                            funcInfo.Paras.Skip(1).ForEach((para,index) =>
+                            {
+                                cb.Append(",");
+                                // if (para.Type is BasicTypeInfo basicTypeInfo2)
+                                // {
+                                //     cb.Append($"{basicTypeInfo2.TypeLiteral} {para.Name}");
+                                // }
+                                // else if (para.Type.Members.Length == 0)
+                                // {
+                                //     cb.Append($"{UnknownTypeMark} {para.Name}");
+                                // }
+                                // else
+                                // {
+                                //     cb.Append($"{para.Type.Name} {para.Name}");
+                                // }
+                                AppendPara(para,index+1);
                             });
                         }
 
@@ -164,9 +196,18 @@ namespace ParseJSDataBindAbstract.CodeWriter
                         cb.AppendCodeLine($"public {member.Type.Name} {member.Name} {{get;set;}} = new {member.Type.Name}();");
                     }
 
-                    if (!string.IsNullOrEmpty(member.Type.MemberManualCodeLine))
+                    // add class annotations
+                    if (member.Type.AnnotationLines?.Length > 0)
                     {
-                        cb.Append(member.Type.MemberManualCodeLine);
+                        foreach (var memberAnnotationLine in member.Type.AnnotationLines)
+                        {
+                            cb.AppendLine(memberAnnotationLine);
+                        }
+                    }
+                    // add class def
+                    if (!string.IsNullOrEmpty(member.Type.TypeDefManualCodeLine))
+                    {
+                        cb.AppendLine(member.Type.TypeDefManualCodeLine);
                     }
                     else
                     {
@@ -183,19 +224,24 @@ namespace ParseJSDataBindAbstract.CodeWriter
                 }
             }
 
-            public string WriteCode(EnvInfo envInfo, string envClassName)
+            public string WriteCode(EnvInfo envInfo)
             {
                 var cb = new CodeBuffer();
+                cb.AppendCodeLine("using number = System.Double;");
+                cb.AppendLine("");
                 cb.AppendCodeLine("namespace TestingCode");
                 cb.AppendCodeSegBegin("{");
-                cb.AppendCodeSegBegin($"public class {envClassName}: vm.Host");
-                cb.AppendCodeLine("{");
+                cb.AppendCodeLine($"public class {envInfo.Name}: vm.Host");
+                cb.AppendCodeSegBegin("{");
 
                 foreach (var member1 in envInfo.Members)
                 {
-                    cb.AppendCodeLine("/// <note>");
-                    cb.AppendCodeLine($"/// env::{member1.Name}");
-                    cb.AppendCodeLine("/// </note>");
+                    if (!(member1.AnnotationLines?.Length > 0))
+                    {
+                        cb.AppendCodeLine("/// <note>");
+                        cb.AppendCodeLine($"/// env::{member1.Name}");
+                        cb.AppendCodeLine("/// </note>");
+                    }
                     ExpressMember(cb, member1);
                 }
 

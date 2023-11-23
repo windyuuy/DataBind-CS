@@ -2,7 +2,7 @@
 
 namespace TestingCode
 {
-	public class TestWriteCodeCase2: vm.Host
+	public class TestWriteCodeCase3: vm.Host
 	{
 		/// <note>
 		/// env::a
@@ -18,15 +18,9 @@ namespace TestingCode
 			public TB b {get;set;} = new TB();
 			public class TB
 			{
-				/// <usecase>
-				/// a.b.c<br/>
-				/// </usecase>
 				public int c {get;set;}
 			}
 		}
-		/// <note>
-		/// env::fe
-		/// </note>
 		public TFe fe {get;set;} = new TFe();
 		public class TFe
 		{
@@ -49,31 +43,11 @@ namespace TestingCode
 				}
 			}
 		}
-		/// <note>
-		/// env::n
-		/// </note>
 		public TN n {get;set;} = new TN();
 		public class TN
 		{
-			/// <usecase>
-			/// n.wf<br/>
-			/// </usecase>
 			public object wf {get;set;}
 		}
-		/// <note>
-		/// env::rrx
-		/// </note>
-		public TRrx rrx {get;set;} = new TRrx();
-		public class TRrx
-		{
-			/// <usecase>
-			/// rrx.xx<br/>
-			/// </usecase>
-			public object xx {get;set;}
-		}
-		/// <note>
-		/// env::few
-		/// </note>
 		public object few {get;set;}
 		/// <note>
 		/// env::wf
@@ -81,31 +55,11 @@ namespace TestingCode
 		public TWf wf {get;set;} = new TWf();
 		public class TWf
 		{
-			/// <usecase>
-			/// wf.f<br/>
-			/// </usecase>
 			public object f {get;set;}
 		}
-		/// <note>
-		/// env::wef
-		/// </note>
-		public bool wef {get;set;}
-		/// <note>
-		/// env::ke
-		/// </note>
 		public TKe ke {get;set;} = new TKe();
 		public class TKe
 		{
-			/// <usecase>
-			/// ke.jf<br/>
-			/// </usecase>
-			/// <summary>
-			/// wjflkjwelj
-			/// klew//we///welkj
-			/// </summary>
-			public void jf()
-			{
-			}
 		}
 		/// <note>
 		/// env::jklwe
@@ -116,18 +70,6 @@ namespace TestingCode
 			public TJx jx {get;set;} = new TJx();
 			public class TJx
 			{
-				/// <usecase>
-				/// jklwe.jx.jfj<br/>
-				/// </usecase>
-				public void jfj(number p_4,object g,TFe.TCx cx,object kxx)
-				{
-				}
-				/// <usecase>
-				/// jklwe.jx.jfj2<br/>
-				/// </usecase>
-				public void jfj2(number p_4,string p_1,bool p_False,TFe.TCx cx)
-				{
-				}
 			}
 		}
 		/// <note>
@@ -141,9 +83,5 @@ namespace TestingCode
 			/// </usecase>
 			public object g {get;set;}
 		}
-		/// <note>
-		/// env::kxx
-		/// </note>
-		public object kxx {get;set;}
 	}
 }
