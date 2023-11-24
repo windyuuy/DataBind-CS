@@ -261,44 +261,78 @@ namespace ParseJSDataBindAbstract
 
 		public string[] AnnotationLines;
 
-		public static readonly Regex IsBoolMatcher = new(@"^(?:is|be|are|was|were|Is|Be|Are|Was|Were)[A-Z_]");
+		public static readonly Regex IsBoolMatcher1 = new(@"^(?:is|be|are|was|were|Is|Be|Are|Was|Were)[A-Z_]");
 		public static readonly Regex IsBoolMatcher3 = new(@"[a-z]able$");
 		public static readonly Regex IsBoolMatcher2 = new(@"^(?:enabled|visible|enable|active|valid)$");
-		public static readonly Regex IsStringMatcher = new(@"(?:Label|Text|Txt|Name|Title|Tag|Content|Url|Uri)$");
+		public static readonly Regex IsStringMatcher1 = new(@"(?:Label|Text|Txt|Name|Title|Tag|Content|Url|Uri)$");
 		public static readonly Regex IsStringMatcher2 = new(@"^(?:label|text|txt|name|title|tag|content|url|uri)$");
-		public static readonly Regex IsNumberMatcher = new(@"(?:Count|Length|Len|Num|Progress)$");
+		public static readonly Regex IsNumberMatcher1 = new(@"(?:Count|Length|Len|Num|Progress)$");
 		public static readonly Regex IsNumberMatcher2 = new(@"^(?:n)[A-Z_]");
 		public static readonly Regex IsNumberMatcher3 = new(@"^(?:progress)$");
 		public static readonly Regex IsActionMatcher1 = new(@"(?:Click)$");
 		public static readonly Regex IsActionMatcher2 = new(@"^(?:click)$");
+
+
+		public static Regex[] IsBoolMatchers = new[]
+		{
+			IsBoolMatcher1,
+			IsBoolMatcher2,
+			IsBoolMatcher3,
+		};
+
+		public static Regex[] IsStringMatchers = new[]
+		{
+			IsStringMatcher1,
+			IsStringMatcher2,
+		};
+
+		public static Regex[] IsNumberMatchers = new[]
+		{
+			IsNumberMatcher1,
+			IsNumberMatcher2,
+			IsNumberMatcher3,
+		};
+
+		public static Regex[] IsActionMatchers = new[]
+		{
+			IsActionMatcher1,
+			IsActionMatcher2,
+		};
+
 		public string InferType(string defaultValue)
 		{
 			if (this.Type.MemberCount == 0)
 			{
-				if (IsBoolMatcher.IsMatch(Name) 
-				    || IsBoolMatcher2.IsMatch(Name) 
-				    || IsBoolMatcher3.IsMatch(Name)
-				    )
+				foreach (var isBoolMatcher in IsBoolMatchers)
 				{
-					return "bool";
+					if (isBoolMatcher.IsMatch(Name))
+					{
+						return "bool";
+					}
 				}
-				else if (IsStringMatcher.IsMatch(Name)
-				         || IsStringMatcher2.IsMatch(Name))
+
+				foreach (var isStringMatcher in IsStringMatchers)
 				{
-					return "string";
+					if (isStringMatcher.IsMatch(Name))
+					{
+						return "string";
+					}
 				}
-				else if (IsNumberMatcher.IsMatch(Name)
-				         || IsNumberMatcher2.IsMatch(Name)
-				         || IsNumberMatcher3.IsMatch(Name)
-				         )
+
+				foreach (var isNumberMatcher in IsNumberMatchers)
 				{
-					return "number";
+					if (isNumberMatcher.IsMatch(Name))
+					{
+						return "number";
+					}
 				}
-				else if (IsActionMatcher1.IsMatch(Name)
-				         || IsActionMatcher2.IsMatch(Name)
-				        )
+
+				foreach (var isActionMatcher in IsActionMatchers)
 				{
-					return "Action";
+					if (isActionMatcher.IsMatch(Name))
+					{
+						return "Action";
+					}
 				}
 			}
 			
