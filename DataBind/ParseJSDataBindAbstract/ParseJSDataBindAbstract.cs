@@ -254,6 +254,14 @@ namespace ParseJSDataBindAbstract
 		public string Name;
 		public ClassInfo Type;
 		public List<string> UsedCases = new List<string>();
+
+		public void AddUseCase(string useCase)
+		{
+			if (!UsedCases.Contains(useCase))
+			{
+				UsedCases.Add(useCase);
+			}
+		}
 		/// <summary>
 		/// 手工书写的声明
 		/// </summary>
@@ -547,7 +555,7 @@ namespace ParseJSDataBindAbstract
 					if (astNode.Parent==null ||
 					    (astNode.Parent != null && astNode.Parent.OperatorX != TNodeType.Inst["."]))
 					{
-						right.UsedCases.Add(GetNodeIndexPath(binaryAstNode.Right as ValueASTNode));
+						right.AddUseCase(GetNodeIndexPath(binaryAstNode.Right as ValueASTNode));
 					}
 					return right;
 				}
