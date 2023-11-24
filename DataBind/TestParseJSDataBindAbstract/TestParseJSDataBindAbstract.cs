@@ -14,10 +14,10 @@ namespace Tests
         [Test]
         public void Test节点树测试2()
         {
-            var interpreter = new vm.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fe['ds']+few[wf.f]+few[0]+!wef");
+            var interpreter = new vm.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fex['ds']+few[wf.f]+few[0]+!wef+fe.je");
             var envInfo = new EnvInfo();
             var retType = ParseJSDataBind.HandleOperator(envInfo, null, interpreter.Ast);
-            expect(envInfo.MemberMap.Count).toBe(7);
+            expect(envInfo.MemberMap.Count).toBe(8);
             expect(envInfo.MemberMap["a"].Type.GetType()).toBe(typeof(ClassInfo));
             expect(envInfo.MemberMap["a"].Type.Name).toBe("TA");
 
@@ -28,6 +28,16 @@ namespace Tests
             expect(funcType.Paras[0].Type.Parent.Name).toBe("TN");
             expect(funcType.Paras[1].Name).toBe("xx");
             expect(funcType.Paras[1].Type.Parent.Name).toBe("TRrx");
+
+            var dictType = envInfo.MemberMap["fex"].Type as DictionaryTypeInfo;
+            expect(dictType != null).toBe(true);
+            expect(dictType.KeyType is StringTypeInfo).toBe(true);
+            expect(dictType.ElementType == null).toBe(true);
+            
+            var arrayType = envInfo.MemberMap["few"].Type as ArrayTypeInfo;
+            expect(arrayType != null).toBe(true);
+            expect(arrayType.KeyType is NumberTypeInfo).toBe(true);
+            expect(arrayType.ElementType == null).toBe(true);
         }
 
         // [Test]
@@ -56,7 +66,7 @@ namespace Tests
         [Test]
         public void TestModifyCodeWithCase2()
         {
-            var interpreter = new vm.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fe['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
+            var interpreter = new vm.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fex['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
             var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestWriteCodeCase2");
             
             var codeLoader = new CodeLoader();
@@ -87,7 +97,6 @@ namespace Tests
             expect(codeText).toBe(contentOutput);
         }
         
-        
         [Test]
         public void TestModifyCodeWithCase4()
         {
@@ -97,7 +106,7 @@ namespace Tests
             var codeLoader = new CodeLoader();
             var content = File.ReadAllText("../../../DataBindGen4.cs");
             var contentOutput = File.ReadAllText("../../../DataBindGen4.txt");
-            codeLoader.ModifyCode(envInfo,typeof(TestWriteCodeCase3),content);
+            codeLoader.ModifyCode(envInfo,typeof(TestWriteCodeCase4),content);
             
             var codeWriter = new CodeWriter();
             codeWriter.UnknownTypeMark = "object";

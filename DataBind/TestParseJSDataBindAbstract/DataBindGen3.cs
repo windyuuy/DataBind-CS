@@ -21,7 +21,6 @@ namespace TestingCode
 				public int c {get;set;}
 			}
 		}
-		public TFe fe {get;set;} = new TFe();
 		public class TFe
 		{
 			// lkjwf

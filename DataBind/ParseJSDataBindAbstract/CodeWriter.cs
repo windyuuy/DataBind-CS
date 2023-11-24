@@ -108,6 +108,28 @@ namespace ParseJSDataBindAbstract.CodeWriter
                         cb.AppendCodeLine($"public {basicTypeInfo.TypeLiteral} {member.Name} {{get;set;}}");
                     }
                 }
+                else if (member.Type is ArrayTypeInfo arrayTypeInfo)
+                {
+                    if (!string.IsNullOrEmpty(member.MemberManualCodeLine))
+                    {
+                        cb.AppendLine(member.MemberManualCodeLine);
+                    }
+                    else
+                    {
+                        cb.AppendCodeLine($"public {arrayTypeInfo.TypeLiteral} {member.Name} {{get;set;}}");
+                    }
+                }
+                else if (member.Type is DictionaryTypeInfo dictionaryTypeInfo)
+                {
+                    if (!string.IsNullOrEmpty(member.MemberManualCodeLine))
+                    {
+                        cb.AppendLine(member.MemberManualCodeLine);
+                    }
+                    else
+                    {
+                        cb.AppendCodeLine($"public {dictionaryTypeInfo.TypeLiteral} {member.Name} {{get;set;}}");
+                    }
+                }
                 else if (member.Type is FuncInfo funcInfo)
                 {
                     if (!string.IsNullOrEmpty(member.MemberManualCodeLine))
@@ -228,6 +250,15 @@ namespace ParseJSDataBindAbstract.CodeWriter
             {
                 var cb = new CodeBuffer();
 
+                foreach (var envInfoUsingNamespace in envInfo.UsingNamespaces)
+                {
+                    cb.AppendCodeLine($"using {envInfoUsingNamespace};");
+                }
+                foreach (var item in envInfo.UsingAlias)
+                {
+                    cb.AppendCodeLine($"using {item.Key} = {item.Value};");
+                }
+
                 var fileHeaders = envInfo.FileHeaders;
                 if (fileHeaders.Count > 0)
                 {
@@ -238,7 +269,6 @@ namespace ParseJSDataBindAbstract.CodeWriter
                 }
                 else
                 {
-                    cb.AppendCodeLine("using number = System.Double;");
                     cb.AppendLine("");
                 }
                 

@@ -1,4 +1,5 @@
-﻿using number = System.Double;
+﻿using DataBinding.CollectionExt;
+using number = System.Double;
 
 namespace TestingCode
 {
@@ -27,28 +28,7 @@ namespace TestingCode
 		/// <note>
 		/// env::fe
 		/// </note>
-		public TFe fe {get;set;} = new TFe();
-		public class TFe
-		{
-			// lkjwf
-			/// <summary>
-			/// lkwjef
-			/// </summary>
-			public TCx cx {get;set;} = new TCx();
-			/// <summary>
-			/// lkjwelkfj
-			/// </summary>
-			public class TCx
-			{
-				/// <usecase>
-				/// fe.cx.xc<br/>
-				/// </usecase>
-				public int xc(TWf wf,object xc)
-				{
-					return 564;
-				}
-			}
-		}
+		public Dictionary<string, object> fe {get;set;}
 		/// <note>
 		/// env::n
 		/// </note>
@@ -115,13 +95,13 @@ namespace TestingCode
 				/// <usecase>
 				/// jklwe.jx.jfj<br/>
 				/// </usecase>
-				public void jfj(number p_4,object g,TFe.TCx cx,object kxx)
+				public void jfj(number p_4,object g,object cx,object kxx)
 				{
 				}
 				/// <usecase>
 				/// jklwe.jx.jfj2<br/>
 				/// </usecase>
-				public void jfj2(number p_4,string p_1,bool p_False,TFe.TCx cx)
+				public void jfj2(number p_4,string p_1,bool p_False,object cx)
 				{
 				}
 			}

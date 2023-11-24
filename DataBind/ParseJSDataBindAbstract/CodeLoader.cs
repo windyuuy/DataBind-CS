@@ -175,7 +175,22 @@ namespace ParseJSDataBindAbstract
             {
                 HandleFileHeader = (line)=>
                 {
-                    envInfo.FileHeaders.Add(line);
+                    var m = new Regex(@"using ([\w\.]+)(?: = ([\w\.]+))?;").Match(line);
+                    if(m.Success)
+                    {
+                        if (string.IsNullOrEmpty(m.Groups[2].Value))
+                        {
+                            envInfo.AddNamespace(m.Groups[1].Value);
+                        }
+                        else
+                        {
+                            envInfo.AddTypeAlias(m.Groups[1].Value, m.Groups[2].Value);
+                        }
+                    }
+                    else
+                    {
+                        envInfo.FileHeaders.Add(line);
+                    }
                 },
                 HandleProp = (line, cls, propName, annos) =>
                 {

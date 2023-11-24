@@ -226,7 +226,28 @@ namespace vm
 			this.Node = node;
 		}
 
-		internal override string DebuggerDisplay => $"({Node.DebuggerDisplay})";
+		internal override string DebuggerDisplay
+		{
+			get
+			{
+				if (OperatorX == TNodeType.Inst["["])
+				{
+					return $"[{Node.DebuggerDisplay}]";
+				}
+				else if (OperatorX == TNodeType.Inst["{"])
+				{
+					return $"{{{Node.DebuggerDisplay}}}";
+				}
+				else if (OperatorX == TNodeType.Inst["<"])
+				{
+					return $"<{Node.DebuggerDisplay}>";
+				}
+				else
+				{
+					return $"({Node.DebuggerDisplay})";
+				}
+			}
+		}
 	}
 
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
@@ -285,8 +306,21 @@ namespace vm
 			this.Left.Parent = this;
 			this.Right.Parent = this;
 		}
-		
-		internal override string DebuggerDisplay => $"{Left.DebuggerDisplay}{OperatorName}{Right.DebuggerDisplay}";
+
+		internal override string DebuggerDisplay
+		{
+			get
+			{
+				if (OperatorX == TNodeType.Inst["["] && Right is BracketASTNode && Right.OperatorX == TNodeType.Inst["["])
+				{
+					return $"{Left.DebuggerDisplay}{Right.DebuggerDisplay}";
+				}
+				else
+				{
+					return $"{Left.DebuggerDisplay}{OperatorName}{Right.DebuggerDisplay}";
+				}
+			}
+		}
 	}
 
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]

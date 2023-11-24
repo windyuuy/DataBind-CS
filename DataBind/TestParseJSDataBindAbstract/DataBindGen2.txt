@@ -1,4 +1,5 @@
-﻿using number = System.Double;
+﻿using DataBinding.CollectionExt;
+using number = System.Double;
 
 namespace TestingCode
 {
@@ -71,6 +72,10 @@ namespace TestingCode
 			/// </usecase>
 			public object xx {get;set;}
 		}
+		/// <note>
+		/// env::fex
+		/// </note>
+		public Dictionary<string, object> fex {get;set;}
 		/// <note>
 		/// env::few
 		/// </note>

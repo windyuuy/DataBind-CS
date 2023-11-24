@@ -36,7 +36,7 @@ namespace ParseJSDataBindAbstract
 			this.Parent.InsideTypeMap.Remove(this.Name);
 			this.Name = name;
 		}
-		internal virtual string TypeLiteral => "class";
+		public  virtual string TypeLiteral => "class";
 		/// <summary>
 		/// 手工书写的声明
 		/// </summary>
@@ -103,7 +103,7 @@ namespace ParseJSDataBindAbstract
 
 	public class EnvInfo : ClassInfo
 	{
-		internal override string TypeLiteral => "env";
+		public override string TypeLiteral => "env";
 		public EnvInfo(){}
 
 		public EnvInfo(string name)
@@ -116,6 +116,22 @@ namespace ParseJSDataBindAbstract
 
 		public MemberInfo StatementReturnType;
 		public List<string> FileHeaders = new();
+		protected Dictionary<string, string> Namespaces = new();
+		public void AddNamespace(string ns)
+		{
+			this.Namespaces[ns] = null;
+		}
+
+		public void AddTypeAlias(string ns, string alias)
+		{
+			this.Namespaces[ns] = alias;
+		}
+
+		public IEnumerable<string> UsingNamespaces =>
+			Namespaces.Where(item => item.Value == null).Select(item => item.Key);
+		
+		public IEnumerable<KeyValuePair<string,string>> UsingAlias =>
+			Namespaces.Where(item => item.Value != null);
 		public override MemberInfo TryAddMember(string name, (int, Func<ClassInfo>) typeGen)
 		{
 			if (!MemberMap.TryGetValue(name, out var memberInfo))
@@ -170,26 +186,25 @@ namespace ParseJSDataBindAbstract
 
 	public class BasicTypeInfo : ClassInfo
 	{
-		public virtual string TypeLiteral
+		public override string TypeLiteral
 		{
 			get => "unkown_basic";
-			set => throw new NotImplementedException();
 		}
 	}
 
 	public class NumberTypeInfo : BasicTypeInfo
 	{
-		public override string TypeLiteral { get; set; } = "number";
+		public override string TypeLiteral { get; } = "number";
 	}
 
 	public class StringTypeInfo : BasicTypeInfo
 	{
-		public override string TypeLiteral { get; set; } = "string";
+		public override string TypeLiteral { get; } = "string";
 	}
 
 	public class BoolTypeInfo : BasicTypeInfo
 	{
-		public override string TypeLiteral { get; set; } = "bool";
+		public override string TypeLiteral { get; } = "bool";
 	}
 	public class UnknownTypeInfo : ClassInfo
 	{
@@ -221,23 +236,82 @@ namespace ParseJSDataBindAbstract
 			this.Type.Parent.InsideTypeMap[funcInfo.Name] = funcInfo;
 			return funcInfo;
 		}
+		
+		public ArrayTypeInfo CastToArray(ClassInfo keyType, ClassInfo eleType)
+		{
+			var arrayInfo = new ArrayTypeInfo()
+			{
+				Name = this.Type.Name,
+				Parent = this.Type.Parent,
+				KeyType = keyType,
+				ElementType = eleType,
+			};
+			this.Type = arrayInfo;
+			this.Type.Parent.InsideTypeMap[arrayInfo.Name] = arrayInfo;
+			return arrayInfo;
+		}
+
+		public DictionaryTypeInfo CastToDict(ClassInfo keyType, ClassInfo eleType)
+		{
+			var dictInfo = new DictionaryTypeInfo()
+			{
+				Name = this.Type.Name,
+				Parent = this.Type.Parent,
+				KeyType = keyType,
+				ElementType = eleType,
+			};
+			this.Type = dictInfo;
+			this.Type.Parent.InsideTypeMap[dictInfo.Name] = dictInfo;
+			return dictInfo;
+		}
 
 	}
 
-	public class ListInfo : ClassInfo
-	{
-		public ClassInfo IndexerType;
-	}
-
-	public class DictInfo : ClassInfo
+	public class ArrayTypeInfo : ClassInfo
 	{
 		public ClassInfo KeyType;
-		public ClassInfo ValueType;
+		public ClassInfo ElementType;
+
+		public override string TypeLiteral
+		{
+			get
+			{
+				if (ElementType == null)
+				{
+					return $"object[]";
+				}
+				else
+				{
+					return $"{ElementType.TypeLiteral}[]";
+				}
+			}
+		}
+	}
+
+	public class DictionaryTypeInfo : ClassInfo
+	{
+		public ClassInfo KeyType;
+		public ClassInfo ElementType;
+		
+		public override string TypeLiteral
+		{
+			get
+			{
+				if (ElementType == null)
+				{
+					return $"Dictionary<{KeyType.TypeLiteral}, object>";
+				}
+				else
+				{
+					return $"Dictionary<{KeyType.TypeLiteral}, {ElementType.TypeLiteral}>";
+				}
+			}
+		}
 	}
 
 	public class FuncInfo : ClassInfo
 	{
-		internal override string TypeLiteral => "func";
+		public override string TypeLiteral => "func";
 		public DataBinding.CollectionExt.List<MemberInfo> Paras = new DataBinding.CollectionExt.List<MemberInfo>();
 		public MemberInfo RetType;
 		public string[] FuncBodyManualCodeLines;
@@ -322,7 +396,7 @@ namespace ParseJSDataBindAbstract
 
 			return sb.ToString();
 		}
-		public static MemberInfo HandleOperator(ClassInfo root, ClassInfo current, ASTNodeBase astNode)
+		public static MemberInfo HandleOperator(EnvInfo root, ClassInfo current, ASTNodeBase astNode)
 		{
 			if (astNode is ValueASTNode valueAstNode)
 			{
@@ -357,7 +431,7 @@ namespace ParseJSDataBindAbstract
 				if (astNode.OperatorX == TNodeType.Inst["."])
 				{
 					var parent = HandleOperator(root, null, binaryAstNode.Left);
-					var right=HandleOperator(root, parent.Type, binaryAstNode.Right);
+					var right = HandleOperator(root, parent.Type, binaryAstNode.Right);
 					if (astNode.Parent==null ||
 					    (astNode.Parent != null && astNode.Parent.OperatorX != TNodeType.Inst["."]))
 					{
@@ -367,8 +441,21 @@ namespace ParseJSDataBindAbstract
 				}
 				else
 				{
-					HandleOperator(root, null, binaryAstNode.Left);
-					return HandleOperator(root, null, binaryAstNode.Right);
+					var left = HandleOperator(root, null, binaryAstNode.Left);
+					var right = HandleOperator(root, null, binaryAstNode.Right);
+					if (binaryAstNode.OperatorX == TNodeType.Inst["["])
+					{
+						if (right.Type is NumberTypeInfo)
+						{
+							left.CastToArray(right.Type, null);
+						}
+						else
+						{
+							left.CastToDict(right.Type, null);
+						}
+						root.AddNamespace("DataBinding.CollectionExt");
+					}
+					return right;
 				}
 			}
 			else
@@ -380,6 +467,7 @@ namespace ParseJSDataBindAbstract
 		public static EnvInfo ParseTypeInfo(ASTNodeBase astNode, string name)
 		{
 			var envInfo = new EnvInfo(name);
+			envInfo.AddTypeAlias("number", "System.Double");
 			var retType = HandleOperator(envInfo, null, astNode);
 			envInfo.StatementReturnType = retType;
 			return envInfo;
