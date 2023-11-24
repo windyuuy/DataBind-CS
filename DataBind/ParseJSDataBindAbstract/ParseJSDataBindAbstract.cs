@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using vm;
 
 namespace ParseJSDataBindAbstract
@@ -45,6 +46,7 @@ namespace ParseJSDataBindAbstract
 		public string[] AnnotationLines;
 		public Dictionary<string, MemberInfo> MemberMap = new Dictionary<string, MemberInfo>();
 		public MemberInfo[] Members => MemberMap.Values.ToArray();
+		public int MemberCount => MemberMap.Count;
 
 		public Dictionary<string, ClassInfo> InsideTypeMap = new Dictionary<string, ClassInfo>();
 		public ClassInfo[] InsideTypes => InsideTypeMap.Values.ToArray();
@@ -223,7 +225,19 @@ namespace ParseJSDataBindAbstract
 		public string MemberManualCodeLine;
 
 		public string[] AnnotationLines;
-		
+
+		public static Regex IsBoolMatcher = new(@"^(?:is|be|are|was|were|Is|Be|Are|Was|Were)[A-Z_]");
+		public string InferType(string defaultValue)
+		{
+			if (this.Type.MemberCount == 0 && IsBoolMatcher.IsMatch(Name))
+			{
+				return "bool";
+			}
+			else
+			{
+				return defaultValue;
+			}
+		}
 		
 		public FuncInfo CastToFunc()
 		{
@@ -330,7 +344,7 @@ namespace ParseJSDataBindAbstract
 	{
 		internal static (int, Func<ClassInfo>) SelectTypeGen(ASTNodeBase astNode)
 		{
-			if (astNode.OperatorX == TNodeType.Word)
+			if (astNode is ValueASTNode valueAstNode && astNode.OperatorX == TNodeType.Word)
 			{
 				if (astNode.Parent.OperatorX == TNodeType.Inst["!"])
 				{
@@ -467,6 +481,10 @@ namespace ParseJSDataBindAbstract
 		public static EnvInfo ParseTypeInfo(ASTNodeBase astNode, string name)
 		{
 			var envInfo = new EnvInfo(name);
+			return ParseTypeInfo(astNode, envInfo);
+		}
+		public static EnvInfo ParseTypeInfo(ASTNodeBase astNode, EnvInfo envInfo)
+		{
 			envInfo.AddTypeAlias("number", "System.Double");
 			var retType = HandleOperator(envInfo, null, astNode);
 			envInfo.StatementReturnType = retType;

@@ -23,5 +23,16 @@ namespace TestingCode
 				}
 			}
 		}
+		/// <note>
+		/// env::isFX
+		/// </note>
+		public TIsFX isFX {get;set;} = new TIsFX();
+		public class TIsFX
+		{
+			/// <usecase>
+			/// isFX.areKX<br/>
+			/// </usecase>
+			public bool areKX {get;set;}
+		}
 	}
 }

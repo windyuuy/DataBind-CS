@@ -100,7 +100,7 @@ namespace Tests
         [Test]
         public void TestModifyCodeWithCase4()
         {
-            var interpreter = new vm.Interpreter("a.b.c");
+            var interpreter = new vm.Interpreter("a.b.c+isFX.areKX");
             var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestWriteCodeCase4");
             
             var codeLoader = new CodeLoader();

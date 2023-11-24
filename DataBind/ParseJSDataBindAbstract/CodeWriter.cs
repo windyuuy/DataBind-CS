@@ -158,7 +158,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                                 }
                                 else if (para.Type.Members.Length == 0)
                                 {
-                                    cb.Append($"{UnknownTypeMark} {para.Name}");
+                                    cb.Append($"{para.InferType(UnknownTypeMark)} {para.Name}");
                                 }
                                 else
                                 {
@@ -204,7 +204,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                     }
                     else
                     {
-                        cb.AppendCodeLine($"public {UnknownTypeMark} {member.Name} {{get;set;}}");
+                        cb.AppendCodeLine($"public {member.InferType(UnknownTypeMark)} {member.Name} {{get;set;}}");
                     }
                 }
                 else
