@@ -34,7 +34,6 @@ namespace TestingCode
 		{
 			/// <usecase>
 			/// fe.cx<br/>
-			/// fe.cx<br/>
 			/// </usecase>
 			public TCx cx {get;set;} = new TCx();
 			public class TCx
