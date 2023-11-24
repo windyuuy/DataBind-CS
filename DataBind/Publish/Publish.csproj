@@ -11,6 +11,7 @@
     <ProjectReference Include="..\DataBindService\DataBindService.csproj" />
     <ProjectReference Include="..\DataBind\DataBind.csproj" />
     <ProjectReference Include="..\EngineAdapter\EngineAdapter.csproj" />
+    <ProjectReference Include="..\ParseJSDataBindAbstract\ParseJSDataBindAbstract.csproj" />
     <ProjectReference Include="..\UnityDataBindService\UnityDataBindService.csproj" />
   </ItemGroup>
 
