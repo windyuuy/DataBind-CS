@@ -62,6 +62,14 @@ namespace Tests
             var ret=interpreter.Run(data);
             expect(ret).toBe(data.a.b.c+564);
         }
+
+        [Test]
+        public void TestSimpleCase1()
+        {
+            var interpreter = new vm.Interpreter("isEnabled");
+            var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestSimpleCase1");
+            expect(envInfo.MemberMap["isEnabled"].Type is ClassInfo);
+        }
         
         [Test]
         public void TestModifyCodeWithCase2()

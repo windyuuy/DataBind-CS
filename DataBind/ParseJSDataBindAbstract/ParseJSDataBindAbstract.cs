@@ -226,17 +226,48 @@ namespace ParseJSDataBindAbstract
 
 		public string[] AnnotationLines;
 
-		public static Regex IsBoolMatcher = new(@"^(?:is|be|are|was|were|Is|Be|Are|Was|Were)[A-Z_]");
+		public static readonly Regex IsBoolMatcher = new(@"^(?:is|be|are|was|were|Is|Be|Are|Was|Were)[A-Z_]");
+		public static readonly Regex IsBoolMatcher3 = new(@"[a-z]able$");
+		public static readonly Regex IsBoolMatcher2 = new(@"^(?:enabled|visible|enable|active|valid)$");
+		public static readonly Regex IsStringMatcher = new(@"(?:Label|Text|Txt|Name|Title|Tag|Content|Url|Uri)$");
+		public static readonly Regex IsStringMatcher2 = new(@"^(?:label|text|txt|name|title|tag|content|url|uri)$");
+		public static readonly Regex IsNumberMatcher = new(@"(?:Count|Length|Len|Num|Progress)$");
+		public static readonly Regex IsNumberMatcher2 = new(@"^(?:n)[A-Z_]");
+		public static readonly Regex IsNumberMatcher3 = new(@"^(?:progress)$");
+		public static readonly Regex IsActionMatcher1 = new(@"(?:Click)$");
+		public static readonly Regex IsActionMatcher2 = new(@"^(?:click)$");
 		public string InferType(string defaultValue)
 		{
-			if (this.Type.MemberCount == 0 && IsBoolMatcher.IsMatch(Name))
+			if (this.Type.MemberCount == 0)
 			{
-				return "bool";
+				if (IsBoolMatcher.IsMatch(Name) 
+				    || IsBoolMatcher2.IsMatch(Name) 
+				    || IsBoolMatcher3.IsMatch(Name)
+				    )
+				{
+					return "bool";
+				}
+				else if (IsStringMatcher.IsMatch(Name)
+				         || IsStringMatcher2.IsMatch(Name))
+				{
+					return "string";
+				}
+				else if (IsNumberMatcher.IsMatch(Name)
+				         || IsNumberMatcher2.IsMatch(Name)
+				         || IsNumberMatcher3.IsMatch(Name)
+				         )
+				{
+					return "number";
+				}
+				else if (IsActionMatcher1.IsMatch(Name)
+				         || IsActionMatcher2.IsMatch(Name)
+				        )
+				{
+					return "Action";
+				}
 			}
-			else
-			{
-				return defaultValue;
-			}
+			
+			return defaultValue;
 		}
 		
 		public FuncInfo CastToFunc()
@@ -346,7 +377,7 @@ namespace ParseJSDataBindAbstract
 		{
 			if (astNode is ValueASTNode valueAstNode && astNode.OperatorX == TNodeType.Word)
 			{
-				if (astNode.Parent.OperatorX == TNodeType.Inst["!"])
+				if (astNode.Parent?.OperatorX == TNodeType.Inst["!"])
 				{
 					return (astNode.OperatorX, () => new BoolTypeInfo());
 				}
@@ -485,7 +516,8 @@ namespace ParseJSDataBindAbstract
 		}
 		public static EnvInfo ParseTypeInfo(ASTNodeBase astNode, EnvInfo envInfo)
 		{
-			envInfo.AddTypeAlias("number", "System.Double");
+			envInfo.AddTypeAlias("number", "System.Single");
+			envInfo.AddTypeAlias("Action", "System.Action");
 			var retType = HandleOperator(envInfo, null, astNode);
 			envInfo.StatementReturnType = retType;
 			return envInfo;
