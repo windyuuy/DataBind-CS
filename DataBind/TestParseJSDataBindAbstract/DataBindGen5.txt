@@ -1,0 +1,50 @@
+﻿using DataBinding.CollectionExt;
+using number = System.Single;
+using Action = System.Action;
+
+namespace TestingCode
+{
+	public class TestSimpleCase5: vm.Host
+	{
+		/// <note>
+		/// env::a
+		/// </note>
+		public TA a {get;set;} = new TA();
+		public class TA
+		{
+			/// <usecase>
+			/// a.b<br/>
+			/// </usecase>
+			public object b {get;set;}
+		}
+		/// <note>
+		/// env::C1
+		/// </note>
+		public TC1_Ele_Ele[][] C1 {get;set;}
+		/// <note>
+		/// env::D1
+		/// </note>
+		public Dictionary<string, Dictionary<string, TD1_Ele_Ele>> D1 {get;set;}
+		public class TC1_Ele_Ele
+		{
+			/// <usecase>
+			/// C2<br/>
+			/// </usecase>
+			public TC1_Ele_Ele.TC2_Ele_Ele_Ele[][][] C2 {get;set;}
+			public class TC2_Ele_Ele_Ele
+			{
+				/// <usecase>
+				/// pp<br/>
+				/// </usecase>
+				public object pp {get;set;}
+			}
+		}
+		public class TD1_Ele_Ele
+		{
+			/// <usecase>
+			/// D2<br/>
+			/// </usecase>
+			public Dictionary<string, Dictionary<string, Dictionary<string, object>>> D2 {get;set;}
+		}
+	}
+}

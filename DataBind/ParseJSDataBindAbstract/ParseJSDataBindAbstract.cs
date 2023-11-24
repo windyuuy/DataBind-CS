@@ -37,7 +37,26 @@ namespace ParseJSDataBindAbstract
 			this.Parent.InsideTypeMap.Remove(this.Name);
 			this.Name = name;
 		}
-		public  virtual string TypeLiteral => "class";
+
+		public virtual string TypeLiteral => this.FullName;
+
+		public virtual string InferTypeLiteral(string defaultTypeLiteral)
+		{
+			if (TypeLiteral == null)
+			{
+				return defaultTypeLiteral;
+			}
+
+			if (MemberCount == 0)
+			{
+				return defaultTypeLiteral;
+			}
+
+			return TypeLiteral;
+		}
+
+		public virtual bool IsComposedType => false;
+		
 		/// <summary>
 		/// 手工书写的声明
 		/// </summary>
@@ -50,8 +69,9 @@ namespace ParseJSDataBindAbstract
 
 		public Dictionary<string, ClassInfo> InsideTypeMap = new Dictionary<string, ClassInfo>();
 		public ClassInfo[] InsideTypes => InsideTypeMap.Values.ToArray();
+		public int InsideTypeCount => InsideTypeMap.Count;
 
-		public ClassInfo AddOrGetType(string typeName, Func<ClassInfo> typeGen)
+		public ClassInfo GetOrAddType(string typeName, Func<ClassInfo> typeGen)
 		{
 			if (!InsideTypeMap.TryGetValue(typeName, out var type))
 			{
@@ -65,12 +85,17 @@ namespace ParseJSDataBindAbstract
 
 		public ClassInfo Parent;
 
+		public static string CastMemberNameToTypeName(string memberName)
+		{
+			var typeName = "T" + ToCammelCase(memberName);
+			return typeName;
+		}
 		public virtual MemberInfo TryAddMember(string name, (int, Func<ClassInfo>) typeGen)
 		{
 			if (!MemberMap.TryGetValue(name, out var memberInfo))
 			{
-				var typeName = "T" + ToCammelCase(name);
-				var type = this.AddOrGetType(typeName, () =>
+				var typeName = CastMemberNameToTypeName(name);
+				var type = this.GetOrAddType(typeName, () =>
 				{
 					var type0 = typeGen.Item2();
 					type0.Name = typeName;
@@ -168,7 +193,7 @@ namespace ParseJSDataBindAbstract
 				}
 				else
 				{
-					var type = this.AddOrGetType(typeName, () =>
+					var type = this.GetOrAddType(typeName, () =>
 					{
 						var type0 = typeGen.Item2();
 						type0.Name = typeName;
@@ -191,6 +216,16 @@ namespace ParseJSDataBindAbstract
 		public override string TypeLiteral
 		{
 			get => "unkown_basic";
+		}
+		
+		public override string InferTypeLiteral(string defaultTypeLiteral)
+		{
+			if (TypeLiteral == null)
+			{
+				return defaultTypeLiteral;
+			}
+
+			return TypeLiteral;
 		}
 	}
 
@@ -282,28 +317,28 @@ namespace ParseJSDataBindAbstract
 			return funcInfo;
 		}
 		
-		public ArrayTypeInfo CastToArray(ClassInfo keyType, ClassInfo eleType)
+		public ArrayTypeInfo CastToArray(ClassInfo keyType, MemberInfo eleInfo)
 		{
 			var arrayInfo = new ArrayTypeInfo()
 			{
 				Name = this.Type.Name,
 				Parent = this.Type.Parent,
 				KeyType = keyType,
-				ElementType = eleType,
+				ElementInfo = eleInfo,
 			};
 			this.Type = arrayInfo;
 			this.Type.Parent.InsideTypeMap[arrayInfo.Name] = arrayInfo;
 			return arrayInfo;
 		}
 
-		public DictionaryTypeInfo CastToDict(ClassInfo keyType, ClassInfo eleType)
+		public DictionaryTypeInfo CastToDict(ClassInfo keyType, MemberInfo eleInfo)
 		{
 			var dictInfo = new DictionaryTypeInfo()
 			{
 				Name = this.Type.Name,
 				Parent = this.Type.Parent,
 				KeyType = keyType,
-				ElementType = eleType,
+				ElementInfo = eleInfo,
 			};
 			this.Type = dictInfo;
 			this.Type.Parent.InsideTypeMap[dictInfo.Name] = dictInfo;
@@ -315,43 +350,41 @@ namespace ParseJSDataBindAbstract
 	public class ArrayTypeInfo : ClassInfo
 	{
 		public ClassInfo KeyType;
-		public ClassInfo ElementType;
+		public MemberInfo ElementInfo;
 
-		public override string TypeLiteral
+		public override string InferTypeLiteral(string defaultTypeLiteral)
 		{
-			get
+			if (ElementInfo == null)
 			{
-				if (ElementType == null)
-				{
-					return $"object[]";
-				}
-				else
-				{
-					return $"{ElementType.TypeLiteral}[]";
-				}
+				return $"{defaultTypeLiteral}[]";
+			}
+			else
+			{
+				return $"{ElementInfo.Type.InferTypeLiteral(defaultTypeLiteral)}[]";
 			}
 		}
+
+		public override bool IsComposedType => true;
 	}
 
 	public class DictionaryTypeInfo : ClassInfo
 	{
 		public ClassInfo KeyType;
-		public ClassInfo ElementType;
+		public MemberInfo ElementInfo;
 		
-		public override string TypeLiteral
+		public override string InferTypeLiteral(string defaultTypeLiteral)
 		{
-			get
+			if (ElementInfo == null)
 			{
-				if (ElementType == null)
-				{
-					return $"Dictionary<{KeyType.TypeLiteral}, object>";
-				}
-				else
-				{
-					return $"Dictionary<{KeyType.TypeLiteral}, {ElementType.TypeLiteral}>";
-				}
+				return $"Dictionary<{KeyType.InferTypeLiteral(defaultTypeLiteral)}, {defaultTypeLiteral}>";
+			}
+			else
+			{
+				return $"Dictionary<{KeyType.InferTypeLiteral(defaultTypeLiteral)}, {ElementInfo.Type.InferTypeLiteral(defaultTypeLiteral)}>";
 			}
 		}
+		
+		public override bool IsComposedType => true;
 	}
 
 	public class FuncInfo : ClassInfo
@@ -490,15 +523,35 @@ namespace ParseJSDataBindAbstract
 					var right = HandleOperator(root, null, binaryAstNode.Right);
 					if (binaryAstNode.OperatorX == TNodeType.Inst["["])
 					{
+						MemberInfo CreateEle()
+						{
+							var memberName = $"{left.Name}_Ele";
+							var typeName = ClassInfo.CastMemberNameToTypeName(memberName);
+							var memberType = left.Type.Parent.GetOrAddType(typeName, () =>
+							{
+								var type0 = new ClassInfo();
+								type0.Name = typeName;
+								return type0;
+							});
+							var eleMember = new MemberInfo();
+							eleMember.Name = memberName;
+							eleMember.Type = memberType;
+							return eleMember;
+						}
+
+						MemberInfo eleMember;
 						if (right.Type is NumberTypeInfo)
 						{
-							left.CastToArray(right.Type, null);
+							var arrayTypeInfo = left.CastToArray(right.Type, null);
+							eleMember = arrayTypeInfo.ElementInfo ??= CreateEle();
 						}
 						else
 						{
-							left.CastToDict(right.Type, null);
+							var dictTypeInfo = left.CastToDict(right.Type, null);
+							eleMember = dictTypeInfo.ElementInfo ??= CreateEle();
 						}
 						root.AddNamespace("DataBinding.CollectionExt");
+						return eleMember;
 					}
 					return right;
 				}

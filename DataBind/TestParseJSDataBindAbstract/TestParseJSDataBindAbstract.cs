@@ -32,12 +32,16 @@ namespace Tests
             var dictType = envInfo.MemberMap["fex"].Type as DictionaryTypeInfo;
             expect(dictType != null).toBe(true);
             expect(dictType.KeyType is StringTypeInfo).toBe(true);
-            expect(dictType.ElementType == null).toBe(true);
+            expect(dictType.ElementInfo != null).toBe(true);
+            expect(dictType.ElementInfo.Name).toBe("fex_Ele");
+            expect(dictType.ElementInfo.Type.Name).toBe("TFex_Ele");
             
             var arrayType = envInfo.MemberMap["few"].Type as ArrayTypeInfo;
             expect(arrayType != null).toBe(true);
             expect(arrayType.KeyType is NumberTypeInfo).toBe(true);
-            expect(arrayType.ElementType == null).toBe(true);
+            expect(arrayType.ElementInfo != null).toBe(true);
+            expect(arrayType.ElementInfo.Name).toBe("few_Ele");
+            expect(arrayType.ElementInfo.Type.Name).toBe("TFew_Ele");
         }
 
         // [Test]
@@ -122,5 +126,20 @@ namespace Tests
             // File.WriteAllText("../../../DataBindGen4.txt", codeText,Encoding.UTF8);
             expect(codeText).toBe(contentOutput);
         }
+        
+        [Test]
+        public void TestSimpleCase5()
+        {
+            var interpreter = new vm.Interpreter("a.b+C1[0][0].C2[0][0][0].pp+D1['fe']['d'].D2['lkjw']['we']['wf']");
+            var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestSimpleCase5");
+            
+            var codeWriter = new CodeWriter();
+            codeWriter.UnknownTypeMark = "object";
+            var codeText = codeWriter.WriteCode(envInfo);
+            
+            var contentOutput = File.ReadAllText("../../../DataBindGen5.txt");
+            expect(codeText).toBe(contentOutput);
+        }
+
     }
 }

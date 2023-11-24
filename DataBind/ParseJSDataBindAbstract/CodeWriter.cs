@@ -81,7 +81,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
         public class CodeWriter
         {
             public string UnknownTypeMark = "object?";
-            public void ExpressMember(CodeBuffer cb, MemberInfo member)
+            public void ExpressMember(CodeBuffer cb, MemberInfo member, Dictionary<ClassInfo,bool> typeSpace)
             {
                 if (member.AnnotationLines?.Length > 0)
                 {
@@ -116,7 +116,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                     }
                     else
                     {
-                        cb.AppendCodeLine($"public {arrayTypeInfo.TypeLiteral} {member.Name} {{get;set;}}");
+                        cb.AppendCodeLine($"public {arrayTypeInfo.InferTypeLiteral(UnknownTypeMark)} {member.Name} {{get;set;}}");
                     }
                 }
                 else if (member.Type is DictionaryTypeInfo dictionaryTypeInfo)
@@ -127,7 +127,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                     }
                     else
                     {
-                        cb.AppendCodeLine($"public {dictionaryTypeInfo.TypeLiteral} {member.Name} {{get;set;}}");
+                        cb.AppendCodeLine($"public {dictionaryTypeInfo.InferTypeLiteral(UnknownTypeMark)} {member.Name} {{get;set;}}");
                     }
                 }
                 else if (member.Type is FuncInfo funcInfo)
@@ -156,7 +156,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                                         cb.Append($"{basicTypeInfo2.TypeLiteral} p_{para.Name}");
                                     }
                                 }
-                                else if (para.Type.Members.Length == 0)
+                                else if (para.Type.MemberCount == 0)
                                 {
                                     cb.Append($"{para.InferType(UnknownTypeMark)} {para.Name}");
                                 }
@@ -174,7 +174,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                                 // {
                                 //     cb.Append($"{basicTypeInfo2.TypeLiteral} {para.Name}");
                                 // }
-                                // else if (para.Type.Members.Length == 0)
+                                // else if (para.Type.MembersCount == 0)
                                 // {
                                 //     cb.Append($"{UnknownTypeMark} {para.Name}");
                                 // }
@@ -196,7 +196,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                     }
                     cb.AppendCodeLine("}");
                 }
-                else if (member.Type.Members.Length == 0)
+                else if (member.Type.MemberCount == 0)
                 {
                     if (!string.IsNullOrEmpty(member.MemberManualCodeLine))
                     {
@@ -226,23 +226,49 @@ namespace ParseJSDataBindAbstract.CodeWriter
                             cb.AppendLine(memberAnnotationLine);
                         }
                     }
+                    
                     // add class def
-                    if (!string.IsNullOrEmpty(member.Type.TypeDefManualCodeLine))
+                    AddClassDef(cb, member.Type, typeSpace);
+                }
+            }
+
+            public void AddClassDef(CodeBuffer cb, ClassInfo classInfo, Dictionary<ClassInfo,bool> typeSpace)
+            {
+                if (!(
+                        classInfo.IsComposedType
+                        || classInfo.InsideTypeCount == 0
+                        || typeSpace.ContainsKey(classInfo)
+                        ))
+                {
+                    typeSpace.Add(classInfo, true);
+                    if (!string.IsNullOrEmpty(classInfo.TypeDefManualCodeLine))
                     {
-                        cb.AppendLine(member.Type.TypeDefManualCodeLine);
+                        cb.AppendLine(classInfo.TypeDefManualCodeLine);
                     }
                     else
                     {
-                        cb.AppendCodeLine($"public class {member.Type.Name}");
+                        cb.AppendCodeLine($"public class {classInfo.Name}");
                     }
                     cb.AppendCodeSegBegin("{");
 
-                    foreach (var member2 in member.Type.Members)
+                    foreach (var member2 in classInfo.Members)
                     {
-                        ExpressMember(cb, member2);
+                        ExpressMember(cb, member2, typeSpace);
+                    }
+
+                    foreach (var item in classInfo.InsideTypeMap)
+                    {
+                        if (!typeSpace.ContainsKey(item.Value))
+                        {
+                            AddClassDef(cb, item.Value, typeSpace);
+                        }
                     }
 
                     cb.AppendCodeSegEnd("}");
+                }
+                else
+                {
+                    // added already
                 }
             }
 
@@ -277,6 +303,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                 cb.AppendCodeLine($"public class {envInfo.Name}: vm.Host");
                 cb.AppendCodeSegBegin("{");
 
+                var typeSpace = new Dictionary<ClassInfo, bool>();
                 foreach (var member1 in envInfo.Members)
                 {
                     if (!(member1.AnnotationLines?.Length > 0))
@@ -285,7 +312,16 @@ namespace ParseJSDataBindAbstract.CodeWriter
                         cb.AppendCodeLine($"/// env::{member1.Name}");
                         cb.AppendCodeLine("/// </note>");
                     }
-                    ExpressMember(cb, member1);
+
+                    ExpressMember(cb, member1, typeSpace);
+                }
+
+                foreach (var item in envInfo.InsideTypeMap)
+                {
+                    if (!typeSpace.ContainsKey(item.Value))
+                    {
+                        AddClassDef(cb, item.Value, typeSpace);
+                    }
                 }
 
                 cb.AppendCodeSegEnd("}");
