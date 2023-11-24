@@ -21,33 +21,11 @@ namespace TestingCode
 				public int c {get;set;}
 			}
 		}
-		public class TFe
-		{
-			// lkjwf
-			/// <summary>
-			/// lkwjef
-			/// </summary>
-			public TCx cx {get;set;} = new TCx();
-			/// <summary>
-			/// lkjwelkfj
-			/// </summary>
-			public class TCx
-			{
-				/// <usecase>
-				/// fe.cx.xc<br/>
-				/// </usecase>
-				public int xc(TWf wf,object xc)
-				{
-					return 564;
-				}
-			}
-		}
 		public TN n {get;set;} = new TN();
 		public class TN
 		{
 			public object wf {get;set;}
 		}
-		public object few {get;set;}
 		/// <note>
 		/// env::wf
 		/// </note>

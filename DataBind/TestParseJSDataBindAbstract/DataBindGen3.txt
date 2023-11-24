@@ -28,7 +28,24 @@ namespace TestingCode
 		/// <note>
 		/// env::fe
 		/// </note>
-		public Dictionary<string, object> fe {get;set;}
+		public TFe fe {get;set;} = new TFe();
+		public class TFe
+		{
+			/// <usecase>
+			/// fe.cx<br/>
+			/// fe.cx<br/>
+			/// </usecase>
+			public TCx cx {get;set;} = new TCx();
+			public class TCx
+			{
+				/// <usecase>
+				/// fe.cx.xc<br/>
+				/// </usecase>
+				public void xc(object wf,object xx)
+				{
+				}
+			}
+		}
 		/// <note>
 		/// env::n
 		/// </note>
@@ -52,9 +69,13 @@ namespace TestingCode
 			public object xx {get;set;}
 		}
 		/// <note>
+		/// env::fex
+		/// </note>
+		public Dictionary<string, object> fex {get;set;}
+		/// <note>
 		/// env::few
 		/// </note>
-		public object few {get;set;}
+		public object[] few {get;set;}
 		/// <note>
 		/// env::wf
 		/// </note>
@@ -95,13 +116,13 @@ namespace TestingCode
 				/// <usecase>
 				/// jklwe.jx.jfj<br/>
 				/// </usecase>
-				public void jfj(number p_4,object g,object cx,object kxx)
+				public void jfj(number p_4,object g,TFe.TCx cx,object kxx)
 				{
 				}
 				/// <usecase>
 				/// jklwe.jx.jfj2<br/>
 				/// </usecase>
-				public void jfj2(number p_4,string p_1,bool p_False,object cx)
+				public void jfj2(number p_4,string p_1,bool p_False,TFe.TCx cx)
 				{
 				}
 			}

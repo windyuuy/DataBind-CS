@@ -83,7 +83,7 @@ namespace Tests
         [Test]
         public void TestModifyCodeWithCase3()
         {
-            var interpreter = new vm.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fe['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
+            var interpreter = new vm.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fex['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
             var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestWriteCodeCase3");
             
             var codeLoader = new CodeLoader();
