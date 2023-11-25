@@ -102,21 +102,21 @@ namespace TestDataBind
 		public void TestObserve()
 		{
 			var obj = new SampleOBD();
-			var obj2 = Utils.observe(obj);
+			var obj2 = Utils.Observe(obj);
 
 			Assert.IsTrue(obj2 is vm.Observer);
 			Assert.AreSame(obj._SgetOb(), obj2);
 
-			var obj3 = vm.Utils.observe(obj);
-			Assert.IsNull(vm.Utils.observe(123));
+			var obj3 = vm.Utils.Observe(obj);
+			Assert.IsNull(vm.Utils.Observe(123));
 		}
 
 		[Test]
 		public void TestDefineReactive()
 		{
 			var o = new SampleOBD2() { a = 1, b = 2, c = 3, };
-			vm.Utils.observe(o);
-			vm.Utils.defineReactive(o, "a", 1);
+			vm.Utils.Observe(o);
+			vm.Utils.DefineReactive(o, "a", 1);
 			Assert.AreEqual(1, o.a);
 			o.a = 123;
 			Assert.AreEqual(o.a, 123);
@@ -126,7 +126,7 @@ namespace TestDataBind
 		public void TestObserver()
 		{
 			var obj = new SampleOBD();
-			var ob = vm.Utils.observe(obj);
+			var ob = vm.Utils.Observe(obj);
 
 			Assert.AreEqual(ob?.value, obj);
 		}
@@ -139,7 +139,7 @@ namespace TestDataBind
 				a = 1,
 				b = 2,
 			};
-			var ob = vm.Utils.observe(obj);
+			var ob = vm.Utils.Observe(obj);
 
 
 			//vm.defineCompute(obj, 'a', () => {

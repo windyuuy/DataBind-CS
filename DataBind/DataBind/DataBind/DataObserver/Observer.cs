@@ -56,7 +56,7 @@ namespace vm
 		/**
 		 * 将对象处理为可观察对象
 		 */
-		public static Observer observe(object value)
+		public static Observer Observe(object value)
 		{
 			if (value is Observer value1)
 			{
@@ -106,7 +106,7 @@ namespace vm
 		/**
 		 * 拦截对象所有的key和value
 		 */
-		public static void defineReactive(
+		public static void DefineReactive(
 				object obj0,
 				string key,
 				/**
@@ -122,7 +122,7 @@ namespace vm
 
 			//必包的中依赖，相当于是每一个属性的附加对象，用于记录属性的所有以来侦听。
 			var dep = new Dep();
-			var childOb = observe(val);
+			var childOb = Observe(val);
 			var obj = Utils.AsObservable(obj0);
 			var ob = obj._SgetOb();
 			System.Diagnostics.Debug.Assert(ob != null);
@@ -180,7 +180,7 @@ namespace vm
 						return;
 					}
 					var newVal = e.NewValue;
-					childOb = observe(newVal);//如果是普通对象需要处理成可观察的
+					childOb = Observe(newVal);//如果是普通对象需要处理成可观察的
 					dep.notifyWatchers();//触发刷新
 				};
 				//var weakRef = new WeakReference<PropertyChangedEventHandler>(handle);
@@ -222,8 +222,8 @@ namespace vm
 
 			//实现双向绑定
 			value._SsetOb(this);
-			value.PropertyGot += onPropertyGot;
-			value.PropertyChanged += onPropertyChanged;
+			value.PropertyGot += OnPropertyGot;
+			value.PropertyChanged += OnPropertyChanged;
 
 			//if (value is System.Collections.IEnumerable)
 			//{
@@ -231,11 +231,11 @@ namespace vm
 			//}
 
 			{
-				this.walk(value);
+				this.Walk(value);
 			}
 		}
 
-		protected virtual void onPropertyGot(object sender, PropertyGetEventArgs e)
+		protected virtual void OnPropertyGot(object sender, PropertyGetEventArgs e)
 		{
 			TGotFuncs funcs;
 			lock (DictGotFuncs)
@@ -256,7 +256,7 @@ namespace vm
 			}
 		}
 
-		protected virtual void onPropertyChanged(object sender, PropertyChangedEventArgs e)
+		protected virtual void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			TChangedFuncs funcs;
 			lock (DictChangedFuncs)
@@ -286,7 +286,7 @@ namespace vm
 				if (key.GetIndexParameters().Length == 0)
 				{
 					var value = key.GetValue(obj);
-					Utils.defineReactive(obj, key.Name, value);
+					Utils.DefineReactive(obj, key.Name, value);
 				}
 				else
 				{
@@ -297,7 +297,7 @@ namespace vm
 		/**
 		 * 遍历所有属性，拦截get set
 		 */
-		public void walk(object obj)
+		public void Walk(object obj)
 		{
 			var type = obj.GetType();
 			var keys = type.GetProperties(
@@ -320,7 +320,7 @@ namespace vm
 					foreach (var key in dict.Keys)
 					{
 						var value = dict[key];
-						Utils.defineReactive(obj, Utils.ToIndexKey(key), value);
+						Utils.DefineReactive(obj, Utils.ToIndexKey(key), value);
 					}
 				}
 				else if (obj is System.Collections.IList list)
@@ -329,7 +329,7 @@ namespace vm
 					for (int index = 0; index < list.Count; index++)
 					{
 						var value = list[index];
-						Utils.defineReactive(obj, index.ToString(), value);
+						Utils.DefineReactive(obj, index.ToString(), value);
 					}
 				}
 				else if (obj is System.Collections.IEnumerable items)
@@ -337,7 +337,7 @@ namespace vm
 					//ObserveNormalObject(obj, keys);
 					foreach (var item in items)
 					{
-						Utils.observe(item);
+						Utils.Observe(item);
 					}
 				}
 
@@ -347,7 +347,7 @@ namespace vm
 					var ob = e.Host._SgetOb();
 					if (e.NewItems != null)
 					{
-						ob.observeCollection(e.NewItems);
+						ob.ObserveCollection(e.NewItems);
 					}
 					ob.dep.notifyWatchers();
 				};
@@ -361,20 +361,20 @@ namespace vm
 		/**
 		 * 所以成员都替换成observe
 		 */
-		public void observeCollection(System.Collections.IEnumerable items)
+		public void ObserveCollection(System.Collections.IEnumerable items)
 		{
 			if (items is System.Collections.IDictionary dict)
 			{
 				foreach (var item in dict.Values)
 				{
-					Utils.observe(item);
+					Utils.Observe(item);
 				}
 			}
 			else
 			{
 				foreach (var item in items)
 				{
-					Utils.observe(item);
+					Utils.Observe(item);
 				}
 			}
 		}

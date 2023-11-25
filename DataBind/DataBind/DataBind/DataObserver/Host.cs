@@ -63,7 +63,7 @@ namespace vm
 			}
 			if (!Utils.IsObserved(this))
 			{
-				Utils.observe(this);
+				Utils.Observe(this);
 			}
 			var watcher = new Watcher(this, expOrFn, cb, new WatchOptions()
 			{
@@ -141,7 +141,7 @@ namespace vm
 					InterpreterEnv.ImplementEnvironment(env);
 				}
 
-				observe(obj);
+				Observe(obj);
 			}
 			return obj as IHost;
 		}
@@ -159,7 +159,7 @@ namespace vm
 					InterpreterEnv.ImplementEnvironment(obj1);
 				}
 
-				observe(obj);
+				Observe(obj);
 			}
 			return obj as DataBinding.IStdHost;
 		}

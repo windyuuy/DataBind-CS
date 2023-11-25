@@ -30,7 +30,7 @@ namespace vm
 
 			if (!Utils.IsObserved(self))
 			{
-				Utils.observe(self);
+				Utils.Observe(self);
 			}
 			var watcher = new Watcher(self, expOrFn, cb, new WatchOptions()
 			{
