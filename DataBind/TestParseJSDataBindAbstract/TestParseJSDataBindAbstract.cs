@@ -130,7 +130,7 @@ namespace Tests
         [Test]
         public void TestSimpleCase5()
         {
-            var interpreter = new vm.Interpreter("a.b+C1[0][0].C2[0][0][0].pp+D1['fe']['d'].D2['lkjw']['we']['wf']");
+            var interpreter = new vm.Interpreter("a.b+C1[0][0].C2[0][0][0].pp+D1['fe']['d'].D2['lkjw']['we']['wf']+C1.Length+C1[0].Length+D3['fx']['xc'][0]['cx']['cc'].tt+D4[3][3]['cs']['ccx'][0].hg");
             var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestSimpleCase5");
             
             var codeWriter = new CodeWriter();
@@ -140,6 +140,19 @@ namespace Tests
             var contentOutput = File.ReadAllText("../../../DataBindGen5.txt");
             expect(codeText).toBe(contentOutput);
         }
-
+        //
+        // [Test]
+        // public void TestSimpleCase6()
+        // {
+        //     var interpreter = new vm.Interpreter("D1[ccx']");
+        //     var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestSimpleCase5");
+        //     
+        //     var codeWriter = new CodeWriter();
+        //     codeWriter.UnknownTypeMark = "object";
+        //     var codeText = codeWriter.WriteCode(envInfo);
+        //     
+        //     var contentOutput = File.ReadAllText("../../../DataBindGen5.txt");
+        //     expect(codeText).toBe(contentOutput);
+        // }
     }
 }

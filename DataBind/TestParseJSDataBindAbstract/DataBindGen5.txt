@@ -25,6 +25,14 @@ namespace TestingCode
 		/// env::D1
 		/// </note>
 		public Dictionary<string, Dictionary<string, TD1_Ele_Ele>> D1 {get;set;}
+		/// <note>
+		/// env::D3
+		/// </note>
+		public Dictionary<string, Dictionary<string, Dictionary<string, Dictionary<string, TD3_Ele_Ele_Ele_Ele_Ele>>[]>> D3 {get;set;}
+		/// <note>
+		/// env::D4
+		/// </note>
+		public Dictionary<string, Dictionary<string, TD4_Ele_Ele_Ele_Ele_Ele[]>>[][] D4 {get;set;}
 		public class TC1_Ele_Ele
 		{
 			/// <usecase>
@@ -45,6 +53,20 @@ namespace TestingCode
 			/// D2<br/>
 			/// </usecase>
 			public Dictionary<string, Dictionary<string, Dictionary<string, object>>> D2 {get;set;}
+		}
+		public class TD3_Ele_Ele_Ele_Ele_Ele
+		{
+			/// <usecase>
+			/// tt<br/>
+			/// </usecase>
+			public object tt {get;set;}
+		}
+		public class TD4_Ele_Ele_Ele_Ele_Ele
+		{
+			/// <usecase>
+			/// hg<br/>
+			/// </usecase>
+			public object hg {get;set;}
 		}
 	}
 }
