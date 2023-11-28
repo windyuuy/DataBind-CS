@@ -2,7 +2,7 @@ using System;
 using DataBinding.CollectionExt;
 using System.Linq;
 
-namespace vm
+namespace VM
 {
 	using TEnv = Dictionary<string, object>;
 	using number = System.Double;

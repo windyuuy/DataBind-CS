@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace vm
+namespace VM
 {
 
 	public class Tick

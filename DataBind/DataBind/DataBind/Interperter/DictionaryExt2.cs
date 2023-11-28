@@ -1,5 +1,5 @@
 using System;
-using vm;
+using VM;
 
 namespace DataBinding.CollectionExt
 {

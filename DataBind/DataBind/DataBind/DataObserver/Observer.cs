@@ -5,7 +5,7 @@ using Game.Diagnostics.IO;
 using Console = Game.Diagnostics.IO.Console;
 
 
-namespace vm
+namespace VM
 {
 	using TDictGotFuncs = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<PropertyGetEventHandler>>;
 	using TGotFuncs = System.Collections.Generic.List<PropertyGetEventHandler>;

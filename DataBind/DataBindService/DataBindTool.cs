@@ -54,8 +54,8 @@ namespace DataBindService
 			using var DataBindServiceAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
 			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBinding.HostExt2).Assembly.Location);
 
-			var IFullHostRef = MainAssembly.MainModule.ImportReference(typeof(vm.IFullHost));
-			var IHostRef = MainAssembly.MainModule.ImportReference(typeof(vm.IHost));
+			var IFullHostRef = MainAssembly.MainModule.ImportReference(typeof(VM.IFullHost));
+			var IHostRef = MainAssembly.MainModule.ImportReference(typeof(VM.IHost));
 			if (typeDefinition.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, IHostRef)))
 			{
 				return;
@@ -68,10 +68,10 @@ namespace DataBindService
 			#region implement IFullHost
 			var VoidRef = MainAssembly.MainModule.ImportReference(typeof(void));
 			var BoolRef = MainAssembly.MainModule.ImportReference(typeof(bool));
-			var TWatcherCollection = typeof(System.Collections.Generic.ICollection<vm.Watcher>);
+			var TWatcherCollection = typeof(System.Collections.Generic.ICollection<VM.Watcher>);
 			var IWatcherCollectionRef = MainAssembly.MainModule.ImportReference(TWatcherCollection);
-			var TDefaultValueType = typeof(System.Collections.Generic.List<vm.Watcher>);
-			var WatcherRef = MainAssembly.MainModule.ImportReference(typeof(vm.Watcher));
+			var TDefaultValueType = typeof(System.Collections.Generic.List<VM.Watcher>);
+			var WatcherRef = MainAssembly.MainModule.ImportReference(typeof(VM.Watcher));
 			//var CombineTypeRef = MainAssembly.MainModule.ImportReference(typeof(vm.CombineType<object, string, Func<object, object, object>>));
 			//var CallbackRef = MainAssembly.MainModule.ImportReference(typeof(Action<object, object, object>));
 			//         var CombineTypeRef2 = MainAssembly.MainModule.ImportReference(typeof(vm.CombineType<object, string, number, boolean>));
@@ -221,22 +221,22 @@ namespace DataBindService
 			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
 
 			var DebuggerStepThroughAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerStepThroughAttribute).GetConstructor(new Type[0]));
-			var ObserverRef = MainAssembly.MainModule.ImportReference(typeof(vm.Observer));
+			var ObserverRef = MainAssembly.MainModule.ImportReference(typeof(VM.Observer));
 
 			CILUtils.InjectField(MainAssembly, typeDefinition, "___Sob__", ObserverRef, FieldAttributes.Family);
 			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "_SgetOb", "___Sob__", ObserverRef);
 			CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "_SsetOb", "___Sob__", ObserverRef);
 
-			var GetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyGot", typeof(vm.PropertyGetEventHandler));
+			var GetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyGot", typeof(VM.PropertyGetEventHandler));
 			//GetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			GetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			GetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			var SetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyChanged", typeof(vm.PropertyChangedEventHandler));
+			var SetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyChanged", typeof(VM.PropertyChangedEventHandler));
 			//SetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			SetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 			SetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
 
-			var IObservableRef = MainAssembly.MainModule.ImportReference(typeof(vm.IObservable));
+			var IObservableRef = MainAssembly.MainModule.ImportReference(typeof(VM.IObservable));
 			var IObservableDef = new InterfaceImplementation(IObservableRef);
 			typeDefinition.Interfaces.Add(IObservableDef);
 			
@@ -249,8 +249,8 @@ namespace DataBindService
 			
 			{
 				var eventField = typeDefinition.Fields.First(f => f.Name == "PropertyGot");
-				var PropertyGetEventArgsCtor = MainAssembly.MainModule.ImportReference(typeof(vm.PropertyGetEventArgs).GetConstructor(new Type[] { typeof(string), typeof(object) }));
-				var PropertyGetEventHandler = MainAssembly.MainModule.ImportReference(typeof(vm.PropertyGetEventHandler).GetMethod("Invoke"));
+				var PropertyGetEventArgsCtor = MainAssembly.MainModule.ImportReference(typeof(VM.PropertyGetEventArgs).GetConstructor(new Type[] { typeof(string), typeof(object) }));
+				var PropertyGetEventHandler = MainAssembly.MainModule.ImportReference(typeof(VM.PropertyGetEventHandler).GetMethod("Invoke"));
 			
 				GetMethodNotify.Body.Instructions.Clear();
 				var worker = GetMethodNotify.Body.GetILProcessor();
@@ -275,8 +275,8 @@ namespace DataBindService
 			}
 			{
 				var eventField = typeDefinition.Fields.First(f => f.Name == "PropertyChanged");
-				var PropertyChangeEventArgsCtor = MainAssembly.MainModule.ImportReference(typeof(vm.PropertyChangedEventArgs).GetConstructor(new Type[] { typeof(string), typeof(object), typeof(object) }));
-				var PropertyChangeEventHandler = MainAssembly.MainModule.ImportReference(typeof(vm.PropertyChangedEventHandler).GetMethod("Invoke"));
+				var PropertyChangeEventArgsCtor = MainAssembly.MainModule.ImportReference(typeof(VM.PropertyChangedEventArgs).GetConstructor(new Type[] { typeof(string), typeof(object), typeof(object) }));
+				var PropertyChangeEventHandler = MainAssembly.MainModule.ImportReference(typeof(VM.PropertyChangedEventHandler).GetMethod("Invoke"));
 			
 				SetMethodNotify.Body.Instructions.Clear();
 				var worker = SetMethodNotify.Body.GetILProcessor();
@@ -304,7 +304,7 @@ namespace DataBindService
 			var NotifyPropertyGot = typeDefinition.Methods.First(m => m.Name == "NotifyPropertyGot");
 			var NotifyPropertyChanged = typeDefinition.Methods.First(m => m.Name == "NotifyPropertyChanged");
 			
-			var IObservableEventDelegateRef = MainAssembly.MainModule.ImportReference(typeof(vm.IObservableEventDelegate));
+			var IObservableEventDelegateRef = MainAssembly.MainModule.ImportReference(typeof(VM.IObservableEventDelegate));
 			var IObservableEventDelegateDef = new InterfaceImplementation(IObservableEventDelegateRef);
 			typeDefinition.Interfaces.Add(IObservableEventDelegateDef);
 			var BoolRef = MainAssembly.MainModule.ImportReference(typeof(bool));

@@ -4,7 +4,7 @@ using System.Linq;
 using DataBinding.CollectionExt;
 using System.Runtime.CompilerServices;
 
-namespace vm
+namespace VM
 {
 	using boolean = System.Boolean;
 	using number = System.Double;

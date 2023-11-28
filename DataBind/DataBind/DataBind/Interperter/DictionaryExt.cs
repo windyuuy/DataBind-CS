@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using vm;
+using VM;
 
 namespace DataBinding.CollectionExt
 {

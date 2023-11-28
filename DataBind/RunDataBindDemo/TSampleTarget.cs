@@ -1,7 +1,7 @@
 ﻿using DataBinding;
 using System;
 using System.Runtime.CompilerServices;
-using vm;
+using VM;
 
 namespace RunDataBindDemo
 {
@@ -12,7 +12,7 @@ namespace RunDataBindDemo
         public string SS { get; set; }
         public event PropertyGetEventHandler PropertyGet2;
     }
-    public class T2 : vm.IObservable
+    public class T2 : VM.IObservable
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public event PropertyGetEventHandler PropertyGot;

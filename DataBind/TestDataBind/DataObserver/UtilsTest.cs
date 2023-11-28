@@ -2,14 +2,14 @@
 using System;
 using DataBinding.CollectionExt;
 using System.Text;
-using vm;
+using VM;
 
 namespace TestDataBind
 {
 
 	public class SampleOBD3<T> : IObservable, IWithPrototype
 	{
-		public vm.Observer ___Sob__;
+		public VM.Observer ___Sob__;
 		protected T a1;
 
 		public void Set(T a)
@@ -35,12 +35,12 @@ namespace TestDataBind
 			}
 		}
 
-		public vm.Observer _SgetOb()
+		public VM.Observer _SgetOb()
 		{
 			return ___Sob__;
 		}
 
-		public void _SsetOb(vm.Observer value)
+		public void _SsetOb(VM.Observer value)
 		{
 			___Sob__ = value;
 		}
@@ -82,7 +82,7 @@ namespace TestDataBind
 		{
 			var a = new SampleOBD4<SampleOBD4<SampleOBD3<int>>>();
 			a.A.A.A = 100;
-			var func = vm.Utils.parsePath("A.A.A");
+			var func = VM.Utils.parsePath("A.A.A");
 			Assert.IsNotNull(func);
 			Assert.AreEqual(func(null, a), 100);
 		}
@@ -93,7 +93,7 @@ namespace TestDataBind
 			var a = new SampleOBD4<Dictionary<string, SampleOBD3<int>>>();
 			a.A["a"] = new SampleOBD3<int>();
 			a.A["a"].A = 100;
-			var func = vm.Utils.parsePath("A.a.A");
+			var func = VM.Utils.parsePath("A.a.A");
 			Assert.IsNotNull(func);
 			Assert.AreEqual(func(null, a), 100);
 		}

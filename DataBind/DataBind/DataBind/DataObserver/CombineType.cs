@@ -2,7 +2,7 @@
 using System;
 using DataBinding.CollectionExt;
 
-namespace vm
+namespace VM
 {
 	public class CombineType
 	{

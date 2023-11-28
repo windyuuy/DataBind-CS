@@ -30,7 +30,7 @@ namespace TestWithInjected
                     var TString = typeof(string);
                     var rtstr = a.MainModule.ImportReference(TString);
 
-                    using var db = AssemblyDefinition.ReadAssembly(typeof(vm.IObservable).Assembly.Location);
+                    using var db = AssemblyDefinition.ReadAssembly(typeof(VM.IObservable).Assembly.Location);
                     var tIObservable = db.MainModule.ImportReference(typeof(RunDataBindDemo.ITest));
                     var types = assembly.MainModule.GetTypes();
 
@@ -49,7 +49,7 @@ namespace TestWithInjected
                     CILUtils.SysAssembly = sys;
                     //sys.MainModule.AssemblyReferences.Add(corlibReference);
 
-                    var tPropertyGetEventHandler = db.MainModule.ImportReference(typeof(vm.PropertyGetEventHandler));
+                    var tPropertyGetEventHandler = db.MainModule.ImportReference(typeof(VM.PropertyGetEventHandler));
                     foreach (var type in types)
                     {
                         foreach (var Prop in type.Properties)
@@ -63,7 +63,7 @@ namespace TestWithInjected
 
                                 CILUtils.InjectProperty(assembly, type, "CCC", typeof(double));
                                 CILUtils.InjectProperty(assembly, type, "SS", typeof(string));
-                                CILUtils.InjectEvent(assembly, type, "PropertyGet2", typeof(vm.PropertyGetEventHandler));
+                                CILUtils.InjectEvent(assembly, type, "PropertyGet2", typeof(VM.PropertyGetEventHandler));
                                 break;
 
                                 //var DemoP = tDemo.Properties.First(p => p.Name == "CCC");

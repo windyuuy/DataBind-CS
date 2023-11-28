@@ -300,7 +300,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                 
                 cb.AppendCodeLine("namespace TestingCode");
                 cb.AppendCodeSegBegin("{");
-                cb.AppendCodeLine($"public class {envInfo.Name}: vm.Host");
+                cb.AppendCodeLine($"public class {envInfo.Name}: DataBinding.IStdHost");
                 cb.AppendCodeSegBegin("{");
 
                 var typeSpace = new Dictionary<ClassInfo, bool>();

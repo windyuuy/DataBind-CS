@@ -28,7 +28,7 @@ class _Env
 
 }
 
-namespace vm
+namespace VM
 {
 	using ASTNode = ASTNodeBase;
 	using Node = CombineType<object, List<WordNode>, WordNode, ASTNodeBase>;
@@ -783,7 +783,7 @@ namespace vm
 					var a = list.TryGet(i - 1);
 					var b = list.TryGet(i);
 					var c = list.TryGet(i + 1);
-					if (b.Is<WordNode>() && b.As<WordNode>().Type > startPriority && b.As<WordNode>().Type < endPriority)
+					if (b.Is<WordNode>() && startPriority < b.As<WordNode>().Type && b.As<WordNode>().Type < endPriority)
 					{
 						if (c == null)
 						{
@@ -1118,7 +1118,7 @@ namespace vm
 			if (ast1 is ValueASTNode)
 			{
 				var ast = ast1 as ValueASTNode;
-				if (ast.OperatorX == vm.TNodeType.Word)
+				if (ast.OperatorX == TNodeType.Word)
 				{
 					if ("this" == (Utils.ToIndexKey(ast.Value.Value)))
 					{

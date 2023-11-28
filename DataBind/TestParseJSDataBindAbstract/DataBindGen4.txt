@@ -1,11 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 using number = System.Double;
-using Action = System.Action;
 
 
 namespace TestingCode
 {
-	public class TestWriteCodeCase4: vm.Host
+	public class TestWriteCodeCase4: DataBinding.IStdHost
 	{
 		/// <note>
 		/// env::a

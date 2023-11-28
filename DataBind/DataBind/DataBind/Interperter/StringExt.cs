@@ -29,6 +29,11 @@ public static class StringExt
     {
 		return str.Length;
 	}
+	/// <summary>
+	/// _P_ 开头的方法可以以属性的形式在数据绑定表达式中使用
+	/// </summary>
+	/// <param name="str"></param>
+	/// <returns></returns>
 	public static int _P_length(this string str)
 	{
 		return str.Length;

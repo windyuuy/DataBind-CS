@@ -1,6 +1,6 @@
 ﻿namespace TestingCode
 {
-	public class TestWriteCodeCase1: vm.Host
+	public class TestWriteCodeCase1: VM.Host
 	{
 		/// <note>
 		/// env::a

@@ -1,7 +1,7 @@
 
 using DataBinding.CollectionExt;
 
-namespace vm
+namespace VM
 {
 	public partial class ProtoDict<K, V> : Dictionary<K, V>, IWithPrototype
 	{

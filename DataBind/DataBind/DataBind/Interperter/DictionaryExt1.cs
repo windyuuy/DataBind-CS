@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using vm;
+using VM;
 
 namespace DataBinding.CollectionExt
 {

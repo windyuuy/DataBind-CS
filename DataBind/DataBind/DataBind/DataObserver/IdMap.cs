@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace vm
+namespace VM
 {
 	using number = System.Double;
 	using boolean = System.Boolean;

@@ -5,10 +5,36 @@ using System.Reflection;
 using Game.Diagnostics.IO;
 using Console = Game.Diagnostics.IO.Console;
 
-namespace vm
+namespace VM
 {
 	using boolean = System.Boolean;
 	using number = System.Double;
+
+	public struct MemberMethod
+	{
+		public object Self;
+		public MethodInfo MethodInfo;
+
+		public MemberMethod(object self, MethodInfo methodInfo)
+		{
+			this.Self = self;
+			this.MethodInfo = methodInfo;
+		}
+
+		public object Invoke(object[] paras)
+		{
+			return this.MethodInfo.Invoke(Self, paras);
+		}
+
+		public ParameterInfo[] GetParameters()
+		{
+			return this.MethodInfo.GetParameters();
+		}
+		public int GetParametersCount()
+		{
+			return this.MethodInfo.GetParameters().Length;
+		}
+	}
 
 	// TODO: 避免原型链死循环
 	public partial class Utils
@@ -278,7 +304,7 @@ namespace vm
 					}
 					else
 					{
-						return m;
+						return new MemberMethod(a, m);
 					}
 				}
 				else
@@ -288,6 +314,7 @@ namespace vm
 				}
 			}
 		}
+
 		public static System.Collections.Generic.IEnumerable<MethodInfo> GetExtensionMethods(Assembly assembly, Type extendedType)
 		{
 			var query = from type in assembly.GetTypes()

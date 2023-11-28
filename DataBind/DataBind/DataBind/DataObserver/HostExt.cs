@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using vm;
+using VM;
 using Game.Diagnostics.IO;
 using Console = Game.Diagnostics.IO.Console;
 
-namespace vm
+namespace VM
 {
 
 	using boolean = System.Boolean;

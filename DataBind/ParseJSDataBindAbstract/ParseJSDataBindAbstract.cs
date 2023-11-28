@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using vm;
+using VM;
 
 namespace ParseJSDataBindAbstract
 {
@@ -339,7 +339,7 @@ namespace ParseJSDataBindAbstract
 				{
 					if (isActionMatcher.IsMatch(Name))
 					{
-						return "Action";
+						return "System.Action";
 					}
 				}
 			}
@@ -612,7 +612,7 @@ namespace ParseJSDataBindAbstract
 		public static EnvInfo ParseTypeInfo(ASTNodeBase astNode, EnvInfo envInfo)
 		{
 			envInfo.AddTypeAlias("number", "System.Single");
-			envInfo.AddTypeAlias("Action", "System.Action");
+			// envInfo.AddTypeAlias("Action", "System.Action");
 			var retType = HandleOperator(envInfo, null, astNode);
 			envInfo.StatementReturnType = retType;
 			return envInfo;

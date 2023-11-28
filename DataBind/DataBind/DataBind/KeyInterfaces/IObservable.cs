@@ -3,7 +3,7 @@ using DataBinding.CollectionExt;
 using System.Linq;
 
 
-namespace vm
+namespace VM
 {
 	[System.Diagnostics.DebuggerStepThrough]
 	public class PropertyChangedEventArgs : EventArgs

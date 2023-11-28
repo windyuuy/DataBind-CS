@@ -1,10 +1,9 @@
 ﻿using DataBinding.CollectionExt;
 using number = System.Single;
-using Action = System.Action;
 
 namespace TestingCode
 {
-	public class TestSimpleCase5: vm.Host
+	public class TestSimpleCase5: DataBinding.IStdHost
 	{
 		/// <note>
 		/// env::a

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace vm.MathExt
+namespace VM.MathExt
 {
     using number = Double;
     public class Math

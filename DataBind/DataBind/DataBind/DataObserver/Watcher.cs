@@ -5,7 +5,7 @@ using DataBinding;
 using Game.Diagnostics.IO;
 using Console = Game.Diagnostics.IO.Console;
 
-namespace vm
+namespace VM
 {
 	using number = System.Double;
 	using boolean = System.Boolean;

@@ -4,7 +4,7 @@ using Action = System.Action;
 
 namespace TestingCode
 {
-	public class TestWriteCodeCase2: vm.Host
+	public class TestWriteCodeCase2: DataBinding.IStdHost
 	{
 		/// <note>
 		/// env::a

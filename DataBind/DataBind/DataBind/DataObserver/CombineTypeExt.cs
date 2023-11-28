@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace vm
+namespace VM
 {
 	public static class CombineTypeExt
 	{
