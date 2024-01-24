@@ -76,7 +76,12 @@ namespace DataBindService
 			//var CallbackRef = MainAssembly.MainModule.ImportReference(typeof(Action<object, object, object>));
 			//         var CombineTypeRef2 = MainAssembly.MainModule.ImportReference(typeof(vm.CombineType<object, string, number, boolean>));
 
-			CILUtils.InjectProperty(MainAssembly, typeDefinition, "_SIsDestroyed", BoolRef);
+			var DebuggerHiddenAttributeAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerHiddenAttribute).GetConstructor(new Type[0]));
+			
+			var isDestroyProp=CILUtils.InjectProperty(MainAssembly, typeDefinition, "_SIsDestroyed", BoolRef);
+			isDestroyProp.GetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
+			isDestroyProp.SetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
+			isDestroyProp.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
 			CILUtils.InjectField(MainAssembly, typeDefinition, "_Swatchers", IWatcherCollectionRef, FieldAttributes.Family);
 			CILUtils.InjectGetOrCreateObjectMethod(MainAssembly, typeDefinition, "GetWatchers", "_Swatchers", IWatcherCollectionRef, TDefaultValueType);
 
@@ -222,6 +227,7 @@ namespace DataBindService
 
 			var DebuggerStepThroughAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerStepThroughAttribute).GetConstructor(new Type[0]));
 			var ObserverRef = MainAssembly.MainModule.ImportReference(typeof(VM.Observer));
+			var DebuggerHiddenAttributeAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerHiddenAttribute).GetConstructor(new Type[0]));
 
 			CILUtils.InjectField(MainAssembly, typeDefinition, "___Sob__", ObserverRef, FieldAttributes.Family);
 			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "_SgetOb", "___Sob__", ObserverRef);
@@ -458,6 +464,9 @@ namespace DataBindService
 
 			CILUtils.InjectField(MainAssembly, typeDefinition, "___Sproto__", ObjectRef, FieldAttributes.Family);
 			var P_ = CILUtils.InjectProperty(MainAssembly, typeDefinition, "_", ObjectRef);
+			P_.GetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
+			P_.SetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
+			P_.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
 
 			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "GetProto", "___Sproto__", ObjectRef);
 			var SetProtoDef = CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "SetProto", "___Sproto__", ObjectRef);

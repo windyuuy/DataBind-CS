@@ -245,6 +245,9 @@ namespace CiLin
 		{
 			//Import the void type
 			TypeReference voidRef = assembly.MainModule.ImportReference(typeof(void));
+			
+			var TCompilerGenerated = typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute);
+			var rCompilerGenerated = assembly.MainModule.ImportReference(TCompilerGenerated.GetConstructor(new Type[] { }));
 
 			var fieldName = ConvertToFieldName(propertyName);
 			var field = fieldDefinition;
@@ -300,11 +303,14 @@ namespace CiLin
 			targetType.Methods.Add(set);
 
 			//create the property
+			get.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			set.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
 			PropertyDefinition propertyDefinition = new PropertyDefinition(propertyName, PropertyAttributes.None, propertyType)
 			{
 				GetMethod = get,
 				SetMethod = set
 			};
+			propertyDefinition.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
 
 			//add the property to the type.
 			targetType.Properties.Add(propertyDefinition);
@@ -385,9 +391,9 @@ namespace CiLin
 			}
 			methodAttributes |= MethodAttributes.SpecialName;
 			prop.GetMethod.Attributes = getMethodAttrs;
-			prop.GetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			// prop.GetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
 			prop.SetMethod.Attributes = setMethodAttrs;
-			prop.SetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			// prop.SetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
 
 			var fieldAttributes = FieldAttributes.Private;
             if (field.IsStatic)
