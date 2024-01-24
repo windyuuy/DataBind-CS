@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
+using Game.Diagnostics;
 using VM;
 
 namespace DataBinding
@@ -91,6 +93,91 @@ namespace DataBinding
 		public static object GetProto(this IStdHost self)
 		{
 			return ((DataBinding.CollectionExt.IWithPrototype)self).GetProto();
+		}
+
+		/// <summary>
+		/// 通知设置值并强制通知值已更新
+		/// </summary>
+		/// <param name="self"></param>
+		/// <param name="key"></param>
+		/// <param name="newValue"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public static T NotifyChangeValue<T>(this IStdHost self, string key, T newValue)
+		{
+			var p = self.GetType().GetProperty(key, BindingFlags.Instance | BindingFlags.Public);
+			if (p != null)
+			{
+				var oldValue=p.GetValue(self);
+				p.SetValue(self, newValue);
+				if (self is VM.IObservableEventDelegate observable)
+				{
+					observable.NotifyPropertyChanged(newValue, oldValue, key);
+				}
+				else
+				{
+					Debug.LogError($"Invalid type {self?.GetType()?.FullName} not implement interface {nameof(VM.IObservableEventDelegate)}");
+				}
+			}
+			else
+			{
+				Debug.LogError($"Invalid type {self?.GetType()?.FullName} without property {key}");
+			}
+			return newValue;
+		}
+		
+		/// <summary>
+		/// 强制通知值已更新
+		/// </summary>
+		/// <param name="self"></param>
+		/// <param name="key"></param>
+		/// <param name="oldValue"></param>
+		/// <typeparam name="T"></typeparam>
+		public static void MarkDirty<T>(this IStdHost self, string key, T oldValue)
+		{
+			var p = self.GetType().GetProperty(key, BindingFlags.Instance | BindingFlags.Public);
+			if (p != null)
+			{
+				var value=p.GetValue(self);
+				if (self is VM.IObservableEventDelegate observable)
+				{
+					observable.NotifyPropertyChanged(value, oldValue, key);
+				}
+				else
+				{
+					Debug.LogError($"Invalid type {self?.GetType()?.FullName} not implement interface {nameof(VM.IObservableEventDelegate)}");
+				}
+			}
+			else
+			{
+				Debug.LogError($"Invalid type {self?.GetType()?.FullName} without property {key}");
+			}
+		}
+		/// <summary>
+		/// 强制通知值已更新
+		/// </summary>
+		/// <param name="self"></param>
+		/// <param name="key"></param>
+		/// <typeparam name="T"></typeparam>
+		public static void MarkDirty<T>(this IStdHost self, string key)
+		{
+			var p = self.GetType().GetProperty(key, BindingFlags.Instance | BindingFlags.Public);
+			if (p != null)
+			{
+				var value=p.GetValue(self);
+				if (self is VM.IObservableEventDelegate observable)
+				{
+					observable.NotifyPropertyChanged(value, value, key);
+				}
+				else
+				{
+					Debug.LogError($"Invalid type {self?.GetType()?.FullName} not implement interface {nameof(VM.IObservableEventDelegate)}");
+				}
+			}
+			else
+			{
+				Debug.LogError($"Invalid type {self?.GetType()?.FullName} without property {key}");
+			}
 		}
 	}
 

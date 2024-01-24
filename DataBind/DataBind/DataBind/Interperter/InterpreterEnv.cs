@@ -75,8 +75,28 @@ namespace VM
 		}
 		public static IWithPrototype ImplementEnvironment(IWithPrototype b)
 		{
-			var envDict = new TEnv();
-			b.SetProto(envDict);
+			if (!(b.GetProto() is TEnv))
+			{
+				var envDict = new TEnv();
+				b.SetProto(envDict);
+				foreach (var kv in Environment)
+				{
+					if (kv.Key == "___Sob__")
+					{
+						continue;
+					}
+					envDict[kv.Key] = kv.Value;
+				}
+			}
+			return b;
+		}
+		public static IWithPrototype UpdateEnvironment(IWithPrototype b)
+		{
+			if (!(b.GetProto() is TEnv envDict))
+			{
+				envDict = new TEnv();
+				b.SetProto(envDict);
+			}
 			foreach (var kv in Environment)
 			{
 				if (kv.Key == "___Sob__")

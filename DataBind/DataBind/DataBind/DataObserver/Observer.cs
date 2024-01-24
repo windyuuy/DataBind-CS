@@ -73,16 +73,17 @@ namespace VM
 					//只有普通的对象才可以进行观察
 					return new Observer(AsObservable(value));
 				}
-            }
-            else if(value != null && (
+			}
+			else if(value != null && (
 				value.GetType().IsPrimitive
 				|| (value is string)
 				|| (value is Delegate)
 				|| (value.GetType().GetProperties().Length==0 && value.GetType().GetFields().Length==0)
-				)==false)
-            {
+				|| value.GetType().Name == "RuntimeMethodInfo"
+				) ==false)
+			{
 				Console.Error($"该对象类型不可监测: type={value.GetType().Name}");
-            }
+			}
 			return null;
 		}
 

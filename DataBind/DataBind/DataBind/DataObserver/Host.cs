@@ -21,7 +21,7 @@ namespace VM
 
 		protected Observer ___Sob__;
 		public System.Collections.Generic.ICollection<Watcher> _Swatchers;
-		public boolean _SisDestroyed;
+		protected boolean _SisDestroyed;
 
 		public virtual bool _SIsDestroyed { get => _SisDestroyed; set => _SisDestroyed = value; }
 
@@ -131,7 +131,7 @@ namespace VM
 		/**
 		 * 向普通对象注入Host相关方法
 		 */
-		public static IHost implementHost<T>(T obj)
+		public static IHost ImplementHost<T>(T obj)
 		{
 			if (obj is IObservable)
 			{
@@ -149,7 +149,7 @@ namespace VM
 		/**
 		 * 向普通对象注入Host相关方法
 		 */
-		public static DataBinding.IStdHost implementStdHost<T>(T obj)
+		public static DataBinding.IStdHost ImplementStdHost<T>(T obj)
 		{
 			if (obj is IObservable)
 			{
@@ -157,6 +157,42 @@ namespace VM
 				if (obj is IWithPrototype obj1)
 				{
 					InterpreterEnv.ImplementEnvironment(obj1);
+				}
+
+				Observe(obj);
+			}
+			return obj as DataBinding.IStdHost;
+		}
+
+		/**
+		 * 向普通对象注入Host相关方法
+		 */
+		public static IHost UpdateHost<T>(T obj)
+		{
+			if (obj is IObservable)
+			{
+				//实现基础方法，用于表达式中方便得调用
+				if (obj is IWithPrototype env)
+				{
+					InterpreterEnv.UpdateEnvironment(env);
+				}
+
+				Observe(obj);
+			}
+			return obj as IHost;
+		}
+
+		/**
+		 * 向普通对象注入Host相关方法
+		 */
+		public static DataBinding.IStdHost UpdateStdHost<T>(T obj)
+		{
+			if (obj is IObservable)
+			{
+				//实现基础方法，用于表达式中方便得调用
+				if (obj is IWithPrototype obj1)
+				{
+					InterpreterEnv.UpdateEnvironment(obj1);
 				}
 
 				Observe(obj);

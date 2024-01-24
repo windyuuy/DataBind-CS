@@ -480,11 +480,13 @@ namespace TestDataBind.DataObserver
 			host.a[1] = "修改对象2";
 			VM.Tick.Next();
 			expect(view.list1).toEqual("修改对象2");
+			expect(view.length).toEqual(4);
 
 			host.a.RemoveAt(2);
 			VM.Tick.Next();
 			expect(view.list1).toEqual("修改对象2");
 			expect(view.list2).toEqual("对象4");
+			expect(view.length).toEqual(3);
 
 		}
 
