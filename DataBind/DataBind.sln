@@ -20,9 +20,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CiLin", "CiLin\CiLin.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestInjectDataBind", "TestInjectDataBind\TestInjectDataBind.csproj", "{EBF94F84-CD93-4431-8C0A-D4050B2DF29F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataBindService", "DataBindService\DataBindService.csproj", "{8CDA4732-EB8D-403A-9CE6-37E964A102F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataBind.Service", "DataBind.Service\DataBind.Service.csproj", "{8CDA4732-EB8D-403A-9CE6-37E964A102F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnityDataBindService", "UnityDataBindService\UnityDataBindService.csproj", "{667637AC-EAD3-44AF-B97E-39DA41050017}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataBind.UnityBindEntry", "DataBind.UnityBindEntry\DataBind.UnityBindEntry.csproj", "{667637AC-EAD3-44AF-B97E-39DA41050017}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnityBuiltinLibs", "UnityBuiltinLibs\UnityBuiltinLibs.csproj", "{33DC53A1-7FB0-4407-8922-FED874014FFA}"
 EndProject
@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publish", "Publish\Publish.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestUtils", "UnitTestUtils\UnitTestUtils.csproj", "{8A728BC5-4BF8-42EA-9545-929F713BC6E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseJSDataBindAbstract", "ParseJSDataBindAbstract\ParseJSDataBindAbstract.csproj", "{E4D32BB7-3AE5-4B42-A632-A2CB6E1D1974}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBind.ParseJSAbstract", "DataBind.ParseJSAbstract\DataBind.ParseJSAbstract.csproj", "{E4D32BB7-3AE5-4B42-A632-A2CB6E1D1974}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DB26575E-398A-4C1F-801C-59E6F79620D3} = {DB26575E-398A-4C1F-801C-59E6F79620D3}
 	EndProjectSection

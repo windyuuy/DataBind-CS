@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Mono.Cecil.Cil;
 using CiLin;
 
-namespace DataBindService
+namespace DataBind.Service
 {
     public class Field2PropInfo
     {

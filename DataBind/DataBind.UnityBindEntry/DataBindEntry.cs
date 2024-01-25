@@ -1,5 +1,5 @@
 ﻿
-using DataBindService;
+using DataBind.Service;
 using UnityEditor.Callbacks;
 using UnityEditor;
 
@@ -61,7 +61,7 @@ namespace DataBinding.Editor.DataBindEntry
 		public static void SupportU3DDataBind()
 		{
 
-			BindEntry.SupportU3DDataBind();
+			BindEntry.SupportU3DDataBindInLibrary();
 		}
 
 	}

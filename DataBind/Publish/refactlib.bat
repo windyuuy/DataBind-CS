@@ -7,16 +7,16 @@ IF NOT EXIST %Bin%\Editor\Service MKDIR %Bin%\Editor\Service
 
 XCOPY %Source%\CiLin.dll %Bin%\Editor\Service /y
 XCOPY %Source%\CiLin.pdb %Bin%\Editor\Service /y
-XCOPY %Source%\DataBindService.dll %Bin%\Editor\Service /y
-XCOPY %Source%\DataBindService.pdb %Bin%\Editor\Service /y
+XCOPY %Source%\DataBind.Service.dll %Bin%\Editor\Service /y
+XCOPY %Source%\DataBind.Service.pdb %Bin%\Editor\Service /y
 XCOPY %Source%\Mono.Cecil.dll %Bin%\Editor\Service /y
 
-XCOPY %Source%\UnityDataBindService.dll %Bin%\Editor\Entry /y
-XCOPY %Source%\UnityDataBindService.pdb %Bin%\Editor\Entry /y
+XCOPY %Source%\DataBind.UnityBindEntry.dll %Bin%\Editor\Entry /y
+XCOPY %Source%\DataBind.UnityBindEntry.pdb %Bin%\Editor\Entry /y
 
 XCOPY %Source%\DataBind.dll %Bin%\DataBind /y
 XCOPY %Source%\DataBind.xml %Bin%\DataBind /y
 XCOPY %Source%\EngineAdapter.dll %Bin%\DataBind /y
 XCOPY %Source%\EngineAdapter.pdb %Bin%\DataBind /y
-XCOPY %Source%\ParseJSDataBindAbstract.dll %Bin%\DataBind /y
-XCOPY %Source%\ParseJSDataBindAbstract.pdb %Bin%\DataBind /y
+XCOPY %Source%\DataBind.ParseJSAbstract.dll %Bin%\DataBind /y
+XCOPY %Source%\DataBind.ParseJSAbstract.pdb %Bin%\DataBind /y

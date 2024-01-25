@@ -1,3 +1,4 @@
+using System;
 using SysConsole = System.Console;
 using SysDebug = System.Diagnostics.Debug;
 using UConsole = UnityEngine.Debug;
@@ -74,6 +75,18 @@ namespace Game.Diagnostics
             else
             {
                 SysConsole.WriteLine(message);
+            }
+        }
+
+        public static void LogException(Exception exception, DLogType type = DLogType.Log)
+        {
+            if (isUnityEnv)
+            {
+                UConsole.LogException(exception);
+            }
+            else
+            {
+                SysConsole.WriteLine(exception);
             }
         }
 

@@ -8,11 +8,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CiLin\CiLin.csproj" />
-    <ProjectReference Include="..\DataBindService\DataBindService.csproj" />
+    <ProjectReference Include="..\DataBind.Service\DataBind.Service.csproj" />
     <ProjectReference Include="..\DataBind\DataBind.csproj" />
     <ProjectReference Include="..\EngineAdapter\EngineAdapter.csproj" />
-    <ProjectReference Include="..\ParseJSDataBindAbstract\ParseJSDataBindAbstract.csproj" />
-    <ProjectReference Include="..\UnityDataBindService\UnityDataBindService.csproj" />
+    <ProjectReference Include="..\DataBind.ParseJSAbstract\DataBind.ParseJSAbstract.csproj" />
+    <ProjectReference Include="..\DataBind.UnityBindEntry\DataBind.UnityBindEntry.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

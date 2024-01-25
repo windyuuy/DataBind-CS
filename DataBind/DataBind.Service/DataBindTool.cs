@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Mono.Cecil.Cil;
 using CiLin;
 
-namespace DataBindService
+namespace DataBind.Service
 {
 	public class DataBindTool
 	{
@@ -51,7 +51,7 @@ namespace DataBindService
 
 		public static void HandleHost(TypeDefinition typeDefinition)
 		{
-			using var DataBindServiceAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
+			using var DataBindServiceAssembly = AssemblyDefinition.ReadAssembly(typeof(DBRuntimeDemo).Assembly.Location);
 			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBinding.HostExt2).Assembly.Location);
 
 			var IFullHostRef = MainAssembly.MainModule.ImportReference(typeof(VM.IFullHost));
@@ -223,7 +223,7 @@ namespace DataBindService
 			}
 
 			#region implement IObservable
-			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBindService.DBRuntimeDemo).Assembly.Location);
+			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DBRuntimeDemo).Assembly.Location);
 
 			var DebuggerStepThroughAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerStepThroughAttribute).GetConstructor(new Type[0]));
 			var ObserverRef = MainAssembly.MainModule.ImportReference(typeof(VM.Observer));
@@ -246,7 +246,7 @@ namespace DataBindService
 			var IObservableDef = new InterfaceImplementation(IObservableRef);
 			typeDefinition.Interfaces.Add(IObservableDef);
 			
-			var RuntimeDemoRef = MainAssembly.MainModule.ImportReference(typeof(DataBindService.DBRuntimeDemo));
+			var RuntimeDemoRef = MainAssembly.MainModule.ImportReference(typeof(DBRuntimeDemo));
 			var RuntimeDemoDef = DataBindAssembly.MainModule.Types.First(t => t != null && t.Namespace == RuntimeDemoRef.Namespace && t.FullName == RuntimeDemoRef.FullName);
 			var NotifyPropertyGotMethod = RuntimeDemoDef.Methods.First(m => m.Name == "NotifyPropertyGot");
 			var NotifyPropertyChangedMethod = RuntimeDemoDef.Methods.First(m => m.Name == "NotifyPropertyChanged");

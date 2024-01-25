@@ -3,73 +3,144 @@ using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Game.Diagnostics.IO;
 using Console = Game.Diagnostics.IO.Console;
 
-namespace DataBindService
+namespace DataBind.Service
 {
 	[System.Diagnostics.DebuggerStepThrough]
 	public class BindOptions
 	{
-		public bool writeImmediate = true;
-		public bool useSymbols = true;
+		public bool WriteImmediate = true;
+		public bool UseSymbols = true;
 		//public Action<AssemblyDefinition> onDone;
-		public System.IO.FileStream readStream;
-		public string outputPath;
+		// public System.IO.FileStream readStream;
+		public string OutputPath;
+		public IAssemblyResolver Resolver;
 	}
 
 	public class BindEntry
 	{
-
-		//[System.Diagnostics.DebuggerStepThrough]
-		public static void SupportU3DDataBind()
+#if _DEBUG
+		[System.Diagnostics.DebuggerStepThrough]
+#endif
+		public static void SupportU3DDataBindInLibrary()
+		{
+			SupportU3DDataBindInLibrary(null);
+		}
+#if _DEBUG
+		[System.Diagnostics.DebuggerStepThrough]
+#endif
+		public static void SupportU3DDataBindInLibrary(IEnumerable<string> resolvePaths)
 		{
 			var filePaths = System.IO.Directory.GetFiles(@".\Library\ScriptAssemblies\", @"*.dll", System.IO.SearchOption.TopDirectoryOnly);
-			SupportU3DDataBind(filePaths);
+			// resolvePaths ??= new string[]
+			// {
+			// 	@".\Assets\Framework\Third\Demigiant\DOTween\",
+			// 	@".\TestProjects\CommobLibs\Managed\UnityEngine\",
+			// };
+			SupportU3DDataBind(filePaths, resolvePaths);
 		}
-		public static void SupportU3DDataBind(IEnumerable<string> filePaths)
+		public static void SupportU3DDataBind(IEnumerable<string> filePaths, IEnumerable<string> resolvePaths = null)
 		{
-			var postTask = new PostTask();
-
-			postTask.Clear();
-
-			var validDlls = filePaths
+			var validAssemblyPaths = filePaths
 				.Where(p => IsValidDllToSupport(p))
 				.ToArray();
-			var assmeblyList = new List<AssemblyDefinition>();
 			var buildOptions = new BindOptions();
-			foreach (var dllPath in validDlls)
+			if (resolvePaths != null)
+			{
+				var resolver = new DefaultAssemblyResolver();
+				//resolver.AddSearchDirectory(@".");
+				//resolver.AddSearchDirectory(@"bin");
+				// resolver.AddSearchDirectory(@".\Assets\Framework\Third\Demigiant\DOTween\");
+				// resolver.AddSearchDirectory(@".\TestProjects\CommobLibs\Managed\UnityEngine\");
+				foreach (var resolvePath in resolvePaths)
+				{
+					resolver.AddSearchDirectory(resolvePath);
+				}
+
+				buildOptions.Resolver = resolver;
+			}
+			
+			SupportDataBind(validAssemblyPaths, buildOptions);
+		}
+
+		public static void SupportDataBind(string[] assemblyPaths, BindOptions buildOptions)
+		{
+			var postTask = new PostTask();
+			postTask.Clear();
+			
+			SupportDataBind(assemblyPaths, buildOptions, postTask);
+
+			postTask.Clear();
+		}
+
+		public static void SupportDataBind(string[] assemblyPaths, BindOptions buildOptions, PostTask postTask)
+		{
+			var assemblyList = new List<AssemblyDefinition>();
+			foreach (var dllPath in assemblyPaths)
 			{
 				try
 				{
 					var assembly = LoadAssembly(dllPath, buildOptions);
-					assmeblyList.Add(assembly);
+					assemblyList.Add(assembly);
 				}
 				catch (Exception ex)
 				{
-					Console.Error(ex.ToString());
+					Console.Error($"LoadAssembly-Exception: {dllPath}");
+					Console.Exception(ex);
 				}
 			}
-			foreach (var assembly in assmeblyList)
+			foreach (var assembly in assemblyList)
 			{
-				SupportDataBindInMemory(assembly, buildOptions, postTask);
+				try
+				{
+					SupportDataBindInMemory(assembly, buildOptions, postTask);
+				}
+				catch (Exception ex)
+				{
+					Console.Error($"SupportDataBindInMemory-Exception: {assembly.FullName}");
+					Console.Exception(ex);
+				}
 			}
-			foreach (var assembly in assmeblyList)
+			foreach (var assembly in assemblyList)
 			{
-				SupportDataBindPostTask(assembly, buildOptions, postTask, assmeblyList);
+				try
+				{
+					HandleDataBindPostTask(assembly, buildOptions, postTask, assemblyList);
+				}
+				catch (Exception ex)
+				{
+					Console.Error($"SupportDataBindPostTask-Exception: {assembly.FullName}");
+					Console.Exception(ex);
+				}
 			}
-			foreach (var assembly in assmeblyList)
+			foreach (var assembly in assemblyList)
 			{
-				SaveAssembly(assembly, buildOptions);
-				assembly.Dispose();
+				try
+				{
+					SaveAssembly(assembly, buildOptions);
+				}
+				catch (Exception ex)
+				{
+					Console.Error($"SaveAssembly-Exception: {assembly.FullName}");
+					Console.Exception(ex);
+				}
 			}
-
-			postTask.Clear();
+			foreach (var assembly in assemblyList)
+			{
+				try
+				{
+					assembly.Dispose();
+				}
+				catch (Exception ex)
+				{
+					Console.Error($"Dispose-Exception: {assembly.FullName}");
+					Console.Exception(ex);
+				}
+			}
 		}
 
-		public static void SupportDataBindPostTask(AssemblyDefinition assembly, BindOptions options, PostTask postTask0, List<AssemblyDefinition> assmeblyList)
+		public static void HandleDataBindPostTask(AssemblyDefinition assembly, BindOptions options, PostTask postTask0, List<AssemblyDefinition> assmeblyList)
 		{
 			foreach (var refAssembly in assmeblyList)
 			{
@@ -89,6 +160,8 @@ namespace DataBindService
 					|| filePath.StartsWith("DataBind.")
 					|| filePath.Contains(".Editor.")
 					|| filePath.Contains(".Cecil.")
+					|| filePath == "CiLin"
+					|| filePath == "EngineAdapter"
 					)
 			{
 				return false;
@@ -99,14 +172,10 @@ namespace DataBindService
 		//[System.Diagnostics.DebuggerStepThrough]
 		public static AssemblyDefinition LoadAssembly(string inputPath, BindOptions options)
 		{
-			var useSymbols = options.useSymbols;
+			var useSymbols = options.UseSymbols;
 
-			var resolver = new DefaultAssemblyResolver();
-			//resolver.AddSearchDirectory(@".");
-			//resolver.AddSearchDirectory(@"bin");
-			resolver.AddSearchDirectory(@".\Assets\Framework\Third\Demigiant\DOTween\");
-			resolver.AddSearchDirectory(@".\TestProjects\CommobLibs\Managed\UnityEngine\");
-
+			var resolver = options.Resolver;
+			
 			AssemblyDefinition assembly;
 
 			try
@@ -208,22 +277,66 @@ namespace DataBindService
 
 		}
 
+		public static void SafeWriteAssembly(AssemblyDefinition assembly, string fileName, WriterParameters parameters)
+		{
+			try
+			{
+				assembly.Write(fileName, parameters);
+			}
+			catch (Exception ex)
+			{
+				try
+				{
+					parameters.WriteSymbols = false;
+					assembly.Write(fileName, parameters);
+					Console.Warn($"Load-Assembly Without-Symbol-Only: {assembly.FullName} -> {fileName}");
+				}
+				catch(Exception ex2)
+				{
+					Console.Exception(ex);
+					throw;
+				}
+			}
+		}
+
+		public static void SafeWriteAssembly(AssemblyDefinition assembly, WriterParameters parameters)
+		{
+			try
+			{
+				assembly.Write(parameters);
+			}
+			catch (Exception ex)
+			{
+				try
+				{
+					parameters.WriteSymbols = false;
+					assembly.Write(parameters);
+					Console.Warn($"Load-Assembly Without-Symbol-Only: {assembly.FullName}");
+				}
+				catch(Exception ex2)
+				{
+					Console.Exception(ex);
+					throw;
+				}
+			}
+		}
+		
 		public static void SaveAssembly(AssemblyDefinition assembly, BindOptions options)
 		{
-			var useSymbols = options.useSymbols;
+			var useSymbols = options.UseSymbols;
 
-			if (options.writeImmediate)
+			if (options.WriteImmediate)
 			{
-				if (options.outputPath != null)
+				if (options.OutputPath != null)
 				{
-					assembly.Write(options.outputPath, new WriterParameters()
+					SafeWriteAssembly(assembly, options.OutputPath, new WriterParameters()
 					{
 						WriteSymbols = useSymbols,
 					});
 				}
 				else
 				{
-					assembly.Write(new WriterParameters()
+					SafeWriteAssembly(assembly, new WriterParameters()
 					{
 						WriteSymbols = useSymbols,
 					});
@@ -234,11 +347,16 @@ namespace DataBindService
 		public static void SupportDataBind(string assemblyPath, BindOptions options)
 		{
 			var postTask = new PostTask();
-			using var assembly = LoadAssembly(assemblyPath, options);
-			SupportDataBindInMemory(assembly, options, postTask);
-			SupportDataBindPostTask(assembly, options, postTask, new List<AssemblyDefinition>() { assembly });
-			SaveAssembly(assembly, options);
+			SupportDataBind(assemblyPath, options, postTask);
+			postTask.Clear();
 		}
 
+		public static void SupportDataBind(string assemblyPath, BindOptions options, PostTask postTask)
+		{
+			using var assembly = LoadAssembly(assemblyPath, options);
+			SupportDataBindInMemory(assembly, options, postTask);
+			HandleDataBindPostTask(assembly, options, postTask, new List<AssemblyDefinition>() { assembly });
+			SaveAssembly(assembly, options);
+		}
 	}
 }

@@ -1,5 +1,5 @@
+using System;
 using System.Text;
-using Game.Diagnostics;
 
 namespace Game.Diagnostics.IO
 {
@@ -34,6 +34,10 @@ namespace Game.Diagnostics.IO
 			}
 			var ret = sbd.ToString();
 			Diagnostics.Console.LogWarning(ret);
+		}
+		public static void Exception(Exception exception)
+		{
+			Diagnostics.Console.LogException(exception);
 		}
 	}
 }

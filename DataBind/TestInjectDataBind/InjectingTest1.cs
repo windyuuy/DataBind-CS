@@ -5,7 +5,7 @@ using System.Linq;
 using CiLin;
 
 using Debug = Game.Diagnostics.Debug;
-using DataBindService;
+using DataBind.Service;
 using Game.Diagnostics.IO;
 using Console = Game.Diagnostics.IO.Console;
 
@@ -161,8 +161,8 @@ namespace TestWithInjected
                 @"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net471\RunDataBindDemo.dll",
                 new BindOptions()
                 {
-                    outputPath= @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll",
-                    useSymbols = useSymbols,
+                    OutputPath= @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll",
+                    UseSymbols = useSymbols,
                 });
             Console.Log("inject done.");
         }
@@ -175,7 +175,7 @@ namespace TestWithInjected
                 @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll",
                 new BindOptions()
                 {
-                    useSymbols = useSymbols,
+                    UseSymbols = useSymbols,
                 });
             Console.Log("inject done.");
         }
@@ -189,7 +189,7 @@ namespace TestWithInjected
 		@"E:\DATA\Codes\UnityDataBinding\client\Library\ScriptAssemblies\Assembly-CSharp.dll",
                 new BindOptions()
                 {
-                    useSymbols = useSymbols,
+                    UseSymbols = useSymbols,
                 });
             Console.Log("inject done.");
         }
@@ -202,8 +202,8 @@ namespace TestWithInjected
                 @"E:\DATA\Projects\test\TestDataBindDebug\TestDataType.dll",
                 new BindOptions()
                 {
-                    outputPath= @"E:\DATA\Projects\test\TestDataBindDebug\Assets\TestDataType.dll",
-                    useSymbols = useSymbols,
+                    OutputPath= @"E:\DATA\Projects\test\TestDataBindDebug\Assets\TestDataType.dll",
+                    UseSymbols = useSymbols,
                 });
             Console.Log("inject done.");
         }

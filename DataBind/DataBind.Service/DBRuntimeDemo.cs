@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VM;
 
-namespace DataBindService
+namespace DataBind.Service
 {
     public class DBRuntimeDemo
     {
