@@ -1,5 +1,6 @@
 ﻿using Mono.Cecil;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil.Cil;
 
@@ -609,74 +610,91 @@ namespace CiLin
 			return InterfaceDef;
 		}
 
-		public static bool ReplaceFieldReferWithPropertyDef(AssemblyDefinition assembly,FieldDefinition fieldDefinition,PropertyDefinition property)
+		public static bool ReplaceFieldReferWithPropertyDef(AssemblyDefinition assembly,
+			(FieldDefinition, PropertyDefinition)[] field2PropInfos)
         {
 			var anyReferExist = false;
-			assembly.Modules.ForEach((module) =>
-            {
-				module.Types.ForEach((type) =>
-				{
-					type.Methods.ForEach((method) => {
-                        if (method.Body != null && property.GetMethod!=method && property.SetMethod!=method && false==method.Name.EndsWith(">b__pri_get0"))
-                        {
-							var insts = method.Body.Instructions;
-							var isContructorInited = false;
-							var isConstructor = method.IsConstructor && type == fieldDefinition.DeclaringType;
-							insts.ForEach((inst,index) =>
-							{
-                                if (isConstructor)
-                                {
-                                    if (!isContructorInited)
-                                    {
-										// 跳过构造函数初始化阶段代码
-										if (inst.OpCode == OpCodes.Call && inst.Operand is MethodReference ctorB && ctorB.Name.Equals(".ctor")
-											&& (index >= 1 && insts[index - 1].OpCode == OpCodes.Ldarg_0)
-											)
-										{
-											isContructorInited = true;
-											return;
-										}
-										return;
-									}
-								}
-								var exist = true;
-                                // TODO: 考虑其他涉及fld的指令
-                                if (inst.OpCode == OpCodes.Ldfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
-                                {
-                                    inst.OpCode = OpCodes.Call;
-                                    inst.Operand = property.GetMethod;
-                                }
-                                else if (inst.OpCode == OpCodes.Ldsfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
-                                {
-                                    inst.OpCode = OpCodes.Call;
-                                    inst.Operand = property.GetMethod;
-                                }
-                                else if (inst.OpCode == OpCodes.Stfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
-                                {
-                                    inst.OpCode = OpCodes.Call;
-                                    inst.Operand = property.SetMethod;
-                                }
-                                else if (inst.OpCode == OpCodes.Stsfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
-                                {
-                                    inst.OpCode = OpCodes.Call;
-                                    inst.Operand = property.SetMethod;
-                                }
-                                else
-                                {
-									exist= false;
-                                }
 
-                                if (exist)
-                                {
-									anyReferExist = true;
-								}
-                            });
+			foreach (var module in assembly.Modules)
+			{
+				foreach (var type in module.Types)
+				{
+					foreach (var method in type.Methods)
+					{
+						foreach (var field2PropInfo in field2PropInfos)
+						{
+							var (fieldDefinition, property) = field2PropInfo;
+							anyReferExist |=
+								ReplaceFieldReferWithPropertyDef(method, property, type, fieldDefinition);
 						}
-					});
-				});
-			});
+					}
+				}
+			}
 
 			return anyReferExist;
         }
+
+		private static bool ReplaceFieldReferWithPropertyDef(MethodDefinition method, PropertyDefinition property,
+			TypeDefinition type, FieldDefinition fieldDefinition)
+		{
+			bool anyReferExist = false;
+			if (method.Body != null && property.GetMethod!=method && property.SetMethod!=method && false==method.Name.EndsWith(">b__pri_get0"))
+			{
+				var insts = method.Body.Instructions;
+				var isContructorInited = false;
+				var isConstructor = method.IsConstructor && type == fieldDefinition.DeclaringType;
+				insts.ForEach((inst,index) =>
+				{
+					if (isConstructor)
+					{
+						if (!isContructorInited)
+						{
+							// 跳过构造函数初始化阶段代码
+							if (inst.OpCode == OpCodes.Call && inst.Operand is MethodReference ctorB && ctorB.Name.Equals(".ctor")
+							    && (index >= 1 && insts[index - 1].OpCode == OpCodes.Ldarg_0)
+							   )
+							{
+								isContructorInited = true;
+								return;
+							}
+							return;
+						}
+					}
+					var exist = true;
+					// TODO: 考虑其他涉及fld的指令
+					if (inst.OpCode == OpCodes.Ldfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
+					{
+						inst.OpCode = OpCodes.Call;
+						inst.Operand = property.GetMethod;
+					}
+					else if (inst.OpCode == OpCodes.Ldsfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
+					{
+						inst.OpCode = OpCodes.Call;
+						inst.Operand = property.GetMethod;
+					}
+					else if (inst.OpCode == OpCodes.Stfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
+					{
+						inst.OpCode = OpCodes.Call;
+						inst.Operand = property.SetMethod;
+					}
+					else if (inst.OpCode == OpCodes.Stsfld && inst.Operand is FieldDefinition && inst.Operand == fieldDefinition)
+					{
+						inst.OpCode = OpCodes.Call;
+						inst.Operand = property.SetMethod;
+					}
+					else
+					{
+						exist= false;
+					}
+
+					if (exist)
+					{
+						anyReferExist = true;
+					}
+				});
+			}
+
+			return anyReferExist;
+		}
 	}
 }

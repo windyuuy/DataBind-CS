@@ -27,7 +27,7 @@ namespace DataBind.Service
             }
         }
 
-		public static void HandleAutoConvFieldToPropertySeperately(TypeDefinition typeDefinition,TypeReference AsPropertyAttr, PostTask postTask)
+		public static void HandleAutoConvFieldToPropertySeperately(TypeDefinition typeDefinition,TypeReference AsPropertyAttr, PostTask postTask, ref bool isAnyChanged)
 		{
 			foreach (var field in typeDefinition.Fields.ToArray())
 			{
@@ -36,6 +36,8 @@ namespace DataBind.Service
                 {
                     if (IsValidFieldConvToProperty(field))
                     {
+	                    isAnyChanged = true;
+	                    
 						field.CustomAttributes.Remove(attr);
 						var prop=CILUtils.ConvertFieldToProperty(MainAssembly, typeDefinition, field);
 						postTask.AddField2PropInfo(MainAssembly.MainModule, typeDefinition, field, prop);
@@ -49,11 +51,8 @@ namespace DataBind.Service
 			return field.IsStatic==false && ( field.IsPublic || field.IsFamily);
 		}
 
-		public static void HandleHost(TypeDefinition typeDefinition)
+		public static void HandleHost(TypeDefinition typeDefinition, ref bool isAnyChanged)
 		{
-			using var DataBindServiceAssembly = AssemblyDefinition.ReadAssembly(typeof(DBRuntimeDemo).Assembly.Location);
-			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBinding.HostExt2).Assembly.Location);
-
 			var IFullHostRef = MainAssembly.MainModule.ImportReference(typeof(VM.IFullHost));
 			var IHostRef = MainAssembly.MainModule.ImportReference(typeof(VM.IHost));
 			if (typeDefinition.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, IHostRef)))
@@ -64,6 +63,11 @@ namespace DataBind.Service
 			{
 				return;
 			}
+
+			isAnyChanged = true;
+
+			using var DataBindServiceAssembly = AssemblyDefinition.ReadAssembly(typeof(DBRuntimeDemo).Assembly.Location);
+			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBinding.HostExt2).Assembly.Location);
 
 			#region implement IFullHost
 			var VoidRef = MainAssembly.MainModule.ImportReference(typeof(void));
@@ -194,7 +198,7 @@ namespace DataBind.Service
 
         }
 
-        public static void HandleObservable(TypeDefinition typeDefinition, CustomAttribute attr0)
+        public static void HandleObservable(TypeDefinition typeDefinition, CustomAttribute attr0, ref bool isAnyChanged)
 		{
 			var needInject = false;
 
@@ -221,6 +225,8 @@ namespace DataBind.Service
 			{
 				return;
 			}
+
+			isAnyChanged = true;
 
 			#region implement IObservable
 			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DBRuntimeDemo).Assembly.Location);
@@ -488,18 +494,18 @@ namespace DataBind.Service
 			#endregion
 		}
 
-		public static void HandleObservableRecursive(TypeDefinition typeDefinition,CustomAttribute attr0)
-        {
-			HandleObservable(typeDefinition, attr0);
-			typeDefinition.Properties.ToArray().ForEach(prop =>
+		public static void HandleObservableRecursive(TypeDefinition typeDefinition,CustomAttribute attr0, ref bool isAnyChanged)
+		{
+			HandleObservable(typeDefinition, attr0, ref isAnyChanged);
+			foreach (var prop in typeDefinition.Properties.ToArray())
 			{
 				var propTypeDef = MainAssembly.MainModule.Types.FirstOrDefault(t => CILUtils.IsSameTypeReference(t, prop.PropertyType));
 				if(propTypeDef != null)
-                {
+				{
 					var attr = typeDefinition.CustomAttributes.FirstOrDefault(a => a != null && CILUtils.IsSameTypeReference(a.AttributeType, attr0.AttributeType));
-					HandleObservableRecursive(propTypeDef, attr);
+					HandleObservableRecursive(propTypeDef, attr, ref isAnyChanged);
 				}
-			});
-        }
+			}
+		}
 	}
 }

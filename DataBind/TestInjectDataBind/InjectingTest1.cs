@@ -157,7 +157,7 @@ namespace TestWithInjected
         public void TestInjectDataBind()
         {
             var useSymbols = false;
-            BindEntry.SupportDataBind(
+            DataBindModifierHelper.SupportDataBind(
                 @"E:\DATA\Codes\DataBind\DataBind\RunDataBindDemo\bin\Debug\net471\RunDataBindDemo.dll",
                 new BindOptions()
                 {
@@ -171,7 +171,7 @@ namespace TestWithInjected
         public void TestReInjectDataBind()
         {
             var useSymbols = false;
-            BindEntry.SupportDataBind(
+            DataBindModifierHelper.SupportDataBind(
                 @"E:\DATA\Codes\DataBind\DataBind\TestWithInjected\bin\Debug\net471\RunDataBindDemo.dll",
                 new BindOptions()
                 {
@@ -185,7 +185,7 @@ namespace TestWithInjected
         public void TestInjectUnity()
         {
             var useSymbols = true;
-            BindEntry.SupportDataBind(
+            DataBindModifierHelper.SupportDataBind(
 		@"E:\DATA\Codes\UnityDataBinding\client\Library\ScriptAssemblies\Assembly-CSharp.dll",
                 new BindOptions()
                 {
@@ -198,7 +198,7 @@ namespace TestWithInjected
         public void Test0DebugRider()
         {
             var useSymbols = false;
-            BindEntry.SupportDataBind(
+            DataBindModifierHelper.SupportDataBind(
                 @"E:\DATA\Projects\test\TestDataBindDebug\TestDataType.dll",
                 new BindOptions()
                 {

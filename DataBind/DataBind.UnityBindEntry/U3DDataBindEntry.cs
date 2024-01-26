@@ -1,4 +1,5 @@
-﻿using DataBind.Service;
+﻿using System;
+using DataBind.Service;
 using UnityEditor.Callbacks;
 using UnityEditor;
 using System.Linq;
@@ -8,32 +9,35 @@ using UnityEngine;
 
 namespace DataBinding.Editor.DataBindEntry
 {
-	public class MyCustomBuildProcessor0
-	{
-		public virtual void HandleDLLs(BuildReport report)
-		{
-		}
-	}
-
-	public class DataBindEntry : MyCustomBuildProcessor0, IPostBuildPlayerScriptDLLs
+	public class U3DDataBindEntry : IPostBuildPlayerScriptDLLs
 	{
 		#region IPostBuildPlayerScriptDLLs
 
-		public int callbackOrder
+		public virtual int callbackOrder
 		{
 			get { return 0; }
 		}
 
-		public override void HandleDLLs(BuildReport report)
+		public virtual void HandleDLLs(BuildReport report)
 		{
 			// 使用反射绕开 unity 无法自动升级API报错
-			// report.files
-			var filesProperty = report.GetType().GetProperty("files");
-			var files = (BuildFile[])filesProperty!.GetValue(report);
+			// var files = report.files
+			BuildFile[] files;
+			var getFilesMethod = report.GetType().GetMethod("GetFiles");
+			if (getFilesMethod != null)
+			{
+				files = (BuildFile[])getFilesMethod.Invoke(report, Array.Empty<object>());
+			}
+			else
+			{
+				var filesProperty = report.GetType().GetProperty("files");
+				files = (BuildFile[])filesProperty!.GetValue(report);
+			}
+
 			var targets = files
 				.Select(f => f.path)
 				.Where(p => p.EndsWith(".dll", System.StringComparison.OrdinalIgnoreCase));
-			BindEntry.SupportU3DDataBind(targets);
+			U3DBindHelper.SupportU3DDataBind(targets);
 		}
 
 		public virtual void OnPostBuildPlayerScriptDLLs(BuildReport report)
@@ -88,7 +92,7 @@ namespace DataBinding.Editor.DataBindEntry
 				return;
 			}
 
-			BindEntry.SupportU3DDataBindInLibrary();
+			U3DBindHelper.SupportU3DDataBindInLibrary();
 		}
 	}
 }
