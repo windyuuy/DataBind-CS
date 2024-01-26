@@ -26,7 +26,11 @@ namespace DataBinding.Editor.DataBindEntry
 
 		public override void HandleDLLs(BuildReport report)
 		{
-			var targets = report.files
+			// 使用反射绕开 unity 无法自动升级API报错
+			// report.files
+			var filesProperty=report.GetType().GetProperty("files");
+			var files = (BuildFile[])filesProperty!.GetValue(report);
+			var targets = files
 				.Select(f => f.path)
 				.Where(p => p.EndsWith(".dll", System.StringComparison.OrdinalIgnoreCase));
 			BindEntry.SupportU3DDataBind(targets);
@@ -37,9 +41,9 @@ namespace DataBinding.Editor.DataBindEntry
 			HandleDLLs(report);
 		}
 
-        #endregion
+		#endregion
 
-        public static bool HasSupport = false;
+		public static bool HasSupport = false;
 		[PostProcessBuild(1000)]
 		private static void OnPostprocessBuildPlayer(BuildTarget buildTarget, string buildPath)
 		{
