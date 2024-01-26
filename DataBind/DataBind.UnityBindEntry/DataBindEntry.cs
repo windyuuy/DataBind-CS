@@ -1,13 +1,10 @@
-﻿
-using DataBind.Service;
+﻿using DataBind.Service;
 using UnityEditor.Callbacks;
 using UnityEditor;
-
-using System.IO;
 using System.Linq;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using System.Diagnostics;
+using UnityEngine;
 
 namespace DataBinding.Editor.DataBindEntry
 {
@@ -16,19 +13,22 @@ namespace DataBinding.Editor.DataBindEntry
 		public virtual void HandleDLLs(BuildReport report)
 		{
 		}
-
 	}
 
 	public class DataBindEntry : MyCustomBuildProcessor0, IPostBuildPlayerScriptDLLs
 	{
 		#region IPostBuildPlayerScriptDLLs
-		public int callbackOrder { get { return 0; } }
+
+		public int callbackOrder
+		{
+			get { return 0; }
+		}
 
 		public override void HandleDLLs(BuildReport report)
 		{
 			// 使用反射绕开 unity 无法自动升级API报错
 			// report.files
-			var filesProperty=report.GetType().GetProperty("files");
+			var filesProperty = report.GetType().GetProperty("files");
 			var files = (BuildFile[])filesProperty!.GetValue(report);
 			var targets = files
 				.Select(f => f.path)
@@ -38,12 +38,29 @@ namespace DataBinding.Editor.DataBindEntry
 
 		public virtual void OnPostBuildPlayerScriptDLLs(BuildReport report)
 		{
+			if (!IsEnable)
+			{
+				return;
+			}
+
 			HandleDLLs(report);
 		}
 
 		#endregion
 
+		public static bool IsEnable
+		{
+			get
+			{
+				return PlayerPrefs.GetInt("DataBinding.Editor::DataBindEntry.IsEnable", 1) == 1;
+			}
+			set
+			{
+				PlayerPrefs.SetInt("DataBinding.Editor::DataBindEntry.IsEnable", value ? 1 : 0);
+			}
+		}
 		public static bool HasSupport = false;
+
 		[PostProcessBuild(1000)]
 		private static void OnPostprocessBuildPlayer(BuildTarget buildTarget, string buildPath)
 		{
@@ -57,17 +74,21 @@ namespace DataBinding.Editor.DataBindEntry
 			{
 				return;
 			}
+
 			HasSupport = true;
 
 			SupportU3DDataBind();
 		}
+
 		[InitializeOnLoadMethod]
 		public static void SupportU3DDataBind()
 		{
+			if (!IsEnable)
+			{
+				return;
+			}
 
 			BindEntry.SupportU3DDataBindInLibrary();
 		}
-
 	}
-
 }
