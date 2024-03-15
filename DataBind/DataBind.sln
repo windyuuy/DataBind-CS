@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publish", "Publish\Publish.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestUtils", "UnitTestUtils\UnitTestUtils.csproj", "{8A728BC5-4BF8-42EA-9545-929F713BC6E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBind.ParseJSAbstract", "DataBind.ParseJSAbstract\DataBind.ParseJSAbstract.csproj", "{E4D32BB7-3AE5-4B42-A632-A2CB6E1D1974}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBind.UIBind.ParseJSAbstract", "DataBind.UIBind.ParseJSAbstract\DataBind.UIBind.ParseJSAbstract.csproj", "{E4D32BB7-3AE5-4B42-A632-A2CB6E1D1974}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DB26575E-398A-4C1F-801C-59E6F79620D3} = {DB26575E-398A-4C1F-801C-59E6F79620D3}
 	EndProjectSection
@@ -49,7 +49,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Cecil.Rocks", "..\..\c
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UIBind", "UIBind", "{74D33621-01C2-4FBD-ACB2-AEC3A95AB48B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIBind.Meta", "UIBind.Meta\UIBind.Meta.csproj", "{7DCA2657-61D5-46C5-80F4-A2691D9CD300}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBind.UIBind.Meta", "DataBind.UIBind.Meta\DataBind.UIBind.Meta.csproj", "{7DCA2657-61D5-46C5-80F4-A2691D9CD300}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{1D76E6EA-3BAC-47F7-9815-202CEE0E8280}"
 EndProject

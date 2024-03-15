@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ParseJSDataBindAbstract</RootNamespace>
-    <AssemblyName>DataBind.ParseJSAbstract</AssemblyName>
+    <AssemblyName>DataBind.UIBind.ParseJSAbstract</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -56,9 +56,9 @@
       <Project>{2f450413-ea4c-4716-9c39-5be035eaefc8}</Project>
       <Name>EngineAdapter</Name>
     </ProjectReference>
-    <ProjectReference Include="..\UIBind.Meta\UIBind.Meta.csproj">
+    <ProjectReference Include="..\DataBind.UIBind.Meta\DataBind.UIBind.Meta.csproj">
       <Project>{7dca2657-61d5-46c5-80f4-a2691d9cd300}</Project>
-      <Name>UIBind.Meta</Name>
+      <Name>DataBind.UIBind.Meta</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

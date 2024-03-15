@@ -8,8 +8,8 @@
         <ProjectGuid>{7DCA2657-61D5-46C5-80F4-A2691D9CD300}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>UIBind.Meta</RootNamespace>
-        <AssemblyName>UIBind.Meta</AssemblyName>
+        <RootNamespace>DataBind.UIBind.Meta</RootNamespace>
+        <AssemblyName>DataBind.UIBind.Meta</AssemblyName>
         <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <LangVersion>9</LangVersion>
@@ -40,7 +40,7 @@
         <Reference Include="System.Xml"/>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="UIBindKeyAttribute.cs" />
+        <Compile Include="DataBind\UIBindKeyAttribute.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>

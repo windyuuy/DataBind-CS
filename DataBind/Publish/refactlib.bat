@@ -18,5 +18,7 @@ XCOPY %Source%\DataBind.dll %Bin%\DataBind /y
 XCOPY %Source%\DataBind.xml %Bin%\DataBind /y
 XCOPY %Source%\EngineAdapter.dll %Bin%\DataBind /y
 XCOPY %Source%\EngineAdapter.pdb %Bin%\DataBind /y
-XCOPY %Source%\DataBind.ParseJSAbstract.dll %Bin%\DataBind /y
-XCOPY %Source%\DataBind.ParseJSAbstract.pdb %Bin%\DataBind /y
+XCOPY %Source%\DataBind.UIBind.ParseJSAbstract.dll %Bin%\DataBind /y
+XCOPY %Source%\DataBind.UIBind.ParseJSAbstract.pdb %Bin%\DataBind /y
+XCOPY %Source%\DataBind.UIBind.Meta.dll %Bin%\DataBind /y
+XCOPY %Source%\DataBind.UIBind.Meta.pdb %Bin%\DataBind /y

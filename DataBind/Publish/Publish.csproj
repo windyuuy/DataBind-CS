@@ -12,8 +12,9 @@
     <ProjectReference Include="..\DataBind.Service\DataBind.Service.csproj" />
     <ProjectReference Include="..\DataBind\DataBind.csproj" />
     <ProjectReference Include="..\EngineAdapter\EngineAdapter.csproj" />
-    <ProjectReference Include="..\DataBind.ParseJSAbstract\DataBind.ParseJSAbstract.csproj" />
+    <ProjectReference Include="..\DataBind.UIBind.ParseJSAbstract\DataBind.UIBind.ParseJSAbstract.csproj" />
     <ProjectReference Include="..\DataBind.UnityBindEntry\DataBind.UnityBindEntry.csproj" />
+    <ProjectReference Include="..\DataBind.UIBind.Meta\DataBind.UIBind.Meta.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UIBind.Meta
+namespace DataBind.UIBind.Meta
 {
 	[AttributeUsage(AttributeTargets.Field, Inherited = false)]
 	public class UIBindKeyAttribute: Attribute

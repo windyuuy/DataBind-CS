@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataBind\DataBind.csproj" />
-    <ProjectReference Include="..\DataBind.ParseJSAbstract\DataBind.ParseJSAbstract.csproj" />
+    <ProjectReference Include="..\DataBind.UIBind.ParseJSAbstract\DataBind.UIBind.ParseJSAbstract.csproj" />
     <ProjectReference Include="..\UnitTestUtils\UnitTestUtils.csproj" />
   </ItemGroup>
 
