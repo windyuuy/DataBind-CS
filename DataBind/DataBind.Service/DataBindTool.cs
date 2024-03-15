@@ -4,6 +4,7 @@ using Mono.Cecil;
 using System.Collections.Generic;
 using Mono.Cecil.Cil;
 using CiLin;
+using UnityEngine;
 
 namespace DataBind.Service
 {
@@ -14,6 +15,7 @@ namespace DataBind.Service
 
 		public static void HandleAutoConvFieldToProperty(TypeDefinition typeDefinition, TypeReference AsPropertyAttr, PostTask postTask)
         {
+	        var SerializeFieldTypeRef = MainAssembly.MainModule.ImportReference(typeof(SerializeField).GetConstructor(Type.EmptyTypes));
 			var attr = typeDefinition.CustomAttributes.FirstOrDefault(attr => CILUtils.IsSameAttr(attr, AsPropertyAttr));
 			typeDefinition.CustomAttributes.Remove(attr);
 			var fields=typeDefinition.Fields.ToArray();
@@ -22,6 +24,7 @@ namespace DataBind.Service
 				if(IsValidFieldConvToProperty(field))
                 {
 					var prop = CILUtils.ConvertFieldToProperty(MainAssembly, typeDefinition, field);
+					AdaptUnitySerializeField(typeDefinition, field, SerializeFieldTypeRef);
 					postTask.AddField2PropInfo(MainAssembly.MainModule, typeDefinition, field, prop);
 				}
             }
@@ -29,6 +32,7 @@ namespace DataBind.Service
 
 		public static void HandleAutoConvFieldToPropertySeperately(TypeDefinition typeDefinition,TypeReference AsPropertyAttr, PostTask postTask, ref bool isAnyChanged)
 		{
+			var SerializeFieldTypeRef = MainAssembly.MainModule.ImportReference(typeof(SerializeField).GetConstructor(Type.EmptyTypes));
 			foreach (var field in typeDefinition.Fields.ToArray())
 			{
 				var attr = field.CustomAttributes.FirstOrDefault(attr => CILUtils.IsSameAttr(attr, AsPropertyAttr));
@@ -40,9 +44,18 @@ namespace DataBind.Service
 	                    
 						field.CustomAttributes.Remove(attr);
 						var prop=CILUtils.ConvertFieldToProperty(MainAssembly, typeDefinition, field);
+						AdaptUnitySerializeField(typeDefinition, field, SerializeFieldTypeRef);
 						postTask.AddField2PropInfo(MainAssembly.MainModule, typeDefinition, field, prop);
 					}
 				}
+			}
+		}
+
+		public static void AdaptUnitySerializeField(TypeDefinition typeDefinition, FieldDefinition field, MethodReference serializeFieldAttrCtor)
+		{
+			if (typeDefinition.IsSerializable)
+			{
+				field.CustomAttributes.TryAddCustomAttribute(serializeFieldAttrCtor);
 			}
 		}
 
@@ -53,6 +66,12 @@ namespace DataBind.Service
 
 		public static void HandleHost(TypeDefinition typeDefinition, ref bool isAnyChanged)
 		{
+			var keyField=CILUtils.FindField(typeDefinition, "_Swatchers");
+			if (keyField != null)
+			{
+				return;
+			}
+			
 			var IFullHostRef = MainAssembly.MainModule.ImportReference(typeof(VM.IFullHost));
 			var IHostRef = MainAssembly.MainModule.ImportReference(typeof(VM.IHost));
 			if (typeDefinition.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, IHostRef)))
@@ -83,9 +102,9 @@ namespace DataBind.Service
 			var DebuggerHiddenAttributeAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerHiddenAttribute).GetConstructor(new Type[0]));
 			
 			var isDestroyProp=CILUtils.InjectProperty(MainAssembly, typeDefinition, "_SIsDestroyed", BoolRef);
-			isDestroyProp.GetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
-			isDestroyProp.SetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
-			isDestroyProp.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
+			isDestroyProp.GetMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
+			isDestroyProp.SetMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
+			isDestroyProp.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
 			CILUtils.InjectField(MainAssembly, typeDefinition, "_Swatchers", IWatcherCollectionRef, FieldAttributes.Family);
 			CILUtils.InjectGetOrCreateObjectMethod(MainAssembly, typeDefinition, "GetWatchers", "_Swatchers", IWatcherCollectionRef, TDefaultValueType);
 
@@ -207,10 +226,10 @@ namespace DataBind.Service
 			{
 				needInject = true;
 				attr = CILUtils.CopyCustomAttribute(MainAssembly,attr0);
-				typeDefinition.CustomAttributes.Add(attr);
-            }
-            else
-            {
+				typeDefinition.CustomAttributes.TryAddCustomAttribute(attr);
+			}
+			else
+			{
 				var item = attr.ConstructorArguments[0];
 				if (item.Value.Equals(0))
 				{
@@ -231,108 +250,151 @@ namespace DataBind.Service
 			#region implement IObservable
 			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DBRuntimeDemo).Assembly.Location);
 
-			var DebuggerStepThroughAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerStepThroughAttribute).GetConstructor(new Type[0]));
+			var DebuggerStepThroughAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerStepThroughAttribute).GetConstructor(Type.EmptyTypes));
 			var ObserverRef = MainAssembly.MainModule.ImportReference(typeof(VM.Observer));
-			var DebuggerHiddenAttributeAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerHiddenAttribute).GetConstructor(new Type[0]));
+			var DebuggerHiddenAttributeAttrRef = MainAssembly.MainModule.ImportReference(typeof(System.Diagnostics.DebuggerHiddenAttribute).GetConstructor(Type.EmptyTypes));
+			var SerializeFieldTypeRef = MainAssembly.MainModule.ImportReference(typeof(SerializeField).GetConstructor(Type.EmptyTypes));
 
 			CILUtils.InjectField(MainAssembly, typeDefinition, "___Sob__", ObserverRef, FieldAttributes.Family);
 			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "_SgetOb", "___Sob__", ObserverRef);
 			CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "_SsetOb", "___Sob__", ObserverRef);
 
 			var GetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyGot", typeof(VM.PropertyGetEventHandler));
-			//GetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			GetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			GetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			//GetEvent.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerStepThroughAttrRef));
+			GetEvent.AddMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerStepThroughAttrRef));
+			GetEvent.RemoveMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerStepThroughAttrRef));
 			var SetEvent = CILUtils.InjectEvent(MainAssembly, typeDefinition, "PropertyChanged", typeof(VM.PropertyChangedEventHandler));
-			//SetEvent.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			SetEvent.AddMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			SetEvent.RemoveMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+			//SetEvent.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerStepThroughAttrRef));
+			SetEvent.AddMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerStepThroughAttrRef));
+			SetEvent.RemoveMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerStepThroughAttrRef));
 
 			var IObservableRef = MainAssembly.MainModule.ImportReference(typeof(VM.IObservable));
 			var IObservableDef = new InterfaceImplementation(IObservableRef);
-			typeDefinition.Interfaces.Add(IObservableDef);
+			typeDefinition.TryAddInterface(IObservableDef);
 			
 			var RuntimeDemoRef = MainAssembly.MainModule.ImportReference(typeof(DBRuntimeDemo));
 			var RuntimeDemoDef = DataBindAssembly.MainModule.Types.First(t => t != null && t.Namespace == RuntimeDemoRef.Namespace && t.FullName == RuntimeDemoRef.FullName);
-			var NotifyPropertyGotMethod = RuntimeDemoDef.Methods.First(m => m.Name == "NotifyPropertyGot");
-			var NotifyPropertyChangedMethod = RuntimeDemoDef.Methods.First(m => m.Name == "NotifyPropertyChanged");
-			var GetMethodNotify = CILUtils.CopyMethod(MainAssembly, typeDefinition, "NotifyPropertyGot", RuntimeDemoDef, NotifyPropertyGotMethod);
-			var SetMethodNotify = CILUtils.CopyMethod(MainAssembly, typeDefinition, "NotifyPropertyChanged", RuntimeDemoDef, NotifyPropertyChangedMethod);
-			
+			if (typeDefinition.FindMethod("NotifyPropertyChanged") == null)
 			{
-				var eventField = typeDefinition.Fields.First(f => f.Name == "PropertyGot");
-				var PropertyGetEventArgsCtor = MainAssembly.MainModule.ImportReference(typeof(VM.PropertyGetEventArgs).GetConstructor(new Type[] { typeof(string), typeof(object) }));
-				var PropertyGetEventHandler = MainAssembly.MainModule.ImportReference(typeof(VM.PropertyGetEventHandler).GetMethod("Invoke"));
-			
-				GetMethodNotify.Body.Instructions.Clear();
-				var worker = GetMethodNotify.Body.GetILProcessor();
-				worker.Append(worker.Create(OpCodes.Nop));
-				worker.Append(worker.Create(OpCodes.Ldarg_0));
-				worker.Append(worker.Create(OpCodes.Ldfld, eventField));
-				worker.Append(worker.Create(OpCodes.Dup));
-				var inst1 = worker.Create(OpCodes.Ldarg_0);
-				worker.Append(worker.Create(OpCodes.Brtrue, inst1));
-				worker.Append(worker.Create(OpCodes.Pop));
-				var inst2 = worker.Create(OpCodes.Ret);
-				worker.Append(worker.Create(OpCodes.Br_S, inst2));
-				worker.Append(inst1);
-				worker.Append(worker.Create(OpCodes.Ldarg_2));
-				worker.Append(worker.Create(OpCodes.Ldarg_1));
-				worker.Append(worker.Create(OpCodes.Newobj, PropertyGetEventArgsCtor));
-				worker.Append(worker.Create(OpCodes.Callvirt, PropertyGetEventHandler));
-				worker.Append(worker.Create(OpCodes.Nop));
-				worker.Append(inst2);
-			
-				GetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+				var NotifyPropertyGotMethod = RuntimeDemoDef.Methods.First(m => m.Name == "NotifyPropertyGot");
+				var NotifyPropertyChangedMethod = RuntimeDemoDef.Methods.First(m => m.Name == "NotifyPropertyChanged");
+				var GetMethodNotify = CILUtils.CopyMethod(MainAssembly, typeDefinition, "NotifyPropertyGot",
+					RuntimeDemoDef, NotifyPropertyGotMethod);
+				var SetMethodNotify = CILUtils.CopyMethod(MainAssembly, typeDefinition, "NotifyPropertyChanged",
+					RuntimeDemoDef, NotifyPropertyChangedMethod);
+
+				{
+					var eventField = CILUtils.FindField(typeDefinition, "PropertyGot");
+					var PropertyGetEventArgsCtor = MainAssembly.MainModule.ImportReference(
+						typeof(VM.PropertyGetEventArgs).GetConstructor(new Type[] { typeof(string), typeof(object) }));
+					var PropertyGetEventHandler =
+						MainAssembly.MainModule.ImportReference(typeof(VM.PropertyGetEventHandler).GetMethod("Invoke"));
+
+					GetMethodNotify.Body.Instructions.Clear();
+					var worker = GetMethodNotify.Body.GetILProcessor();
+					worker.Append(worker.Create(OpCodes.Nop));
+					worker.Append(worker.Create(OpCodes.Ldarg_0));
+					worker.Append(worker.Create(OpCodes.Ldfld, eventField));
+					worker.Append(worker.Create(OpCodes.Dup));
+					var inst1 = worker.Create(OpCodes.Ldarg_0);
+					worker.Append(worker.Create(OpCodes.Brtrue, inst1));
+					worker.Append(worker.Create(OpCodes.Pop));
+					var inst2 = worker.Create(OpCodes.Ret);
+					worker.Append(worker.Create(OpCodes.Br_S, inst2));
+					worker.Append(inst1);
+					worker.Append(worker.Create(OpCodes.Ldarg_2));
+					worker.Append(worker.Create(OpCodes.Ldarg_1));
+					worker.Append(worker.Create(OpCodes.Newobj, PropertyGetEventArgsCtor));
+					worker.Append(worker.Create(OpCodes.Callvirt, PropertyGetEventHandler));
+					worker.Append(worker.Create(OpCodes.Nop));
+					worker.Append(inst2);
+
+					GetMethodNotify.CustomAttributes.TryAddCustomAttribute(
+						new CustomAttribute(DebuggerStepThroughAttrRef));
+				}
+				{
+					var eventField = CILUtils.FindField(typeDefinition, "PropertyChanged");
+					var PropertyChangeEventArgsCtor = MainAssembly.MainModule.ImportReference(
+						typeof(VM.PropertyChangedEventArgs).GetConstructor(new Type[]
+							{ typeof(string), typeof(object), typeof(object) }));
+					var PropertyChangeEventHandler =
+						MainAssembly.MainModule.ImportReference(
+							typeof(VM.PropertyChangedEventHandler).GetMethod("Invoke"));
+
+					SetMethodNotify.Body.Instructions.Clear();
+					var worker = SetMethodNotify.Body.GetILProcessor();
+					worker.Append(worker.Create(OpCodes.Nop));
+					worker.Append(worker.Create(OpCodes.Ldarg_0));
+					worker.Append(worker.Create(OpCodes.Ldfld, eventField));
+					worker.Append(worker.Create(OpCodes.Dup));
+					var inst1 = worker.Create(OpCodes.Ldarg_0);
+					worker.Append(worker.Create(OpCodes.Brtrue, inst1));
+					worker.Append(worker.Create(OpCodes.Pop));
+					var inst2 = worker.Create(OpCodes.Ret);
+					worker.Append(worker.Create(OpCodes.Br_S, inst2));
+					worker.Append(inst1);
+					worker.Append(worker.Create(OpCodes.Ldarg_3));
+					worker.Append(worker.Create(OpCodes.Ldarg_1));
+					worker.Append(worker.Create(OpCodes.Ldarg_2));
+					worker.Append(worker.Create(OpCodes.Newobj, PropertyChangeEventArgsCtor));
+					worker.Append(worker.Create(OpCodes.Callvirt, PropertyChangeEventHandler));
+					worker.Append(worker.Create(OpCodes.Nop));
+					worker.Append(inst2);
+
+					SetMethodNotify.CustomAttributes.TryAddCustomAttribute(
+						new CustomAttribute(DebuggerStepThroughAttrRef));
+				}
 			}
-			{
-				var eventField = typeDefinition.Fields.First(f => f.Name == "PropertyChanged");
-				var PropertyChangeEventArgsCtor = MainAssembly.MainModule.ImportReference(typeof(VM.PropertyChangedEventArgs).GetConstructor(new Type[] { typeof(string), typeof(object), typeof(object) }));
-				var PropertyChangeEventHandler = MainAssembly.MainModule.ImportReference(typeof(VM.PropertyChangedEventHandler).GetMethod("Invoke"));
-			
-				SetMethodNotify.Body.Instructions.Clear();
-				var worker = SetMethodNotify.Body.GetILProcessor();
-				worker.Append(worker.Create(OpCodes.Nop));
-				worker.Append(worker.Create(OpCodes.Ldarg_0));
-				worker.Append(worker.Create(OpCodes.Ldfld, eventField));
-				worker.Append(worker.Create(OpCodes.Dup));
-				var inst1 = worker.Create(OpCodes.Ldarg_0);
-				worker.Append(worker.Create(OpCodes.Brtrue, inst1));
-				worker.Append(worker.Create(OpCodes.Pop));
-				var inst2 = worker.Create(OpCodes.Ret);
-				worker.Append(worker.Create(OpCodes.Br_S, inst2));
-				worker.Append(inst1);
-				worker.Append(worker.Create(OpCodes.Ldarg_3));
-				worker.Append(worker.Create(OpCodes.Ldarg_1));
-				worker.Append(worker.Create(OpCodes.Ldarg_2));
-				worker.Append(worker.Create(OpCodes.Newobj, PropertyChangeEventArgsCtor));
-				worker.Append(worker.Create(OpCodes.Callvirt, PropertyChangeEventHandler));
-				worker.Append(worker.Create(OpCodes.Nop));
-				worker.Append(inst2);
-			
-				SetMethodNotify.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
-			}
-			
-			var NotifyPropertyGot = typeDefinition.Methods.First(m => m.Name == "NotifyPropertyGot");
-			var NotifyPropertyChanged = typeDefinition.Methods.First(m => m.Name == "NotifyPropertyChanged");
+
+			var NotifyPropertyGot = typeDefinition.FindMethod("NotifyPropertyGot");
+			var NotifyPropertyChanged = typeDefinition.FindMethod("NotifyPropertyChanged");
 			
 			var IObservableEventDelegateRef = MainAssembly.MainModule.ImportReference(typeof(VM.IObservableEventDelegate));
 			var IObservableEventDelegateDef = new InterfaceImplementation(IObservableEventDelegateRef);
-			typeDefinition.Interfaces.Add(IObservableEventDelegateDef);
+			typeDefinition.TryAddInterface(IObservableEventDelegateDef);
 			var BoolRef = MainAssembly.MainModule.ImportReference(typeof(bool));
 			
 			typeDefinition.Properties.ForEach(p =>
 			{
 				Instruction[] getMethodInstCopy = null;
 			
-				var getMethod = p.GetMethod;
+				// rename field of property if has SerializableAttribute
+				{
+					if (typeDefinition.IsSerializable)
+					{
+						if (p.Name[0] != '_')
+						{
+							string targetName;
+							if (char.IsUpper(p.Name[0]))
+							{
+								targetName = $"{char.ToLower(p.Name[0])}{p.Name.Substring(1)}";
+							}
+							else
+							{
+								targetName = $"{char.ToUpper(p.Name[0])}{p.Name.Substring(1)}";
+							}
+
+							var fieldName0 = $"<{p.Name}>k__BackingField";
+							var fields = typeDefinition.Fields;
+							var field = fields.FirstOrDefault(f => f.Name == fieldName0);
+							if (field!=null &&
+							    fields.All(f => f.Name != targetName))
+							{
+								field.Name = targetName;
+								field.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(SerializeFieldTypeRef));
+							}
+						}
+					}
+				}
+
 				// get
 				{
+					var getMethod = p.GetMethod;
 					if (getMethod != null)
 					{
 						getMethodInstCopy = new Instruction[p.GetMethod.Body.Instructions.Count];
 						p.GetMethod.Body.Instructions.CopyTo(getMethodInstCopy, 0);
-						p.GetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+						p.GetMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerStepThroughAttrRef));
 			
 						var getWorker = getMethod.Body.GetILProcessor();
 			
@@ -360,14 +422,14 @@ namespace DataBind.Service
 						CILUtils.InjectBeforeReturn(getMethod, getFinalInst.ToArray());
 					}
 				}
-			
+
 				// set
 				{
 					// TODO: 优化value判定，优化效率
 					var setMethod = p.SetMethod;
 					if (setMethod != null)
 					{
-						setMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+						setMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerStepThroughAttrRef));
 						var setWorker = setMethod.Body.GetILProcessor();
 			
 						if (getMethodInstCopy != null)
@@ -397,7 +459,7 @@ namespace DataBind.Service
 							var privateGetMethod = CILUtils.CopyMethod(MainAssembly, typeDefinition, privateGetMethodName, typeDefinition, p.GetMethod);
 							privateGetMethod.Attributes = MethodAttributes.Private | MethodAttributes.Final | MethodAttributes.NewSlot;
 							privateGetMethod.SemanticsAttributes = MethodSemanticsAttributes.None;
-							privateGetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerStepThroughAttrRef));
+							privateGetMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerStepThroughAttrRef));
 							var privateGetMethodWorker = privateGetMethod.Body.GetILProcessor();
 							getMethodInstCopy.ForEach(inst =>
 							{
@@ -466,31 +528,35 @@ namespace DataBind.Service
 			var ObjectRef = MainAssembly.MainModule.ImportReference(typeof(object));
 			var IWithPrototypeRef = MainAssembly.MainModule.ImportReference(typeof(DataBinding.CollectionExt.IWithPrototype));
 
-			CILUtils.InjectInteface(MainAssembly, typeDefinition, IWithPrototypeRef);
-
-			CILUtils.InjectField(MainAssembly, typeDefinition, "___Sproto__", ObjectRef, FieldAttributes.Family);
-			var P_ = CILUtils.InjectProperty(MainAssembly, typeDefinition, "_", ObjectRef);
-			P_.GetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
-			P_.SetMethod.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
-			P_.CustomAttributes.Add(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
-
-			CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "GetProto", "___Sproto__", ObjectRef);
-			var SetProtoDef = CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "SetProto", "___Sproto__", ObjectRef);
+			if (typeDefinition.FindInterface(IWithPrototypeRef) == null)
 			{
-				var setMethod = SetProtoDef;
-				var retInst = setMethod.Body.Instructions.Last();
+				CILUtils.InjectInteface(MainAssembly, typeDefinition, IWithPrototypeRef);
 
-				var setWorker = setMethod.Body.GetILProcessor();
-				var appendSetInsts = new System.Collections.Generic.List<Instruction>();
-				appendSetInsts.Add(setWorker.Create(OpCodes.Ldarg_0));
-				appendSetInsts.Add(setWorker.Create(OpCodes.Ldarg_1));
-				appendSetInsts.Add(setWorker.Create(OpCodes.Call, P_.SetMethod));
+				CILUtils.InjectField(MainAssembly, typeDefinition, "___Sproto__", ObjectRef, FieldAttributes.Family);
+				var P_ = CILUtils.InjectProperty(MainAssembly, typeDefinition, "_self", ObjectRef);
+				P_.GetMethod.CustomAttributes.TryAddCustomAttribute(
+					new CustomAttribute(DebuggerHiddenAttributeAttrRef));
+				P_.SetMethod.CustomAttributes.TryAddCustomAttribute(
+					new CustomAttribute(DebuggerHiddenAttributeAttrRef));
+				P_.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(DebuggerHiddenAttributeAttrRef));
 
-				appendSetInsts.ForEach(inst =>
+				CILUtils.InjectGetFieldMethod(MainAssembly, typeDefinition, "GetProto", "___Sproto__", ObjectRef);
+				var SetProtoDef = CILUtils.InjectSetFieldMethod(MainAssembly, typeDefinition, "SetProto", "___Sproto__",
+					ObjectRef);
 				{
-					setWorker.InsertBefore(retInst, inst);
-				});
+					var setMethod = SetProtoDef;
+					var retInst = setMethod.Body.Instructions.Last();
+
+					var setWorker = setMethod.Body.GetILProcessor();
+					var appendSetInsts = new System.Collections.Generic.List<Instruction>();
+					appendSetInsts.Add(setWorker.Create(OpCodes.Ldarg_0));
+					appendSetInsts.Add(setWorker.Create(OpCodes.Ldarg_1));
+					appendSetInsts.Add(setWorker.Create(OpCodes.Call, P_.SetMethod));
+
+					appendSetInsts.ForEach(inst => { setWorker.InsertBefore(retInst, inst); });
+				}
 			}
+
 			#endregion
 		}
 

@@ -1,12 +1,9 @@
 using Mono.Cecil;
 using NUnit.Framework;
-using System;
-using System.Linq;
 using CiLin;
 
-using Debug = Game.Diagnostics.Debug;
+using Debug = Game.Diagnostics.Console;
 using DataBind.Service;
-using Game.Diagnostics.IO;
 using Console = Game.Diagnostics.IO.Console;
 
 namespace TestWithInjected
@@ -59,7 +56,7 @@ namespace TestWithInjected
                                 Debug.Log("start");
 
                                 var inter = new InterfaceImplementation(tIObservable);
-                                type.Interfaces.Add(inter);
+                                type.TryAddInterface(inter);
 
                                 CILUtils.InjectProperty(assembly, type, "CCC", typeof(double));
                                 CILUtils.InjectProperty(assembly, type, "SS", typeof(string));
@@ -203,6 +200,20 @@ namespace TestWithInjected
                 new BindOptions()
                 {
                     OutputPath= @"E:\DATA\Projects\test\TestDataBindDebug\Assets\TestDataType.dll",
+                    UseSymbols = useSymbols,
+                });
+            Console.Log("inject done.");
+        }
+
+        [Test]
+        public void TestEaseScrollView()
+        {
+            var useSymbols = false;
+            DataBindModifierHelper.SupportDataBind(
+                @"E:\DATA\Codes\UnityDataBinding\client\Library\ScriptAssemblies\EaseScrollView.Test.dll",
+                new BindOptions()
+                {
+                    OutputPath= @"E:\DATA\Codes\UnityDataBinding\client\Library\ScriptAssemblies\EaseScrollView.Test2.dll",
                     UseSymbols = useSymbols,
                 });
             Console.Log("inject done.");

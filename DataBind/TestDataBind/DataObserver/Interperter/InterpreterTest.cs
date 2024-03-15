@@ -704,7 +704,7 @@ namespace TestDataBind
 			}
 
 			{
-				var exp = new VM.Interpreter("/*嘻嘻嘻出现*/SUM(list/*哈哈哈*/,{攻击力*(1+攻击力加成 )* _.p})//嘻嘻嘻出现");
+				var exp = new VM.Interpreter("/*嘻嘻嘻出现*/SUM(list/*哈哈哈*/,{攻击力*(1+攻击力加成 )* _self.p})//嘻嘻嘻出现");
 				expect(exp.Run(evn5)).toBe(45 * 2);
 			}
 

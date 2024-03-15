@@ -46,7 +46,7 @@ namespace TestDataBind
 		}
 
 		public object Proto;
-		public virtual object _ { get; set; }
+		public virtual object _self { get; set; }
 
 		public virtual object GetProto()
 		{
@@ -56,7 +56,7 @@ namespace TestDataBind
 		public virtual void SetProto(object dict)
 		{
 			this.Proto = dict;
-			this._ = dict;
+			this._self = dict;
 		}
 	}
 	public class SampleOBD4<T> : SampleOBD3<T> where T : class, new()

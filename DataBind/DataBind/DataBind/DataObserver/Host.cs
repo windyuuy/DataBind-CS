@@ -109,12 +109,12 @@ namespace VM
 
 		#region IWithPrototype
 		public object Proto;
-		public virtual object _ { get; set; }
+		public virtual object _self { get; set; }
 
 		public virtual void SetProto(object dict)
 		{
 			this.Proto = dict;
-			this._ = dict;
+			this._self = dict;
 		}
 
 		public virtual object GetProto()

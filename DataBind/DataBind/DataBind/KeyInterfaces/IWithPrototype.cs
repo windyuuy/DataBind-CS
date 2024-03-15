@@ -8,6 +8,6 @@ namespace DataBinding.CollectionExt
 		// protected object ___Sproto__;
 		void SetProto(object proto);
 		object GetProto();
-		object _ { get; set; }
+		object _self { get; set; }
 	}
 }

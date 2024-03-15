@@ -7,7 +7,7 @@ namespace DataBinding.CollectionExt
 	public partial class List<T> : IWithPrototype
 	{
 		public object Proto;
-		public virtual object _ { get; set; }
+		public virtual object _self { get; set; }
 
 		public virtual object GetProto()
 		{
@@ -17,7 +17,7 @@ namespace DataBinding.CollectionExt
 		public virtual void SetProto(object dict)
 		{
 			this.Proto = dict;
-			this._ = dict;
+			this._self = dict;
 		}
 
 	}

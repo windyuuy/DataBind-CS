@@ -2,6 +2,7 @@
 using System.Reflection;
 using Game.Diagnostics;
 using VM;
+using Debug=Game.Diagnostics.Console;
 
 namespace DataBinding
 {

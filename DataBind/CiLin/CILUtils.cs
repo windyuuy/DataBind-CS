@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 
 namespace CiLin
 {
@@ -33,7 +34,7 @@ namespace CiLin
 		}
 	}
 
-	public class CILUtils
+	public static class CILUtils
 	{
 		public static AssemblyDefinition SysAssembly;
 
@@ -88,6 +89,13 @@ namespace CiLin
 
 		public static MethodDefinition InjectSetFieldMethod(AssemblyDefinition assembly, TypeDefinition targetType, string methodName, string fieldName, TypeReference propertyType)
 		{
+			{
+				var method = FindMethod(targetType, methodName);
+				if (method!=null)
+				{
+					return method;
+				}
+			}
 			//Import the void type
 			TypeReference voidRef = assembly.MainModule.ImportReference(typeof(void));
 
@@ -122,6 +130,11 @@ namespace CiLin
 		}
 		public static void InjectGetOrCreateObjectMethod(AssemblyDefinition assembly, TypeDefinition targetType, string methodName, string fieldName, TypeReference propertyType, Type defaultValueType)
 		{
+			if (FindMethod(targetType, methodName) != null)
+			{
+				return;
+			}
+			
 			var TDefaultValueCtor = defaultValueType.GetConstructor(new Type[0]);
 			var FieldTypeCtroRef = assembly.MainModule.ImportReference(TDefaultValueCtor);
 			//define the field we store the value in
@@ -171,6 +184,14 @@ namespace CiLin
 		}
 		public static void InjectGetFieldMethod(AssemblyDefinition assembly, TypeDefinition targetType, string methodName, string fieldName, TypeReference propertyType)
 		{
+			{
+				var method = FindMethod(targetType, methodName);
+				if (method != null)
+				{
+					return;
+				}
+			}
+			
 			//define the field we store the value in
 			var field = targetType.Fields.First(f => f.Name == fieldName);
 
@@ -198,17 +219,23 @@ namespace CiLin
 		}
 		public static void InjectField(AssemblyDefinition assembly, TypeDefinition targetType, string fieldName, TypeReference fieldType, FieldAttributes fieldAttributes)
 		{
+			{
+				if (FindField(targetType, fieldName)!=null)
+				{
+					return;
+				}
+			}
 			//define the field we store the value in
 			FieldDefinition field = new FieldDefinition(fieldName, fieldAttributes, fieldType);
 			targetType.Fields.Add(field);
 		}
 
-		public static void CopyCollection<T>(Mono.Collections.Generic.Collection<T> target, Mono.Collections.Generic.Collection<T> source)
+		public static void CopyCollection<T>(Mono.Collections.Generic.Collection<T> target, IEnumerable<T> source)
 		{
-			source.ForEach(t =>
+			foreach (var t in source)
 			{
 				target.Add(t);
-			});
+			}
 		}
 
 		public static MethodDefinition CopyMethod(AssemblyDefinition assembly, TypeDefinition targetType, string targetMethodName, TypeDefinition sourceType, MethodDefinition sourceMethod)
@@ -220,6 +247,15 @@ namespace CiLin
 			CopyCollection(targetMethod.Body.Variables, sourceMethod.Body.Variables);
 			//CopyCollection(targetMethod.Body.Instructions, sourceMethod.Body.Instructions);
 			CopyCollection(targetMethod.Parameters, sourceMethod.Parameters);
+			// if (targetType.FullName == "TestDataBinding.Tests.TestEnhancedScroller.TRawData" && 
+			//     ( targetMethodName=="NotifyPropertyChanged"))
+			// {
+			// 	Console.Write("");
+			// 	foreach (var targetMethodParameter in targetMethod.Parameters)
+			// 	{
+			// 		var result = targetMethodParameter.CustomAttributes;
+			// 	}
+			// }
 			CopyCollection(targetMethod.GenericParameters, sourceMethod.GenericParameters);
 
 			targetType.Methods.Add(targetMethod);
@@ -237,6 +273,127 @@ namespace CiLin
 			});
 			return copyAttr;
 		}
+
+		public static bool IsFieldExist(this TypeDefinition targetType, string fieldName)
+		{
+			return FindField(targetType, fieldName) != null;
+		}
+		public static FieldDefinition FindField(this TypeDefinition targetType, string fieldName)
+		{
+			var baseType = targetType;
+			while (true)
+			{
+				var field=baseType.Fields.FirstOrDefault(f => f.Name == fieldName);
+				if (field!=null)
+				{
+					return field;
+				}
+
+				if (baseType.BaseType is TypeDefinition baseDef)
+				{
+					baseType = baseDef;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			return null;
+		}
+		public static MethodDefinition FindMethod(this TypeDefinition targetType, string methodName)
+		{
+			var baseType = targetType;
+			while (true)
+			{
+				var method=baseType.Methods.FirstOrDefault(f => f.Name == methodName);
+				if (method!=null)
+				{
+					return method;
+				}
+
+				if (baseType.BaseType is TypeDefinition baseDef)
+				{
+					baseType = baseDef;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			return null;
+		}
+		public static PropertyDefinition FindProperty(this TypeDefinition targetType, string propertyName)
+		{
+			var baseType = targetType;
+			while (true)
+			{
+				var prop=baseType.Properties.FirstOrDefault(f => f.Name == propertyName);
+				if (prop!=null)
+				{
+					return prop;
+				}
+
+				if (baseType.BaseType is TypeDefinition baseDef)
+				{
+					baseType = baseDef;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			return null;
+		}
+		public static EventDefinition FindEvent(this TypeDefinition targetType, string eventName)
+		{
+			var baseType = targetType;
+			while (true)
+			{
+				var eventP=baseType.Events.FirstOrDefault(f => f.Name == eventName);
+				if (eventP!=null)
+				{
+					return eventP;
+				}
+
+				if (baseType.BaseType is TypeDefinition baseDef)
+				{
+					baseType = baseDef;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			return null;
+		}
+		public static InterfaceImplementation FindInterface(this TypeDefinition targetType, TypeReference interfaceRefer)
+		{
+			var baseType = targetType;
+			while (true)
+			{
+				var interfaceP=baseType.Interfaces.FirstOrDefault(i=>IsSameInterface(i, interfaceRefer));
+				if (interfaceP!=null)
+				{
+					return interfaceP;
+				}
+
+				if (baseType.BaseType is TypeDefinition baseDef)
+				{
+					baseType = baseDef;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			return null;
+		}
+
 		public static PropertyDefinition InjectProperty(AssemblyDefinition assembly, TypeDefinition targetType, string propertyName, Type returnType)
 		{
 			TypeReference propertyType = assembly.MainModule.ImportReference(returnType);
@@ -254,9 +411,15 @@ namespace CiLin
 			var field = fieldDefinition;
             if(field == null)
             {
-				field = targetType.Fields.FirstOrDefault(f => f.Name == fieldName);
-			}
-			if (field == null)
+				field = FindField(targetType, fieldName);
+				var prop = FindProperty(targetType, propertyName);
+				if (prop != null)
+				{
+					return prop;
+				}
+            }
+
+            if (field == null)
 			{
 				//define the field we store the value in
 				field = new FieldDefinition(fieldName, FieldAttributes.Private, propertyType);
@@ -304,14 +467,14 @@ namespace CiLin
 			targetType.Methods.Add(set);
 
 			//create the property
-			get.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
-			set.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			get.CustomAttributes.TryAddCustomAttribute(rCompilerGenerated);
+			set.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(rCompilerGenerated));
 			PropertyDefinition propertyDefinition = new PropertyDefinition(propertyName, PropertyAttributes.None, propertyType)
 			{
 				GetMethod = get,
 				SetMethod = set
 			};
-			propertyDefinition.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			propertyDefinition.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(rCompilerGenerated));
 
 			//add the property to the type.
 			targetType.Properties.Add(propertyDefinition);
@@ -320,20 +483,38 @@ namespace CiLin
 		}
 		public static string ConvertToFieldName(string propertyName)
 		{
-			var fieldName = new System.Text.StringBuilder();
-			//<CCC>k__BackingField
-			fieldName.Append("<");
-			fieldName.Append(propertyName);
-			//fieldName.Append(">k__BackingField");
-			fieldName.Append(">k__$BF");
+			return $"<{propertyName}>k__$BF";
+		}
+		public static string ConvertToPropName(string fieldName)
+		{
+			// return fieldName;
+			if (fieldName[0] != '_')
+			{
+				string targetName;
+				if (char.IsUpper(fieldName[0]))
+				{
+					targetName = $"{char.ToLower(fieldName[0])}{fieldName.Substring(1)}";
+				}
+				else
+				{
+					targetName = $"{char.ToUpper(fieldName[0])}{fieldName.Substring(1)}";
+				}
 
-			return fieldName.ToString();
+				return targetName;
+			}
+
+			return fieldName;
 		}
 
 		public static PropertyDefinition ConvertFieldToProperty(AssemblyDefinition assembly, TypeDefinition typeDefinition, FieldDefinition field)
 		{
 			var fieldName0 = field.Name;
-			field.Name = CILUtils.ConvertToFieldName(fieldName0);
+			var propName = ConvertToPropName(fieldName0);
+			if (typeDefinition.FindProperty(propName) != null)
+			{
+				throw new Exception($"Field<{fieldName0}> should be null");
+			}
+			field.Name = propName;
 
 			var TCompilerGenerated = typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute);
 			var rCompilerGenerated = assembly.MainModule.ImportReference(TCompilerGenerated.GetConstructor(new Type[] { }));
@@ -392,9 +573,9 @@ namespace CiLin
 			}
 			methodAttributes |= MethodAttributes.SpecialName;
 			prop.GetMethod.Attributes = getMethodAttrs;
-			// prop.GetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			// prop.GetMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(rCompilerGenerated));
 			prop.SetMethod.Attributes = setMethodAttrs;
-			// prop.SetMethod.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			// prop.SetMethod.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(rCompilerGenerated));
 
 			var fieldAttributes = FieldAttributes.Private;
             if (field.IsStatic)
@@ -408,6 +589,39 @@ namespace CiLin
 			return prop;
 		}
 
+		public static void TryAddCustomAttribute(this Collection<CustomAttribute> customAttributes, MethodReference attr)
+		{
+			if (!customAttributes.Any(a => IsSameAttr(a, attr.DeclaringType)))
+			{
+				customAttributes.Add(new CustomAttribute(attr));
+			}
+		}
+
+		public static void TryAddCustomAttribute(this Collection<CustomAttribute> customAttributes, CustomAttribute attr)
+		{
+			if (!customAttributes.Any(a => IsSameAttr(a, attr.AttributeType)))
+			{
+				customAttributes.Add(attr);
+			}
+		}
+
+		public static void TryAddInterface(this TypeDefinition typeDefinition, TypeReference ii)
+		{
+			var idef = FindInterface(typeDefinition, ii);
+			if (idef == null)
+			{
+				typeDefinition.Interfaces.Add(new InterfaceImplementation(ii));
+			}
+		}
+
+		public static void TryAddInterface(this TypeDefinition typeDefinition, InterfaceImplementation ii)
+		{
+			var idef = FindInterface(typeDefinition, ii.InterfaceType);
+			if (idef == null)
+			{
+				typeDefinition.Interfaces.Add(ii);
+			}
+		}
 
 		private static string ConvertToEventName(string propertyName)
 		{
@@ -418,6 +632,14 @@ namespace CiLin
 		}
 		public static EventDefinition InjectEvent(AssemblyDefinition assembly, TypeDefinition assemblyTypes, string propertyName, Type returnType)
 		{
+			{
+				var eventDef = FindEvent(assemblyTypes, propertyName);
+				if (eventDef != null)
+				{
+					return eventDef;
+				}
+			}
+			
 			//var sys2 = AssemblyDefinition.ReadAssembly(typeof(System.IO.FileAttributes).Assembly.Location);
 			//var sys= AssemblyDefinition.ReadAssembly(typeof(System.Delegate).Assembly.Location);
 			var sys = SysAssembly;
@@ -437,8 +659,8 @@ namespace CiLin
 
 			//define the field we store the value in
 			FieldDefinition field = new FieldDefinition(ConvertToEventName(propertyName), FieldAttributes.Private, propertyType);
-			field.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
-			field.CustomAttributes.Add(new CustomAttribute(rDebuggerBrowsable));
+			field.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(rCompilerGenerated));
+			field.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(rDebuggerBrowsable));
 
 			assemblyTypes.Fields.Add(field);
 
@@ -497,7 +719,7 @@ namespace CiLin
 
 			assembly.MainModule.ImportReference(rCompilerGenerated);
 			assemblyTypes.Module.ImportReference(rCompilerGenerated);
-			// add.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			// add.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(rCompilerGenerated));
 			assemblyTypes.Methods.Add(add);
 
 			//Create the set method
@@ -536,7 +758,7 @@ namespace CiLin
 			remove.Body.InitLocals = true;
 			remove.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, propertyType));
 			remove.SemanticsAttributes = MethodSemanticsAttributes.RemoveOn;
-			// remove.CustomAttributes.Add(new CustomAttribute(rCompilerGenerated));
+			// remove.CustomAttributes.TryAddCustomAttribute(new CustomAttribute(rCompilerGenerated));
 			assemblyTypes.Methods.Add(remove);
 
 			//create the event
@@ -605,9 +827,14 @@ namespace CiLin
 
 		public static InterfaceImplementation InjectInteface(AssemblyDefinition assembly, TypeDefinition typeDefinition, TypeReference interfaceRefer)
 		{
-			var InterfaceDef = new InterfaceImplementation(interfaceRefer);
-			typeDefinition.Interfaces.Add(InterfaceDef);
-			return InterfaceDef;
+			var idef = FindInterface(typeDefinition, interfaceRefer);
+			if (idef != null)
+			{
+				return idef;
+			}
+			var interfaceDef = new InterfaceImplementation(interfaceRefer);
+			typeDefinition.Interfaces.Add(interfaceDef);
+			return interfaceDef;
 		}
 
 		public static bool ReplaceFieldReferWithPropertyDef(AssemblyDefinition assembly,

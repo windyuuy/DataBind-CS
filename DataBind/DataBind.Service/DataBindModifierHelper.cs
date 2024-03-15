@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using CiLin;
 using Mono.Cecil;
 using Console = Game.Diagnostics.IO.Console;
@@ -110,7 +111,10 @@ namespace DataBind.Service
 					}
 #endif
 
-					if (type.CustomAttributes.Any(attr => CILUtils.IsSameAttr(attr, StdHostAttr)))
+					if (
+						type.CustomAttributes.Any(attr =>
+							CILUtils.IsSameAttr(attr, StdHostAttr)
+							)) 
 					{
 						if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, StdHostInterface)) ==
 						    false)
@@ -120,7 +124,8 @@ namespace DataBind.Service
 						}
 					}
 
-					if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, StdHostInterface)))
+					if(CILUtils.FindInterface(type, StdHostInterface)!=null)
+					// if (type.Interfaces.Any(inter => CILUtils.IsSameInterface(inter, StdHostInterface)))
 					{
 						DataBindTool.HandleHost(type, ref isAnyChanged);
 
@@ -176,6 +181,9 @@ namespace DataBind.Service
 		{
 			try
 			{
+				// var referx=assembly.MainModule.ImportReference(typeof(TupleElementNamesAttribute));
+				// var referxCtor = assembly.MainModule.ImportReference(
+				// 	typeof(TupleElementNamesAttribute).GetConstructor(new Type[] { typeof(string[]) }));
 				assembly.Write(parameters);
 			}
 			catch (Exception ex)
@@ -189,6 +197,7 @@ namespace DataBind.Service
 				catch (Exception ex2)
 				{
 					Console.Exception(ex);
+					Console.Exception(ex2);
 					throw;
 				}
 			}

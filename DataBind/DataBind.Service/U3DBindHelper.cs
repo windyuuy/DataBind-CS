@@ -47,17 +47,18 @@ namespace DataBind.Service
 				.Where(p => IsValidDllToSupportForU3D(p))
 				.ToArray();
 			var buildOptions = new BindOptions();
-			if (resolvePaths != null)
+			// if (resolvePaths != null)
 			{
 				var resolver = new DefaultAssemblyResolver();
 				//resolver.AddSearchDirectory(@".");
 				//resolver.AddSearchDirectory(@"bin");
 				// resolver.AddSearchDirectory(@".\Assets\Framework\Third\Demigiant\DOTween\");
 				// resolver.AddSearchDirectory(@".\TestProjects\CommobLibs\Managed\UnityEngine\");
-				foreach (var resolvePath in resolvePaths)
-				{
-					resolver.AddSearchDirectory(resolvePath);
-				}
+				// foreach (var resolvePath in resolvePaths)
+				// {
+				// 	resolver.AddSearchDirectory(resolvePath);
+				// }
+				resolver.AddSearchDirectory(@"E:\PROCS\IDESS\Unity\2022.3.16f1\Editor\Data\MonoBleedingEdge\lib\mono\unityjit-win32\");
 
 				buildOptions.Resolver = resolver;
 			}
