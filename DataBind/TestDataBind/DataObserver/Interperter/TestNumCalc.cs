@@ -1,13 +1,13 @@
 ﻿
-using DataBinding.CollectionExt;
-using Game.Diagnostics.IO;
+using DataBind.CollectionExt;
+using EngineAdapter.Diagnostics;
 using NUnit.Framework;
 
 namespace TestDataBind.DataObserver.Interperter
 {
 
 	// 需要实现 IStdHost 观察者接口
-	public class SampleHost : VM.Host
+	public class SampleHost : DataBind.VM.Host
 	{
 		private SampleOB hello1 = new SampleOB();
 		private double qQ = 234;
@@ -46,7 +46,7 @@ namespace TestDataBind.DataObserver.Interperter
 
 
 	// 需要添加Observable特性，使目标成为可观察对象
-	public class SampleOB : VM.Host
+	public class SampleOB : DataBind.VM.Host
 	{
 		private double kKK = 234;
 		private List<int> intList = new List<int> { 1, 2, 3, 4 };
@@ -67,7 +67,7 @@ namespace TestDataBind.DataObserver.Interperter
 				kKK = value;
 			}
 		}
-		// DataBinding.CollectionExt.List 容器数据
+		// DataBind.CollectionExt.List 容器数据
 		// 注意：必须使用属性字段
 		public List<int> IntList
 		{
@@ -83,7 +83,7 @@ namespace TestDataBind.DataObserver.Interperter
 				intList = value;
 			}
 		}
-		// DataBinding.CollectionExt.Dictionary 容器数据
+		// DataBind.CollectionExt.Dictionary 容器数据
 		// 注意：必须使用属性字段
 		public Dictionary<int, string> NumDictionary
 		{
@@ -117,7 +117,7 @@ namespace TestDataBind.DataObserver.Interperter
 			sampleHost.QQ = 2134;
 			sampleHost.hello.KKK = 3242;
 			// 通知表达式值变化
-			VM.Tick.Next();
+			DataBind.VM.Tick.Next();
 
 			// 监听表达式
 			sampleHost._Swatch("hello.IntList[2]", (host, value, oldValue) =>
@@ -127,7 +127,7 @@ namespace TestDataBind.DataObserver.Interperter
 			});
 			sampleHost.hello.IntList[2] = 44;
 			// 通知表达式值变化
-			VM.Tick.Next();
+			DataBind.VM.Tick.Next();
 
 			// 监听表达式
 			sampleHost._Swatch("hello.NumDictionary[123]", (host, value, oldValue) =>
@@ -137,7 +137,7 @@ namespace TestDataBind.DataObserver.Interperter
 			});
 			sampleHost.hello.NumDictionary[123] = "你变了";
 			// 通知表达式值变化
-			VM.Tick.Next();
+			DataBind.VM.Tick.Next();
 
 		}
 	}

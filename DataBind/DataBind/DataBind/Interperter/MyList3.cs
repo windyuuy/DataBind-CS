@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
-using VM;
+using DataBind.VM;
 
-namespace DataBinding.CollectionExt
+namespace DataBind.CollectionExt
 {
 	public partial class List<T> : IWithPrototype
 	{

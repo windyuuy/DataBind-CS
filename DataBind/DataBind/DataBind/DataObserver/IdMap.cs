@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace VM
+namespace DataBind.VM
 {
 	using number = System.Double;
 	using boolean = System.Boolean;

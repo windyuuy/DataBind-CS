@@ -1,13 +1,13 @@
-using DataBinding.CollectionExt;
+using DataBind.CollectionExt;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Game.Diagnostics.IO;
-using Console = Game.Diagnostics.IO.Console;
+using EngineAdapter.LinqExt;
+using Console = EngineAdapter.Diagnostics.Console;
 
-namespace VM
+namespace DataBind.VM
 {
-	using boolean = System.Boolean;
 	using number = System.Double;
 
 	public struct MemberMethod
@@ -33,6 +33,41 @@ namespace VM
 		public int GetParametersCount()
 		{
 			return this.MethodInfo.GetParameters().Length;
+		}
+	}
+
+	public class DynamicMemberMethod
+	{
+		public object Self;
+		public Type Type;
+		public string MethodName;
+
+		public DynamicMemberMethod(object self, Type type, string methodName)
+		{
+			Self = self;
+			Type = type;
+			MethodName = methodName;
+		}
+
+		public object Invoke(object[] paras)
+		{
+			if (Self == null)
+			{
+				//函数无法执行
+				Console.Error("函数无法执行, self is null");
+				return null;
+			}
+			var types = Utils.ExtractValuesTypes(paras);
+			var func = Utils.IndexMethod(Self, MethodName, types, out var exist);
+			if (exist && func != null)
+			{
+				return Utils.InvokeMethod(func, Self, paras);
+			}
+			else
+			{
+				Console.Error("函数无法访问, func is null");
+				return null;//func无法获取
+			}
 		}
 	}
 
@@ -84,7 +119,7 @@ namespace VM
 		}
 
 
-		public static Dictionary<string, Func<object, object, object>> pathCacheMap = new Dictionary<string, Func<object, object, object>>();
+		public static CollectionExt.Dictionary<string, Func<object, object, object>> pathCacheMap = new CollectionExt.Dictionary<string, Func<object, object, object>>();
 		public static Func<object, object, object> parsePath(string path)
 		{
 			Func<object, object, object> func;
@@ -240,13 +275,21 @@ namespace VM
 				if (p == null)
 				{
 					MethodInfo m;
-					if (isClass)
+					try
 					{
-						m = type.GetMethod(skey, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance);
+						if (isClass)
+						{
+							m = type.GetMethod(skey, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance);
+						}
+						else
+						{
+								m = type.GetMethod(skey,
+									System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+						}
 					}
-					else
+					catch (AmbiguousMatchException ex)
 					{
-						m = type.GetMethod(skey, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+						return new DynamicMemberMethod(a, type, skey);
 					}
 					if (m == null)
 					{
@@ -686,12 +729,11 @@ namespace VM
 				}
 			}
 		}
-		public static object InvokeMethodConsiderExtend(System.Reflection.MethodInfo func, object obj, List<object> paramList)
+		public static object InvokeMethodConsiderExtend(System.Reflection.MethodInfo func, object obj, IEnumerable<object> paramList)
 		{
 			if (func.IsStatic && func.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false))
 			{
-				var paramList2 = paramList.Clone();
-				paramList2.Insert(0, obj);
+				var paramList2 = paramList.Prepend(obj);
 				return func.Invoke(null, paramList2.ToArray());
 			}
 			else
@@ -699,7 +741,7 @@ namespace VM
 				return func.Invoke(obj, paramList.ToArray());
 			}
 		}
-		public static object InvokeMethod(object func, object obj, List<object> paramList0)
+		public static object InvokeMethod(object func, object obj, IEnumerable<object> paramList0)
 		{
 			if (func is MethodInfo func1)
 			{
@@ -719,7 +761,7 @@ namespace VM
 				}
 			}
 		}
-		public static object InvokeMethodRaw(System.Reflection.MethodInfo func, object obj, List<object> paramList0)
+		public static object InvokeMethodRaw(System.Reflection.MethodInfo func, object obj, IEnumerable<object> paramList0)
 		{
 			if (paramList0 == null)
 			{
@@ -727,7 +769,7 @@ namespace VM
 			}
 			else
 			{
-				var paramList = (List<object>)paramList0;
+				var paramList = paramList0;
 
 				var paras = func.GetParameters();
 				if (paras.Length >= 1)
@@ -746,10 +788,12 @@ namespace VM
 					if (isParas)
 					{
 						var paraType = lastPara.ParameterType.GetElementType();
-						var paramList2 = paramList.slice(0, paras.Length - 1);
-						var paramList3 = paramList.slice(paras.Length - 1);
+						// var paramList2 = paramList.slice(0, paras.Length - 1);
+						// var paramList3 = paramList.slice(paras.Length - 1);
+						var paramList2 = paramList.Take(paras.Length - 1);
+						var paramList3 = paramList.Skip(paras.Length - 1);
 						var arr3 = paramList3.ToArray(paraType);
-						paramList2.Add(arr3);
+						paramList2 = paramList2.Append(arr3);
 						return InvokeMethodConsiderExtend(func, obj, paramList2);
 					}
 					else
@@ -769,7 +813,7 @@ namespace VM
 		// {
 		// 	return values.Select(x => x?.GetType()).ToArray();
 		// }
-		public static Type[] ExtractValuesTypes(List<object> values)
+		public static Type[] ExtractValuesTypes(IEnumerable<object> values)
 		{
 			return values.Select(x => x?.GetType()).ToArray();
 		}

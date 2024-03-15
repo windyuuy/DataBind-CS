@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using VM;
+using DataBind.VM;
 
-namespace DataBinding.CollectionExt
+namespace DataBind.CollectionExt
 {
 	public partial class List<T> : IConvertible
 	{

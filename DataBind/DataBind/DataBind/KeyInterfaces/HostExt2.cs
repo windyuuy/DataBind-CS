@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Reflection;
-using Game.Diagnostics;
-using VM;
-using Debug=Game.Diagnostics.Console;
+using DataBind.CollectionExt;
+using EngineAdapter.Diagnostics;
+using DataBind.VM;
+using Debug=EngineAdapter.Diagnostics.Console;
 
-namespace DataBinding
+namespace DataBind
 {
 	using number = System.Double;
 
@@ -87,12 +88,12 @@ namespace DataBinding
 
 		public static void SetProto(this IStdHost self, object proto)
 		{
-			((DataBinding.CollectionExt.IWithPrototype)self).SetProto(proto);
+			((IWithPrototype)self).SetProto(proto);
 		}
 
 		public static object GetProto(this IStdHost self)
 		{
-			return ((DataBinding.CollectionExt.IWithPrototype)self).GetProto();
+			return ((IWithPrototype)self).GetProto();
 		}
 
 		/// <summary>
@@ -110,13 +111,13 @@ namespace DataBinding
 			{
 				var oldValue=p.GetValue(self);
 				p.SetValue(self, newValue);
-				if (self is VM.IObservableEventDelegate observable)
+				if (self is DataBind.VM.IObservableEventDelegate observable)
 				{
 					observable.NotifyPropertyChanged(newValue, oldValue, key);
 				}
 				else
 				{
-					Debug.LogError($"Invalid type {self?.GetType()?.FullName} not implement interface {nameof(VM.IObservableEventDelegate)}");
+					Debug.LogError($"Invalid type {self?.GetType()?.FullName} not implement interface {nameof(DataBind.VM.IObservableEventDelegate)}");
 				}
 			}
 			else
@@ -139,13 +140,13 @@ namespace DataBinding
 			if (p != null)
 			{
 				var value=p.GetValue(self);
-				if (self is VM.IObservableEventDelegate observable)
+				if (self is DataBind.VM.IObservableEventDelegate observable)
 				{
 					observable.NotifyPropertyChanged(value, oldValue, key);
 				}
 				else
 				{
-					Debug.LogError($"Invalid type {self?.GetType()?.FullName} not implement interface {nameof(VM.IObservableEventDelegate)}");
+					Debug.LogError($"Invalid type {self?.GetType()?.FullName} not implement interface {nameof(DataBind.VM.IObservableEventDelegate)}");
 				}
 			}
 			else
@@ -165,13 +166,13 @@ namespace DataBinding
 			if (p != null)
 			{
 				var value=p.GetValue(self);
-				if (self is VM.IObservableEventDelegate observable)
+				if (self is DataBind.VM.IObservableEventDelegate observable)
 				{
 					observable.NotifyPropertyChanged(value, value, key);
 				}
 				else
 				{
-					Debug.LogError($"Invalid type {self?.GetType()?.FullName} not implement interface {nameof(VM.IObservableEventDelegate)}");
+					Debug.LogError($"Invalid type {self?.GetType()?.FullName} not implement interface {nameof(DataBind.VM.IObservableEventDelegate)}");
 				}
 			}
 			else

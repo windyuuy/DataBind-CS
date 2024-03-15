@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-	<LangVersion>8.0</LangVersion>
+	<LangVersion>9</LangVersion>
     <TargetFramework>net471</TargetFramework>
     <DebugType>embedded</DebugType>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>

@@ -1,11 +1,11 @@
 using System;
-using DataBinding.CollectionExt;
+using DataBind.CollectionExt;
 using System.Linq;
-using Game.Diagnostics.IO;
-using Console = Game.Diagnostics.IO.Console;
+using EngineAdapter.Diagnostics;
+using Console = EngineAdapter.Diagnostics.Console;
 
 
-namespace VM
+namespace DataBind.VM
 {
 	using TDictGotFuncs = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<PropertyGetEventHandler>>;
 	using TGotFuncs = System.Collections.Generic.List<PropertyGetEventHandler>;

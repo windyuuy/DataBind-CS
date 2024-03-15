@@ -1,11 +1,11 @@
 
 using System;
-using DataBinding.CollectionExt;
-using DataBinding;
-using Game.Diagnostics.IO;
-using Console = Game.Diagnostics.IO.Console;
+using DataBind.CollectionExt;
+using DataBind;
+using EngineAdapter.Diagnostics;
+using Console = EngineAdapter.Diagnostics.Console;
 
-namespace VM
+namespace DataBind.VM
 {
 	using number = System.Double;
 	using boolean = System.Boolean;

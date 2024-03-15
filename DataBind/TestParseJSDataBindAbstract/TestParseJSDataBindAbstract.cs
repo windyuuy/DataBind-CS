@@ -14,7 +14,7 @@ namespace Tests
         [Test]
         public void Test节点树测试2()
         {
-            var interpreter = new VM.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fex['ds']+few[wf.f]+few[0]+!wef+fe.je");
+            var interpreter = new DataBind.VM.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fex['ds']+few[wf.f]+few[0]+!wef+fe.je");
             var envInfo = new EnvInfo();
             var retType = ParseJSDataBind.HandleOperator(envInfo, null, interpreter.Ast);
             expect(envInfo.MemberMap.Count).toBe(8);
@@ -60,7 +60,7 @@ namespace Tests
         [Test]
         public void TestWriteCodeWithCase1()
         {
-            var interpreter = new VM.Interpreter("a.b.c+fe.cx.xc(n.wf,rrx.xx)");
+            var interpreter = new DataBind.VM.Interpreter("a.b.c+fe.cx.xc(n.wf,rrx.xx)");
             var data = new TestWriteCodeCase1();
             data.a.b.c = 32;
             var ret=interpreter.Run(data);
@@ -70,7 +70,7 @@ namespace Tests
         [Test]
         public void TestSimpleCase1()
         {
-            var interpreter = new VM.Interpreter("isEnabled");
+            var interpreter = new DataBind.VM.Interpreter("isEnabled");
             var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestSimpleCase1");
             expect(envInfo.MemberMap["isEnabled"].Type is ClassInfo);
         }
@@ -78,7 +78,7 @@ namespace Tests
         [Test]
         public void TestModifyCodeWithCase2()
         {
-            var interpreter = new VM.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fex['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
+            var interpreter = new DataBind.VM.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fex['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
             var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestWriteCodeCase2");
             
             var codeLoader = new CodeLoader();
@@ -95,7 +95,7 @@ namespace Tests
         [Test]
         public void TestModifyCodeWithCase3()
         {
-            var interpreter = new VM.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fex['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
+            var interpreter = new DataBind.VM.Interpreter("a.b.c+(3*4)+fe.cx.xc(n.wf,rrx.xx)+fex['ds']+few[wf.f]+few[0]+!wef+ke.jf()+jklwe.jx.jfj(4,fd.g,fe.cx,kxx)+jklwe.jx.jfj2(4,'fdg',false,fe.cx)+kxx");
             var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestWriteCodeCase3");
             
             var codeLoader = new CodeLoader();
@@ -112,7 +112,7 @@ namespace Tests
         [Test]
         public void TestModifyCodeWithCase4()
         {
-            var interpreter = new VM.Interpreter("a.b.c+isFX.areKX");
+            var interpreter = new DataBind.VM.Interpreter("a.b.c+isFX.areKX");
             var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestWriteCodeCase4");
             
             var codeLoader = new CodeLoader();
@@ -130,7 +130,7 @@ namespace Tests
         [Test]
         public void TestSimpleCase5()
         {
-            var interpreter = new VM.Interpreter("a.b+C1[0][0].C2[0][0][0].pp+D1['fe']['d'].D2['lkjw']['we']['wf']+C1.Length+C1[0].Length+D3['fx']['xc'][0]['cx']['cc'].tt+D4[3][3]['cs']['ccx'][0].hg");
+            var interpreter = new DataBind.VM.Interpreter("a.b+C1[0][0].C2[0][0][0].pp+D1['fe']['d'].D2['lkjw']['we']['wf']+C1.Length+C1[0].Length+D3['fx']['xc'][0]['cx']['cc'].tt+D4[3][3]['cs']['ccx'][0].hg");
             var envInfo = ParseJSDataBind.ParseTypeInfo(interpreter.Ast, "TestSimpleCase5");
             
             var codeWriter = new CodeWriter();

@@ -1,4 +1,4 @@
-﻿using Game.Diagnostics;
+﻿using EngineAdapter.Diagnostics;
 
 namespace RunDataBindDemo
 {

@@ -7,7 +7,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-namespace DataBinding.Editor.DataBindEntry
+namespace DataBind.Editor.DataBindEntry
 {
 	public class U3DDataBindEntry : IPostBuildPlayerScriptDLLs
 	{
@@ -56,11 +56,11 @@ namespace DataBinding.Editor.DataBindEntry
 		{
 			get
 			{
-				return PlayerPrefs.GetInt("DataBinding.Editor::DataBindEntry.IsEnable", 1) == 1;
+				return PlayerPrefs.GetInt("DataBind.Editor::DataBindEntry.IsEnable", 1) == 1;
 			}
 			set
 			{
-				PlayerPrefs.SetInt("DataBinding.Editor::DataBindEntry.IsEnable", value ? 1 : 0);
+				PlayerPrefs.SetInt("DataBind.Editor::DataBindEntry.IsEnable", value ? 1 : 0);
 			}
 		}
 		public static bool HasSupport = false;

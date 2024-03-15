@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DataBinding.CollectionExt;
+using DataBind.CollectionExt;
 using System.Runtime.CompilerServices;
 
-namespace VM
+namespace DataBind.VM
 {
 	using boolean = System.Boolean;
 	using number = System.Double;
@@ -52,7 +52,7 @@ namespace VM
 
 }
 
-namespace DataBinding
+namespace DataBind
 {
 
 	// TODO: 支持自动注入IHost

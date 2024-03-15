@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using VM;
-using Game.Diagnostics.IO;
-using Console = Game.Diagnostics.IO.Console;
+using DataBind.VM;
+using EngineAdapter.Diagnostics;
+using Console = EngineAdapter.Diagnostics.Console;
 
-namespace VM
+namespace DataBind.VM
 {
 
 	using boolean = System.Boolean;

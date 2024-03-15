@@ -2,9 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using DataBinding.CollectionExt;
-using Game.Diagnostics.IO;
-using Console = Game.Diagnostics.IO.Console;
+using DataBind.CollectionExt;
+using EngineAdapter.Diagnostics;
+using EngineAdapter.StringExt;
+using Console = EngineAdapter.Diagnostics.Console;
 
 class _Env
 {
@@ -28,7 +29,7 @@ class _Env
 
 }
 
-namespace VM
+namespace DataBind.VM
 {
 	using ASTNode = ASTNodeBase;
 	using Node = CombineType<object, List<WordNode>, WordNode, ASTNodeBase>;
@@ -360,19 +361,19 @@ namespace VM
 
 		static Interpreter()
 		{
-			_Env.SymbolList.ForEach(a => operatorCharMap[a.charAt(0)] = true);
+			_Env.SymbolList.ForEach(a => operatorCharMap[a.CharAt(0)] = true);
 			(new string[] { "\"", "'", "`" }).ForEach(a => markMap[a] = true);
 			_Env.SymbolList.ForEach(a =>
 			{
 				if (a.Length > 1)
 				{
-					doubleOpMap[a.charAt(0)] = true;
+					doubleOpMap[a.CharAt(0)] = true;
 				}
 			});
 			(new string[] { " ", "\n", "\r", "\t" }).ForEach(a => spaceMap[a] = true);
 		}
-		static readonly int ZeroCode = "0".charCodeAt(0);
-		static readonly int NineCode = "9".charCodeAt(0);
+		static readonly int ZeroCode = "0".CharCodeAt(0);
+		static readonly int NineCode = "9".CharCodeAt(0);
 
 		static readonly Dictionary<string, bool> operatorCharMap = new Dictionary<string, bool>();
 
@@ -423,7 +424,7 @@ namespace VM
 					  {
 						  return;
 					  }
-					  var code = charx.charCodeAt(0);
+					  var code = charx.CharCodeAt(0);
 					  if (code >= ZeroCode && code <= NineCode)
 					  {
 						  //数字
@@ -473,7 +474,7 @@ namespace VM
 				  else if (state == 1)
 				  {
 					  //数字
-					  var code = charx.charCodeAt(0);
+					  var code = charx.CharCodeAt(0);
 					  if (code >= ZeroCode && code <= NineCode || charx == ".")
 					  {
 						  temp += charx;
@@ -527,7 +528,7 @@ namespace VM
 						  if (markType == "`")
 						  {
 							  var node = new WordNode(TNodeType.Stringx, temp, line, startColum, column);
-							  node.LineStart = line - (temp.match("\n", RegexOptions.Multiline)?.Length ?? 0);
+							  node.LineStart = line - (temp.Match("\n", RegexOptions.Multiline)?.Length ?? 0);
 							  nodeList.Add(node);
 						  }
 						  else
@@ -593,7 +594,7 @@ namespace VM
 
 						  var node = new WordNode(TNodeType.Annotation, temp, line, startColum, column);
 
-						  node.LineStart = line - temp.match("\n", RegexOptions.Multiline)?.Length ?? 0;
+						  node.LineStart = line - temp.Match("\n", RegexOptions.Multiline)?.Length ?? 0;
 						  nodeList.Add(node);
 						  reset();
 					  }

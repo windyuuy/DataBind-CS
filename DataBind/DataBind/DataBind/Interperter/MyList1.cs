@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using VM;
+using DataBind.VM;
 
-namespace DataBinding.CollectionExt
+namespace DataBind.CollectionExt
 {
 	using TRawList = System.Collections.Generic.List<object>;
 	public partial class List<T> : List, IConvableList, IHostAccessor, ICollection<T>, IEnumerable<T>, IEnumerable, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection, IObservableCollection

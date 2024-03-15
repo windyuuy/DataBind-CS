@@ -2,9 +2,9 @@ using Mono.Cecil;
 using NUnit.Framework;
 using CiLin;
 
-using Debug = Game.Diagnostics.Console;
+using Debug = EngineAdapter.Diagnostics.Console;
 using DataBind.Service;
-using Console = Game.Diagnostics.IO.Console;
+using Console = EngineAdapter.Diagnostics.Console;
 
 namespace TestWithInjected
 {
@@ -27,7 +27,7 @@ namespace TestWithInjected
                     var TString = typeof(string);
                     var rtstr = a.MainModule.ImportReference(TString);
 
-                    using var db = AssemblyDefinition.ReadAssembly(typeof(VM.IObservable).Assembly.Location);
+                    using var db = AssemblyDefinition.ReadAssembly(typeof(DataBind.VM.IObservable).Assembly.Location);
                     var tIObservable = db.MainModule.ImportReference(typeof(RunDataBindDemo.ITest));
                     var types = assembly.MainModule.GetTypes();
 
@@ -46,7 +46,7 @@ namespace TestWithInjected
                     CILUtils.SysAssembly = sys;
                     //sys.MainModule.AssemblyReferences.Add(corlibReference);
 
-                    var tPropertyGetEventHandler = db.MainModule.ImportReference(typeof(VM.PropertyGetEventHandler));
+                    var tPropertyGetEventHandler = db.MainModule.ImportReference(typeof(DataBind.VM.PropertyGetEventHandler));
                     foreach (var type in types)
                     {
                         foreach (var Prop in type.Properties)
@@ -60,7 +60,7 @@ namespace TestWithInjected
 
                                 CILUtils.InjectProperty(assembly, type, "CCC", typeof(double));
                                 CILUtils.InjectProperty(assembly, type, "SS", typeof(string));
-                                CILUtils.InjectEvent(assembly, type, "PropertyGet2", typeof(VM.PropertyGetEventHandler));
+                                CILUtils.InjectEvent(assembly, type, "PropertyGet2", typeof(DataBind.VM.PropertyGetEventHandler));
                                 break;
 
                                 //var DemoP = tDemo.Properties.First(p => p.Name == "CCC");

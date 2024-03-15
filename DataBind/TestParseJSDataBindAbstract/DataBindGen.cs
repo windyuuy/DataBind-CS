@@ -1,6 +1,6 @@
 ﻿namespace TestingCode
 {
-	public class TestWriteCodeCase1: VM.Host
+	public class TestWriteCodeCase1: DataBind.VM.Host
 	{
 		/// <note>
 		/// env::a

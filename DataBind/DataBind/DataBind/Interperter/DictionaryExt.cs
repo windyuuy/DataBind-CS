@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using VM;
+using DataBind.VM;
 
-namespace DataBinding.CollectionExt
+namespace DataBind.CollectionExt
 {
 	public partial class Dictionary : System.Collections.IDictionary, IConvableDictionary
 	{
@@ -39,7 +39,7 @@ namespace DataBinding.CollectionExt
 
 		public virtual ICollection Keys => InnerDict.Keys;
 
-		public virtual ICollection Values => new DataBinding.CollectionExt.List<object>(InnerDict.Values);
+		public virtual ICollection Values => new List<object>(InnerDict.Values);
 
 		public virtual int Count => InnerDict.Count;
 

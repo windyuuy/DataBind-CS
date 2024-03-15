@@ -247,7 +247,7 @@ namespace CiLin
 			CopyCollection(targetMethod.Body.Variables, sourceMethod.Body.Variables);
 			//CopyCollection(targetMethod.Body.Instructions, sourceMethod.Body.Instructions);
 			CopyCollection(targetMethod.Parameters, sourceMethod.Parameters);
-			// if (targetType.FullName == "TestDataBinding.Tests.TestEnhancedScroller.TRawData" && 
+			// if (targetType.FullName == "TestDataBind.Tests.TestEnhancedScroller.TRawData" && 
 			//     ( targetMethodName=="NotifyPropertyChanged"))
 			// {
 			// 	Console.Write("");

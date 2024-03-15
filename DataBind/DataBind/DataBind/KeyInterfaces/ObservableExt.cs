@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using VM;
+using DataBind.VM;
 
-namespace DataBinding
+namespace DataBind
 {
 
 }

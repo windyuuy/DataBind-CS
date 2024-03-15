@@ -4,7 +4,7 @@ using number = System.Double;
 
 namespace TestingCode
 {
-	public class TestWriteCodeCase4: VM.Host
+	public class TestWriteCodeCase4: DataBind.VM.Host
 	{
 		/// <note>
 		/// env::a

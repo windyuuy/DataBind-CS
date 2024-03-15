@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Text;
 
-namespace DataBinding.CollectionExt
+namespace DataBind.CollectionExt
 {
 	public interface IConvableList
 	{

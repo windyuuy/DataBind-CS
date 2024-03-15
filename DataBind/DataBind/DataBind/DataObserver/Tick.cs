@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace VM
+namespace DataBind.VM
 {
 
 	public class Tick

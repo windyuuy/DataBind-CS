@@ -1,5 +1,5 @@
 ﻿
-namespace DataBinding
+namespace DataBind
 {
     //[System.AttributeUsage(System.AttributeTargets.All, Inherited = false, AllowMultiple = true)]
     //public sealed class WatchableAttribute : System.Attribute

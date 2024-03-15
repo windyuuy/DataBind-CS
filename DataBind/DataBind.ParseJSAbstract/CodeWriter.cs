@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Text;
-using DataBinding.CollectionExt;
+using DataBind.CollectionExt;
 
 namespace ParseJSDataBindAbstract.CodeWriter
 {
@@ -300,7 +300,7 @@ namespace ParseJSDataBindAbstract.CodeWriter
                 
                 cb.AppendCodeLine("namespace TestingCode");
                 cb.AppendCodeSegBegin("{");
-                cb.AppendCodeLine($"public class {envInfo.Name}: DataBinding.IStdHost");
+                cb.AppendCodeLine($"public class {envInfo.Name}: DataBind.IStdHost");
                 cb.AppendCodeSegBegin("{");
 
                 var typeSpace = new Dictionary<ClassInfo, bool>();

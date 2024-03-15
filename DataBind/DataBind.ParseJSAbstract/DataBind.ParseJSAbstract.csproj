@@ -52,6 +52,14 @@
       <Project>{DB26575E-398A-4C1F-801C-59E6F79620D3}</Project>
       <Name>DataBind</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EngineAdapter\EngineAdapter.csproj">
+      <Project>{2f450413-ea4c-4716-9c39-5be035eaefc8}</Project>
+      <Name>EngineAdapter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UIBind.Meta\UIBind.Meta.csproj">
+      <Project>{7dca2657-61d5-46c5-80f4-a2691d9cd300}</Project>
+      <Name>UIBind.Meta</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

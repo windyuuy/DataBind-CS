@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
-using DataBinding.CollectionExt;
+using DataBind.CollectionExt;
 using System.Runtime.CompilerServices;
-using Game.Diagnostics.IO;
-using Console = Game.Diagnostics.IO.Console;
+using EngineAdapter.Diagnostics;
+using Console = EngineAdapter.Diagnostics.Console;
 
-namespace VM
+namespace DataBind.VM
 {
 	using boolean = System.Boolean;
 	using number = System.Double;
@@ -149,7 +149,7 @@ namespace VM
 		/**
 		 * 向普通对象注入Host相关方法
 		 */
-		public static DataBinding.IStdHost ImplementStdHost<T>(T obj)
+		public static DataBind.IStdHost ImplementStdHost<T>(T obj)
 		{
 			if (obj is IObservable)
 			{
@@ -161,7 +161,7 @@ namespace VM
 
 				Observe(obj);
 			}
-			return obj as DataBinding.IStdHost;
+			return obj as DataBind.IStdHost;
 		}
 
 		/**
@@ -185,7 +185,7 @@ namespace VM
 		/**
 		 * 向普通对象注入Host相关方法
 		 */
-		public static DataBinding.IStdHost UpdateStdHost<T>(T obj)
+		public static DataBind.IStdHost UpdateStdHost<T>(T obj)
 		{
 			if (obj is IObservable)
 			{
@@ -197,7 +197,7 @@ namespace VM
 
 				Observe(obj);
 			}
-			return obj as DataBinding.IStdHost;
+			return obj as DataBind.IStdHost;
 		}
 
 	}

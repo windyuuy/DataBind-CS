@@ -1,9 +1,9 @@
 using System;
-using DataBinding.CollectionExt;
+using DataBind.CollectionExt;
 using System.Linq;
 
 
-namespace VM
+namespace DataBind.VM
 {
 	[System.Diagnostics.DebuggerStepThrough]
 	public class PropertyChangedEventArgs : EventArgs
@@ -86,7 +86,7 @@ namespace VM
 	}
 }
 
-namespace DataBinding
+namespace DataBind
 {
 
 	/// <summary>

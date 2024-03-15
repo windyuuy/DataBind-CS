@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace System.Linq.Ext
+namespace EngineAdapter.LinqExt
 {
-    public static class LinqExt
+    public static partial class SystemLinqExt
     {
         public static T TryGet<T>(this T[] ts, int index)
         {
@@ -61,6 +59,17 @@ namespace System.Linq.Ext
             }
             return newTs;
         }
-        
+        public static Array ToArray(this IEnumerable<object> list, Type t)
+        {
+            var count = list.Count();
+            var arr = Array.CreateInstance(t, count);
+            var i = 0;
+            foreach (var f in list)
+            {
+                var v2 = System.Convert.ChangeType(f, t);
+                arr.SetValue(v2, i++);
+            }
+            return arr;
+        }
     }
 }

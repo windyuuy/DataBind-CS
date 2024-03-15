@@ -1,8 +1,8 @@
 
 using System;
-using DataBinding.CollectionExt;
+using DataBind.CollectionExt;
 
-namespace VM
+namespace DataBind.VM
 {
 	using number = System.Double;
 

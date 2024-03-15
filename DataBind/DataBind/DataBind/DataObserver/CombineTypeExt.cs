@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace VM
+namespace DataBind.VM
 {
 	public static class CombineTypeExt
 	{
@@ -36,15 +36,15 @@ namespace VM
 		}
 		public static bool IsProtoDict(this object v)
 		{
-			return (v is System.Collections.IDictionary) && (v is DataBinding.CollectionExt.IWithPrototype);
+			return (v is System.Collections.IDictionary) && (v is DataBind.CollectionExt.IWithPrototype);
 		}
 		public static bool IsWithProto(this object v)
 		{
-			return (v is DataBinding.CollectionExt.IWithPrototype);
+			return (v is DataBind.CollectionExt.IWithPrototype);
 		}
 		public static bool IsConvableDict(this object v)
 		{
-			return v is DataBinding.CollectionExt.Dictionary;
+			return v is DataBind.CollectionExt.Dictionary;
 		}
 	}
 }

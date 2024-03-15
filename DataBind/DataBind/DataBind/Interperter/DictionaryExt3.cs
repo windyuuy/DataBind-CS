@@ -1,7 +1,7 @@
 using System;
-using VM;
+using DataBind.VM;
 
-namespace DataBinding.CollectionExt
+namespace DataBind.CollectionExt
 {
 	public partial class Dictionary<K, V> : System.Collections.Generic.IDictionary<K, V>, IWithPrototype, IObservableCollection, IHostAccessor
 	{

@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net471</TargetFramework>
-    <Nullable>enable</Nullable>
-	  <LangVersion>8.0</LangVersion>
+    <Nullable>disable</Nullable>
+	  <LangVersion>9</LangVersion>
   </PropertyGroup>
 
 </Project>

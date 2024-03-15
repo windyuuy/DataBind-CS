@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataBinding
+namespace DataBind
 {
 	/// <summary>
 	/// 使field自动转为property

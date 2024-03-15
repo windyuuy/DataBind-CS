@@ -10,7 +10,7 @@ namespace TestDataBind
 		[Test]
 		public void Test()
 		{
-			var map = new VM.IdMap();
+			var map = new DataBind.VM.IdMap();
 			Assert.AreEqual(map.Has(10),false);
 			map.Add(10);
 			Assert.AreEqual(map.Has(10),true);

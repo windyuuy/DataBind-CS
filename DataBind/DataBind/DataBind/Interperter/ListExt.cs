@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace DataBinding.CollectionExt
+namespace DataBind.CollectionExt
 {
 
 	public static class ListExt

@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using DataBinding.CollectionExt;
+using DataBind.CollectionExt;
 
 namespace TestDataBind.DataObserver.Interperter
 {

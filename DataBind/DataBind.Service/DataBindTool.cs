@@ -86,7 +86,7 @@ namespace DataBind.Service
 			isAnyChanged = true;
 
 			using var DataBindServiceAssembly = AssemblyDefinition.ReadAssembly(typeof(DBRuntimeDemo).Assembly.Location);
-			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBinding.HostExt2).Assembly.Location);
+			using var DataBindAssembly = AssemblyDefinition.ReadAssembly(typeof(DataBind.HostExt2).Assembly.Location);
 
 			#region implement IFullHost
 			var VoidRef = MainAssembly.MainModule.ImportReference(typeof(void));
@@ -121,7 +121,7 @@ namespace DataBind.Service
 
 				// define _SaddWatcher
 				{
-					var HostExt2Type = typeof(DataBinding.HostExt2);
+					var HostExt2Type = typeof(DataBind.HostExt2);
 					var WatchMethodRef = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethod("AddWatcher"));
 					var methodAttribute = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
 					var _SaddWatcherMethod = new MethodDefinition("_SaddWatcher", methodAttribute, VoidRef);
@@ -138,7 +138,7 @@ namespace DataBind.Service
 
 				// define _Sdestroy
 				{
-					var HostExt2Type = typeof(DataBinding.HostExt2);
+					var HostExt2Type = typeof(DataBind.HostExt2);
 					var DestroyMethodRef = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethod("Destroy"));
 					var methodAttribute = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
 					var _SdestroyWatcherMethod = new MethodDefinition("_Sdestroy", methodAttribute, VoidRef);
@@ -153,7 +153,7 @@ namespace DataBind.Service
 
 				// define _SremoveWatcher
 				{
-					var HostExt2Type = typeof(DataBinding.HostExt2);
+					var HostExt2Type = typeof(DataBind.HostExt2);
 					var DestroyMethodRef = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethod("RemoveWatcher"));
 					var methodAttribute = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual;
 					var _SremoveWatcherMethod = new MethodDefinition("_SremoveWatcher", methodAttribute, VoidRef);
@@ -170,7 +170,7 @@ namespace DataBind.Service
 
 				// define _Swatch
 				{
-					var HostExt2Type = typeof(DataBinding.HostExt2);
+					var HostExt2Type = typeof(DataBind.HostExt2);
 					var WatchMethodRef0 = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethod("_Watch0"));
 					var WatchMethodRef = MainAssembly.MainModule.ImportReference(HostExt2Type.GetMethods()
 						.First(m => {
@@ -526,7 +526,7 @@ namespace DataBind.Service
 
 			#region implement IWithPrototype
 			var ObjectRef = MainAssembly.MainModule.ImportReference(typeof(object));
-			var IWithPrototypeRef = MainAssembly.MainModule.ImportReference(typeof(DataBinding.CollectionExt.IWithPrototype));
+			var IWithPrototypeRef = MainAssembly.MainModule.ImportReference(typeof(DataBind.CollectionExt.IWithPrototype));
 
 			if (typeDefinition.FindInterface(IWithPrototypeRef) == null)
 			{

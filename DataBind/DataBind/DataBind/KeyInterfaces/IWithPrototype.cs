@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace DataBinding.CollectionExt
+namespace DataBind.CollectionExt
 {
 	public interface IWithPrototype
 	{

@@ -2,23 +2,23 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using VM;
+using DataBind.VM;
 
 namespace TestDataBind
 {
 	public class SampleOBD : IObservable
 	{
-		public VM.Observer ___Sob__;
+		public DataBind.VM.Observer ___Sob__;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		public event PropertyGetEventHandler PropertyGot;
 
-		public VM.Observer _SgetOb()
+		public DataBind.VM.Observer _SgetOb()
 		{
 			return ___Sob__;
 		}
 
-		public void _SsetOb(VM.Observer value)
+		public void _SsetOb(DataBind.VM.Observer value)
 		{
 			___Sob__ = value;
 		}
@@ -27,7 +27,7 @@ namespace TestDataBind
 
 	public class SampleOBD2 : IObservable
 	{
-		public VM.Observer ___Sob__;
+		public DataBind.VM.Observer ___Sob__;
 		private double a1;
 		private double b1;
 		private double c1;
@@ -85,12 +85,12 @@ namespace TestDataBind
 			}
 		}
 
-		public VM.Observer _SgetOb()
+		public DataBind.VM.Observer _SgetOb()
 		{
 			return ___Sob__;
 		}
 
-		public void _SsetOb(VM.Observer value)
+		public void _SsetOb(DataBind.VM.Observer value)
 		{
 			___Sob__ = value;
 		}
@@ -104,19 +104,19 @@ namespace TestDataBind
 			var obj = new SampleOBD();
 			var obj2 = Utils.Observe(obj);
 
-			Assert.IsTrue(obj2 is VM.Observer);
+			Assert.IsTrue(obj2 is DataBind.VM.Observer);
 			Assert.AreSame(obj._SgetOb(), obj2);
 
-			var obj3 = VM.Utils.Observe(obj);
-			Assert.IsNull(VM.Utils.Observe(123));
+			var obj3 = DataBind.VM.Utils.Observe(obj);
+			Assert.IsNull(DataBind.VM.Utils.Observe(123));
 		}
 
 		[Test]
 		public void TestDefineReactive()
 		{
 			var o = new SampleOBD2() { a = 1, b = 2, c = 3, };
-			VM.Utils.Observe(o);
-			VM.Utils.DefineReactive(o, "a", 1);
+			DataBind.VM.Utils.Observe(o);
+			DataBind.VM.Utils.DefineReactive(o, "a", 1);
 			Assert.AreEqual(1, o.a);
 			o.a = 123;
 			Assert.AreEqual(o.a, 123);
@@ -126,7 +126,7 @@ namespace TestDataBind
 		public void TestObserver()
 		{
 			var obj = new SampleOBD();
-			var ob = VM.Utils.Observe(obj);
+			var ob = DataBind.VM.Utils.Observe(obj);
 
 			Assert.AreEqual(ob?.value, obj);
 		}
@@ -139,7 +139,7 @@ namespace TestDataBind
 				a = 1,
 				b = 2,
 			};
-			var ob = VM.Utils.Observe(obj);
+			var ob = DataBind.VM.Utils.Observe(obj);
 
 
 			//vm.defineCompute(obj, 'a', () => {

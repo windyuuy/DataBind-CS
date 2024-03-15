@@ -1,8 +1,8 @@
 using System;
-using DataBinding.CollectionExt;
+using DataBind.CollectionExt;
 using System.Linq;
 
-namespace VM
+namespace DataBind.VM
 {
 	using TEnv = Dictionary<string, object>;
 	using number = System.Double;

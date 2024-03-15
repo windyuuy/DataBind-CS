@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
-using VM;
+using DataBind.VM;
 
-namespace DataBinding.CollectionExt
+namespace DataBind.CollectionExt
 {
 	public interface IConvableDictionary
 	{
@@ -73,7 +73,7 @@ namespace DataBinding.CollectionExt
 
 		public new virtual System.Collections.Generic.ICollection<K> Keys => dict.Keys;
 
-		public new virtual System.Collections.Generic.ICollection<V> Values => new DataBinding.CollectionExt.List<V>(dict.Values);
+		public new virtual System.Collections.Generic.ICollection<V> Values => new List<V>(dict.Values);
 
 		public override int Count => dict.Count;
 

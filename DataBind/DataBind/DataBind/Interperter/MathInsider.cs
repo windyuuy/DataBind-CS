@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VM
+namespace DataBind.VM
 {
 	using number = System.Double;
 	using ENodeType=System.Int32;

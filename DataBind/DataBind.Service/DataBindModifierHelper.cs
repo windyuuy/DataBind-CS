@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using CiLin;
 using Mono.Cecil;
-using Console = Game.Diagnostics.IO.Console;
+using Console = EngineAdapter.Diagnostics.Console;
 
 namespace DataBind.Service
 {
@@ -79,22 +79,22 @@ namespace DataBind.Service
 				DataBindTool.SysAssembly = sys;
 
 				var types = assembly.MainModule.GetTypes();
-				var MarkAttr = assembly.MainModule.ImportReference(typeof(DataBinding.ObservableAttribute));
+				var MarkAttr = assembly.MainModule.ImportReference(typeof(DataBind.ObservableAttribute));
 				var MarkAttrCtor = assembly.MainModule.ImportReference(
-					typeof(DataBinding.ObservableAttribute).GetConstructor(new Type[] { typeof(int) }));
+					typeof(DataBind.ObservableAttribute).GetConstructor(new Type[] { typeof(int) }));
 				var MarkRecursiveAttr =
-					assembly.MainModule.ImportReference(typeof(DataBinding.ObservableRecursiveAttribute));
+					assembly.MainModule.ImportReference(typeof(DataBind.ObservableRecursiveAttribute));
 
-				var StdHostInterface = assembly.MainModule.ImportReference(typeof(DataBinding.IStdHost));
+				var StdHostInterface = assembly.MainModule.ImportReference(typeof(DataBind.IStdHost));
 				var IntRef = assembly.MainModule.ImportReference(typeof(int));
-				var StdHostAttr = assembly.MainModule.ImportReference(typeof(DataBinding.StdHostAttribute));
+				var StdHostAttr = assembly.MainModule.ImportReference(typeof(DataBind.StdHostAttribute));
 
 				// 模板
 				var ObservableAttrTemp = new CustomAttribute(MarkAttrCtor);
 				ObservableAttrTemp.ConstructorArguments.Add(new CustomAttributeArgument(IntRef, 1));
 
 				var AsPropertyAttr =
-					assembly.MainModule.ImportReference(typeof(DataBinding.AutoFieldPropertyAttribute));
+					assembly.MainModule.ImportReference(typeof(DataBind.AutoFieldPropertyAttribute));
 
 				foreach (var type in types)
 				{

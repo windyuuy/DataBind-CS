@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using RunDataBindDemo;
-using DataBinding;
-using Game.Diagnostics.IO;
+using DataBind;
+using EngineAdapter.Diagnostics;
 
 namespace TestWithInjected
 {
@@ -19,7 +19,7 @@ namespace TestWithInjected
 			});
 			Assert.AreEqual(watcher.value, dv.aaa);
 			host.aaa = nextValue;
-			VM.Tick.Next();
+			DataBind.VM.Tick.Next();
 			Assert.AreEqual(watcher.value, nextValue);
 		}
 
@@ -54,7 +54,7 @@ namespace TestWithInjected
 		public void TestObserver()
 		{
 			var sampleObs = new TSampleObserver();
-			if (sampleObs is VM.IObservable sampleObs1)
+			if (sampleObs is DataBind.VM.IObservable sampleObs1)
 			{
 				var demos = new System.Collections.Generic.List<string>()
 				{
@@ -119,17 +119,17 @@ namespace TestWithInjected
 					Console.Log("value changed:", newValue);
 				});
 				sampleHost.KKK = demos[0];
-				VM.Tick.Next();
+				DataBind.VM.Tick.Next();
 				sampleHost.KKK = demos[0];
-				VM.Tick.Next();
+				DataBind.VM.Tick.Next();
 				sampleHost.KKK = demos[1];
-				VM.Tick.Next();
+				DataBind.VM.Tick.Next();
 				sampleHost.KKK = demos[1];
-				VM.Tick.Next();
+				DataBind.VM.Tick.Next();
 				sampleHost.KKK = demos[2];
-				VM.Tick.Next();
+				DataBind.VM.Tick.Next();
 				sampleHost.KKK = demos[2];
-				VM.Tick.Next();
+				DataBind.VM.Tick.Next();
 
 				Assert.AreEqual(rets.Count, demos.Count);
 				Assert.AreEqual(rets, demos);
@@ -143,12 +143,12 @@ namespace TestWithInjected
 				});
 				sampleObs.FFFF = 234;
 				sampleHost.KKK2 = 2;
-				VM.Tick.Next();
+				DataBind.VM.Tick.Next();
 
-				var value = VM.Utils.IndexValueRecursive(sampleHost, "FFFF");
+				var value = DataBind.VM.Utils.IndexValueRecursive(sampleHost, "FFFF");
 				Console.Log("value:", value);
 
-				var exp = new VM.Interpreter("KKK2+FFFF");
+				var exp = new DataBind.VM.Interpreter("KKK2+FFFF");
 				var ret = exp.Run(sampleHost);
 
 				Console.Log("true");

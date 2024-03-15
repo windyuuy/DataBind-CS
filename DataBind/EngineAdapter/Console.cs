@@ -1,34 +1,16 @@
 using System;
+using System.Diagnostics;
 using SysConsole = System.Console;
 using SysDebug = System.Diagnostics.Debug;
 using UConsole = UnityEngine.Debug;
 using UDebug = UnityEngine.Debug;
 
-namespace Game.Diagnostics
+namespace EngineAdapter.Diagnostics
 {
-
-    public enum DLogType
-    {
-        Assert,
-        Error,
-        Exception,
-        Warning,
-        System,
-        Log,
-        AI,
-        Audio,
-        Content,
-        Logic,
-        GUI,
-        Input,
-        Network,
-        Physics
-    }
-
-    [System.Diagnostics.DebuggerStepThrough]
+    [DebuggerStepThrough]
     public class Console
     {
-        static bool isUnityEnv = false;
+        static bool isUnityEnv;
         static Console()
         {
             try
@@ -36,13 +18,13 @@ namespace Game.Diagnostics
                 UConsole.Log("test UConsole validate");
                 isUnityEnv = true;
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 isUnityEnv = false;
             }
         }
 
-        public static void Log(object message, DLogType type = DLogType.Log)
+        public static void Log(object message)
         {
             if (isUnityEnv)
             {
@@ -54,7 +36,7 @@ namespace Game.Diagnostics
             }
         }
 
-        public static void LogWarning(object message, DLogType type = DLogType.Log)
+        public static void LogWarning(object message)
         {
             if (isUnityEnv)
             {
@@ -66,7 +48,7 @@ namespace Game.Diagnostics
             }
         }
 
-        public static void LogError(object message, DLogType type = DLogType.Log)
+        public static void LogError(object message)
         {
             if (isUnityEnv)
             {
@@ -78,7 +60,7 @@ namespace Game.Diagnostics
             }
         }
 
-        public static void LogException(Exception exception, DLogType type = DLogType.Log)
+        public static void LogException(Exception exception)
         {
             if (isUnityEnv)
             {
@@ -111,6 +93,26 @@ namespace Game.Diagnostics
             {
                 SysDebug.Assert(condition, message);
             }
+        }
+        
+        public static void Error(params object[] ps)
+        {
+            var ret = string.Join(string.Empty,ps);
+            LogError(ret);
+        }
+        public static void Log(params object[] ps)
+        {
+            var ret = string.Join(string.Empty,ps);
+            Log(ret);
+        }
+        public static void Warn(params object[] ps)
+        {
+            var ret = string.Join(string.Empty,ps);
+            LogWarning(ret);
+        }
+        public static void Exception(Exception exception)
+        {
+            LogException(exception);
         }
     }
 

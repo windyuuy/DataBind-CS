@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using VM;
+using DataBind.VM;
 
 namespace ParseJSDataBindAbstract
 {
@@ -432,7 +432,7 @@ namespace ParseJSDataBindAbstract
 	public class FuncInfo : ClassInfo
 	{
 		public override string TypeLiteral => "func";
-		public DataBinding.CollectionExt.List<MemberInfo> Paras = new DataBinding.CollectionExt.List<MemberInfo>();
+		public DataBind.CollectionExt.List<MemberInfo> Paras = new DataBind.CollectionExt.List<MemberInfo>();
 		public MemberInfo RetType;
 		public string[] FuncBodyManualCodeLines;
 
@@ -592,7 +592,7 @@ namespace ParseJSDataBindAbstract
 							var dictTypeInfo = left.CastToDict(right.Type, null);
 							eleMember = dictTypeInfo.ElementInfo ??= CreateEle();
 						}
-						root.AddNamespace("DataBinding.CollectionExt");
+						root.AddNamespace("DataBind.CollectionExt");
 						return eleMember;
 					}
 					return right;
